@@ -38,8 +38,10 @@ export async function createWorkflow(input: unknown): Promise<WorkflowListItem> 
       organizationId: true,
       agentId: true,
       name: true,
+      description: true,
       status: true,
       scheduleCron: true,
+      definition: true,
       createdAt: true,
     },
   });
@@ -62,8 +64,10 @@ export async function listWorkflows(
         organizationId: true,
         agentId: true,
         name: true,
+        description: true,
         status: true,
         scheduleCron: true,
+        definition: true,
         createdAt: true,
       },
       orderBy: {
@@ -106,8 +110,10 @@ export async function updateWorkflowStatus(input: unknown): Promise<WorkflowList
       organizationId: true,
       agentId: true,
       name: true,
+      description: true,
       status: true,
       scheduleCron: true,
+      definition: true,
       createdAt: true,
     },
   });
