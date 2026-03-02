@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 
+import { createWorkflowRequestSchema } from "@/modules/workflows/schemas";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import {
-  createWorkflowTemplate,
+  createWorkflowFromTask,
   fetchWorkflowCatalog,
 } from "@/server/services/workflows/workflow-service";
 
@@ -29,28 +30,23 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const user = await requireOrganizationRole("ADMIN");
-  const body = (await request.json().catch(() => null)) as
-    | {
-        agentId?: string;
-        name?: string;
-        description?: string;
-        scheduleCron?: string;
-        definition?: Record<string, unknown>;
-      }
-    | null;
+  const body = await request.json().catch(() => null);
+  const parsed = createWorkflowRequestSchema.safeParse(body);
 
-  if (!body?.agentId || !body?.name || !body.definition) {
-    return NextResponse.json({ error: "agentId, name, and definition are required" }, { status: 400 });
+  if (!parsed.success) {
+    return NextResponse.json(
+      {
+        error: "Invalid workflow payload",
+        issues: parsed.error.flatten(),
+      },
+      { status: 400 },
+    );
   }
 
-  const workflow = await createWorkflowTemplate({
+  const workflow = await createWorkflowFromTask({
     organizationId: user.organizationId!,
     createdById: user.id,
-    agentId: body.agentId,
-    name: body.name,
-    description: body.description,
-    scheduleCron: body.scheduleCron,
-    definition: body.definition,
+    payload: parsed.data,
   });
 
   return NextResponse.json(workflow, { status: 201 });

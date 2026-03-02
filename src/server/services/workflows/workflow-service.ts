@@ -5,6 +5,9 @@ import {
   listWorkflows,
   updateWorkflowStatus,
 } from "@/server/repositories/workflows/workflow-repository";
+import type { CreateWorkflowRequest } from "@/modules/workflows/schemas";
+import { buildWorkflowDefinition } from "@/server/services/workflows/workflow-builder";
+import { normalizeCronExpression } from "@/lib/utils/cron";
 
 export async function createWorkflowTemplate(input: {
   organizationId: string;
@@ -13,9 +16,43 @@ export async function createWorkflowTemplate(input: {
   name: string;
   description?: string;
   scheduleCron?: string;
-  definition: Record<string, unknown>;
+  definition: {
+    naturalLanguageTask: string;
+    steps: Array<{
+      id: string;
+      action: string;
+      target: string;
+      expectedOutcome: string;
+    }>;
+    guardrails: string[];
+    timeoutSeconds: number;
+    retryLimit: number;
+  };
 }) {
   return createWorkflow(input);
+}
+
+export async function createWorkflowFromTask(input: {
+  organizationId: string;
+  createdById: string;
+  payload: CreateWorkflowRequest;
+}) {
+  const definition = buildWorkflowDefinition({
+    naturalLanguageTask: input.payload.naturalLanguageTask,
+    guardrails: input.payload.guardrails,
+    timeoutSeconds: input.payload.timeoutSeconds,
+    retryLimit: input.payload.retryLimit,
+  });
+
+  return createWorkflowTemplate({
+    organizationId: input.organizationId,
+    createdById: input.createdById,
+    agentId: input.payload.agentId,
+    name: input.payload.name,
+    description: input.payload.description,
+    scheduleCron: normalizeCronExpression(input.payload.scheduleCron),
+    definition,
+  });
 }
 
 export async function fetchWorkflowCatalog(input: {
