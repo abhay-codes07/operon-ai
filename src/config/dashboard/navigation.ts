@@ -14,4 +14,9 @@ export const dashboardNav = [
     label: "Activity",
     description: "Execution timeline",
   },
+  {
+    href: "/dashboard/workflows",
+    label: "Workflows",
+    description: "Builder and schedules",
+  },
 ] as const;
