@@ -86,6 +86,18 @@ WebOps AI is not a chatbot and not a retrieval wrapper. The platform is designed
 - Protected workflow execution endpoint: `POST /api/internal/workflows/[workflowId]/execute`
 - Dashboard “Run Now” workflow action connected to TinyFish execution path
 
+## Phase 7 Scope (Completed)
+
+- BullMQ + Redis background queue foundation
+- Typed queue config and reusable Redis connection layer
+- Execution job contracts and queue producer service
+- Dedicated worker runtime (`npm run worker`) for async processing
+- Async workflow execution endpoint dispatching to queue
+- Execution retry endpoint with lifecycle reset and re-dispatch
+- Queue health monitoring endpoint for operations visibility
+- Dashboard queue metrics card for waiting/active/completed/failed jobs
+- Final-failure recovery handling when queue retries are exhausted
+
 ## Local Development
 
 ### 1. Install dependencies
@@ -148,6 +160,8 @@ src/
 - `GET/POST /api/internal/workflows`
 - `GET/POST /api/internal/executions`
 - `POST /api/internal/workflows/[workflowId]/execute`
+- `POST /api/internal/executions/[executionId]/retry`
+- `GET /api/internal/queue/health`
 
 ## Engineering Principles
 
