@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 
+import { getAppEnv } from "@/config/env";
 import { getStripeClient } from "@/server/integrations/stripe/client";
 import {
   getSubscriptionByStripeCustomerId,
@@ -33,11 +34,7 @@ export async function POST(request: Request) {
   }
 
   const rawBody = await request.text();
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-  if (!webhookSecret) {
-    return NextResponse.json({ error: "STRIPE_WEBHOOK_SECRET is not configured" }, { status: 500 });
-  }
+  const webhookSecret = getAppEnv().STRIPE_WEBHOOK_SECRET;
 
   let event: Stripe.Event;
   try {

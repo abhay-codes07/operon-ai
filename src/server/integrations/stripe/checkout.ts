@@ -1,11 +1,7 @@
 import type Stripe from "stripe";
 
+import { getAppEnv } from "@/config/env";
 import { getStripeClient } from "@/server/integrations/stripe/client";
-
-const PLAN_PRICE_LOOKUP: Record<"STARTER" | "GROWTH", string> = {
-  STARTER: "price_starter_placeholder",
-  GROWTH: "price_growth_placeholder",
-};
 
 export async function createCheckoutSession(input: {
   organizationId: string;
@@ -15,6 +11,12 @@ export async function createCheckoutSession(input: {
   cancelUrl: string;
 }): Promise<Stripe.Checkout.Session> {
   const stripe = getStripeClient();
+  const env = getAppEnv();
+
+  const planPriceLookup: Record<"STARTER" | "GROWTH", string> = {
+    STARTER: env.STRIPE_PRICE_STARTER,
+    GROWTH: env.STRIPE_PRICE_GROWTH,
+  };
 
   return stripe.checkout.sessions.create({
     mode: "subscription",
@@ -27,7 +29,7 @@ export async function createCheckoutSession(input: {
     },
     line_items: [
       {
-        price: PLAN_PRICE_LOOKUP[input.plan],
+        price: planPriceLookup[input.plan],
         quantity: 1,
       },
     ],

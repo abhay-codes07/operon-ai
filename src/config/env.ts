@@ -5,6 +5,9 @@ export type AppEnv = {
   DATABASE_URL: string;
   REDIS_URL: string;
   STRIPE_SECRET_KEY: string;
+  STRIPE_WEBHOOK_SECRET: string;
+  STRIPE_PRICE_STARTER: string;
+  STRIPE_PRICE_GROWTH: string;
   TINYFISH_API_KEY: string;
   TINYFISH_BASE_URL: string;
   TINYFISH_EXECUTE_PATH: string;
@@ -22,6 +25,9 @@ type RequiredStringEnvKey =
   | "DATABASE_URL"
   | "REDIS_URL"
   | "STRIPE_SECRET_KEY"
+  | "STRIPE_WEBHOOK_SECRET"
+  | "STRIPE_PRICE_STARTER"
+  | "STRIPE_PRICE_GROWTH"
   | "TINYFISH_API_KEY"
   | "TINYFISH_BASE_URL"
   | "TINYFISH_EXECUTE_PATH"
@@ -102,6 +108,9 @@ export function getAppEnv(): AppEnv {
     DATABASE_URL: readRequiredEnv("DATABASE_URL"),
     REDIS_URL: readRequiredEnv("REDIS_URL"),
     STRIPE_SECRET_KEY: readRequiredEnv("STRIPE_SECRET_KEY"),
+    STRIPE_WEBHOOK_SECRET: readRequiredEnv("STRIPE_WEBHOOK_SECRET"),
+    STRIPE_PRICE_STARTER: readRequiredEnv("STRIPE_PRICE_STARTER"),
+    STRIPE_PRICE_GROWTH: readRequiredEnv("STRIPE_PRICE_GROWTH"),
     TINYFISH_API_KEY: readRequiredEnv("TINYFISH_API_KEY"),
     TINYFISH_BASE_URL: readRequiredEnv("TINYFISH_BASE_URL"),
     TINYFISH_EXECUTE_PATH: readRequiredEnv("TINYFISH_EXECUTE_PATH"),

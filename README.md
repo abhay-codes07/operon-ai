@@ -109,6 +109,18 @@ WebOps AI is not a chatbot and not a retrieval wrapper. The platform is designed
 - Metadata-rich timeline rendering for log events
 - Observability and trace-correlation operational documentation
 
+## Phase 9 Scope (Completed)
+
+- Stripe checkout and webhook scaffolding
+- Billing data models: subscriptions and usage records
+- Plan-based monthly execution limits
+- Usage metering on successful execution completion
+- Quota enforcement before execution dispatch
+- Billing summary internal API for subscription/usage snapshots
+- Billing dashboard with upgrade controls and usage visibility
+- Stripe webhook reconciliation by customer identity
+- Typed environment configuration for Stripe pricing and webhook secrets
+
 ## Local Development
 
 ### 1. Install dependencies
@@ -173,6 +185,7 @@ src/
 - `POST /api/internal/workflows/[workflowId]/execute`
 - `POST /api/internal/executions/[executionId]/retry`
 - `GET /api/internal/queue/health`
+- `GET /api/internal/billing/summary`
 
 ## Engineering Principles
 
