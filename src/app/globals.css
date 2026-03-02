@@ -3,30 +3,46 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+  --surface-0: #f8fafc;
+  --surface-1: #ffffff;
+  --surface-2: #f1f5f9;
+  --surface-3: #e2e8f0;
+  --ink-strong: #0f172a;
+  --ink-soft: #334155;
+  --ink-muted: #64748b;
+  --brand: #0f172a;
+  --brand-contrast: #ffffff;
+  --success: #166534;
+  --warning: #854d0e;
+  --danger: #991b1b;
+  --ring: rgba(15, 23, 42, 0.2);
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  color: var(--ink-strong);
+  background:
+    radial-gradient(circle at 0% 0%, #e2e8f0 0, transparent 35%),
+    radial-gradient(circle at 100% 0%, #cbd5e1 0, transparent 20%),
+    var(--surface-0);
 }
 
 @layer utilities {
+  .text-ink-soft {
+    color: var(--ink-soft);
+  }
+
+  .text-ink-muted {
+    color: var(--ink-muted);
+  }
+
+  .bg-surface {
+    background-color: var(--surface-1);
+  }
+
+  .card-border {
+    border-color: var(--surface-3);
+  }
+
   .text-balance {
     text-wrap: balance;
   }
