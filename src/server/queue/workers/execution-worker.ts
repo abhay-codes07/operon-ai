@@ -37,6 +37,7 @@ export function startExecutionWorker(): Worker<ExecutionJobData> {
         metadata: {
           attempt: job.attemptsMade + 1,
           queueJobId: job.id,
+          traceId: job.data.traceId,
         },
       });
 
@@ -45,6 +46,7 @@ export function startExecutionWorker(): Worker<ExecutionJobData> {
         executionId: job.data.executionId,
         agentId: job.data.agentId,
         workflowId: job.data.workflowId,
+        traceId: job.data.traceId,
       });
     },
     {
@@ -58,22 +60,33 @@ export function startExecutionWorker(): Worker<ExecutionJobData> {
   });
 
   executionQueueEvents.on("failed", async ({ jobId, failedReason }) => {
-    logError("Queue job failed", {
-      component: "execution-worker",
-      executionId: jobId ?? undefined,
-      metadata: {
-        failedReason,
-      },
-    });
-
     if (!jobId) {
+      logError("Queue job failed without job id", {
+        component: "execution-worker",
+        metadata: { failedReason },
+      });
       return;
     }
 
     const job = await getExecutionQueue().getJob(jobId);
     if (!job?.data) {
+      logError("Queue job payload missing for failed event", {
+        component: "execution-worker",
+        executionId: jobId,
+        metadata: { failedReason },
+      });
       return;
     }
+
+    logError("Queue job failed", {
+      component: "execution-worker",
+      executionId: job.data.executionId,
+      organizationId: job.data.organizationId,
+      traceId: job.data.traceId,
+      metadata: {
+        failedReason,
+      },
+    });
 
     const isFinalAttempt =
       typeof job.opts.attempts === "number" && job.attemptsMade >= job.opts.attempts;
@@ -103,6 +116,7 @@ export function startExecutionWorker(): Worker<ExecutionJobData> {
         queueJobId: job.id,
         attemptsMade: job.attemptsMade,
         failedReason,
+        traceId: job.data.traceId,
       },
     });
   });

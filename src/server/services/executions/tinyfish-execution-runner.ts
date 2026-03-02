@@ -4,6 +4,7 @@ import { RetryableOperationError, withRetry } from "@/lib/utils/retry";
 import { executeTinyFishWorkflow, TinyFishApiError } from "@/server/integrations/tinyfish/client";
 import { buildTinyFishExecutionRequest } from "@/server/integrations/tinyfish/request-builder";
 import { parseTinyFishExecutionResponse } from "@/server/integrations/tinyfish/response-parser";
+import { logInfo } from "@/server/observability/logger";
 import { persistScreenshotArtifact } from "@/server/services/storage/screenshot-storage";
 import { fetchWorkflowById } from "@/server/services/workflows/workflow-service";
 
@@ -18,6 +19,7 @@ type RunTinyFishExecutionInput = {
   executionId: string;
   agentId: string;
   workflowId: string;
+  traceId?: string;
 };
 
 function shouldRetryTinyFishError(error: unknown): boolean {
@@ -51,6 +53,9 @@ export async function runExecutionWithTinyFish(
     executionId: input.executionId,
     level: "INFO",
     message: "TinyFish execution started",
+    metadata: {
+      traceId: input.traceId,
+    },
   });
 
   const definition = workflow.definition;
@@ -73,6 +78,7 @@ export async function runExecutionWithTinyFish(
     },
     metadata: {
       source: "webops-ai",
+      traceId: input.traceId,
     },
   });
 
@@ -106,6 +112,7 @@ export async function runExecutionWithTinyFish(
       message: log.message,
       metadata: {
         source: "tinyfish",
+        traceId: input.traceId,
         ...log.metadata,
       },
     });
@@ -151,6 +158,19 @@ export async function runExecutionWithTinyFish(
     metadata: {
       providerExecutionId: parsed.providerExecutionId,
       status: parsed.status,
+      traceId: input.traceId,
+    },
+  });
+
+  logInfo("TinyFish execution completed", {
+    component: "tinyfish-execution-runner",
+    organizationId: input.organizationId,
+    executionId: input.executionId,
+    workflowId: input.workflowId,
+    traceId: input.traceId,
+    metadata: {
+      status: parsed.status,
+      providerExecutionId: parsed.providerExecutionId,
     },
   });
 

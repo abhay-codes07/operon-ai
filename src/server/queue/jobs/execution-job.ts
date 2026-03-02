@@ -7,4 +7,5 @@ export type ExecutionJobData = {
   workflowId: string;
   requestedById?: string;
   trigger: "MANUAL" | "SCHEDULED" | "API" | "RETRY";
+  traceId: string;
 };

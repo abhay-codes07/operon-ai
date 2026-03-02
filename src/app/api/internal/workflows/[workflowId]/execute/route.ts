@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { createTraceId } from "@/server/observability/tracing";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer";
 import { appendExecutionEvent, queueExecution } from "@/server/services/executions/execution-service";
@@ -33,6 +34,7 @@ export async function POST(_request: Request, context: RouteContext) {
       initiatedByUserId: user.id,
     },
   });
+  const traceId = createTraceId(execution.id);
 
   await enqueueExecutionJob({
     organizationId: user.organizationId!,
@@ -41,6 +43,7 @@ export async function POST(_request: Request, context: RouteContext) {
     agentId: workflow.agentId,
     requestedById: user.id,
     trigger: "MANUAL",
+    traceId,
   });
 
   await appendExecutionEvent({
@@ -50,6 +53,7 @@ export async function POST(_request: Request, context: RouteContext) {
     message: "Execution enqueued for background processing",
     metadata: {
       queue: "execution",
+      traceId,
     },
   });
 

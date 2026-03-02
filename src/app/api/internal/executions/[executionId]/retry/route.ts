@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { createTraceId } from "@/server/observability/tracing";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer";
 import {
@@ -33,6 +34,7 @@ export async function POST(_request: Request, context: RouteContext) {
     organizationId: user.organizationId!,
     executionId: execution.id,
   });
+  const traceId = createTraceId(`${retriedExecution.id}:retry`);
 
   await enqueueExecutionJob({
     organizationId: user.organizationId!,
@@ -41,6 +43,7 @@ export async function POST(_request: Request, context: RouteContext) {
     workflowId: execution.workflowId,
     requestedById: user.id,
     trigger: "RETRY",
+    traceId,
   });
 
   await appendExecutionEvent({
@@ -50,6 +53,7 @@ export async function POST(_request: Request, context: RouteContext) {
     message: "Execution requeued for retry",
     metadata: {
       requestedByUserId: user.id,
+      traceId,
     },
   });
 
