@@ -7,9 +7,24 @@ export type AppEnv = {
   STRIPE_SECRET_KEY: string;
   TINYFISH_API_KEY: string;
   TINYFISH_BASE_URL: string;
+  TINYFISH_EXECUTE_PATH: string;
+  TINYFISH_TIMEOUT_MS: number;
+  SCREENSHOT_STORAGE_PROVIDER: "local";
+  SCREENSHOT_STORAGE_BASE_PATH: string;
 };
 
-const requiredEnvKeys: Array<keyof Omit<AppEnv, "NODE_ENV">> = [
+type RequiredStringEnvKey =
+  | "NEXTAUTH_URL"
+  | "NEXTAUTH_SECRET"
+  | "DATABASE_URL"
+  | "REDIS_URL"
+  | "STRIPE_SECRET_KEY"
+  | "TINYFISH_API_KEY"
+  | "TINYFISH_BASE_URL"
+  | "TINYFISH_EXECUTE_PATH"
+  | "SCREENSHOT_STORAGE_BASE_PATH";
+
+const requiredEnvKeys: RequiredStringEnvKey[] = [
   "NEXTAUTH_URL",
   "NEXTAUTH_SECRET",
   "DATABASE_URL",
@@ -17,6 +32,8 @@ const requiredEnvKeys: Array<keyof Omit<AppEnv, "NODE_ENV">> = [
   "STRIPE_SECRET_KEY",
   "TINYFISH_API_KEY",
   "TINYFISH_BASE_URL",
+  "TINYFISH_EXECUTE_PATH",
+  "SCREENSHOT_STORAGE_BASE_PATH",
 ];
 
 function readNodeEnv(value: string | undefined): AppEnv["NODE_ENV"] {
@@ -27,7 +44,7 @@ function readNodeEnv(value: string | undefined): AppEnv["NODE_ENV"] {
   return "development";
 }
 
-function readRequiredEnv(key: keyof Omit<AppEnv, "NODE_ENV">): string {
+function readRequiredEnv(key: RequiredStringEnvKey): string {
   const value = process.env[key];
 
   if (!value || value.trim().length === 0) {
@@ -35,6 +52,16 @@ function readRequiredEnv(key: keyof Omit<AppEnv, "NODE_ENV">): string {
   }
 
   return value;
+}
+
+function readTimeoutMs(value: string | undefined): number {
+  const parsed = Number(value);
+
+  if (!Number.isInteger(parsed) || parsed < 1_000 || parsed > 120_000) {
+    return 30_000;
+  }
+
+  return parsed;
 }
 
 export function getAppEnv(): AppEnv {
@@ -58,5 +85,9 @@ export function getAppEnv(): AppEnv {
     STRIPE_SECRET_KEY: readRequiredEnv("STRIPE_SECRET_KEY"),
     TINYFISH_API_KEY: readRequiredEnv("TINYFISH_API_KEY"),
     TINYFISH_BASE_URL: readRequiredEnv("TINYFISH_BASE_URL"),
+    TINYFISH_EXECUTE_PATH: readRequiredEnv("TINYFISH_EXECUTE_PATH"),
+    TINYFISH_TIMEOUT_MS: readTimeoutMs(process.env.TINYFISH_TIMEOUT_MS),
+    SCREENSHOT_STORAGE_PROVIDER: "local",
+    SCREENSHOT_STORAGE_BASE_PATH: readRequiredEnv("SCREENSHOT_STORAGE_BASE_PATH"),
   };
 }
