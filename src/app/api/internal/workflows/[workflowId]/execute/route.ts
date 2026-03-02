@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { createTraceId } from "@/server/observability/tracing";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer";
-import { canConsumeExecution } from "@/server/services/billing/usage-service";
+import { enforceExecutionQuotaOrThrow } from "@/server/services/billing/enforcement-service";
 import { appendExecutionEvent, queueExecution } from "@/server/services/executions/execution-service";
 import { fetchWorkflowById } from "@/server/services/workflows/workflow-service";
 
@@ -24,17 +24,14 @@ export async function POST(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
   }
 
-  const allowance = await canConsumeExecution(user.organizationId!);
-  if (!allowance.allowed) {
-    return NextResponse.json(
-      {
-        error: "Execution quota reached for current billing period",
-        plan: allowance.plan,
-        limit: allowance.limit,
-        used: allowance.used,
-      },
-      { status: 402 },
-    );
+  try {
+    await enforceExecutionQuotaOrThrow({ organizationId: user.organizationId! });
+  } catch (error) {
+    if (error instanceof NextResponse) {
+      return error;
+    }
+
+    throw error;
   }
 
   const execution = await queueExecution({
