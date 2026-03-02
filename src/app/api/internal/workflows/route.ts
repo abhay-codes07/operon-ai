@@ -14,6 +14,7 @@ export async function GET(request: Request) {
   const workflows = await fetchWorkflowCatalog({
     organizationId: user.organizationId!,
     agentId: searchParams.get("agentId") ?? undefined,
+    query: searchParams.get("query") ?? undefined,
     status:
       searchParams.get("status") === "DRAFT" ||
       searchParams.get("status") === "ACTIVE" ||

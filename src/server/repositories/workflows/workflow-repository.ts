@@ -17,6 +17,7 @@ type ListWorkflowsInput = {
   organizationId: string;
   agentId?: string;
   status?: WorkflowStatus;
+  query?: string;
   pagination?: PaginationInput;
 };
 
@@ -51,10 +52,27 @@ export async function listWorkflows(
   input: ListWorkflowsInput,
 ): Promise<PaginatedResult<WorkflowListItem>> {
   const pagination = normalizePagination(input.pagination);
+  const trimmedQuery = input.query?.trim();
   const where = {
     organizationId: input.organizationId,
     agentId: input.agentId,
     status: input.status,
+    OR: trimmedQuery
+      ? [
+          {
+            name: {
+              contains: trimmedQuery,
+              mode: "insensitive" as const,
+            },
+          },
+          {
+            description: {
+              contains: trimmedQuery,
+              mode: "insensitive" as const,
+            },
+          },
+        ]
+      : undefined,
   };
   const [items, total] = await Promise.all([
     prisma.workflow.findMany({

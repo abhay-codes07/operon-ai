@@ -59,6 +59,7 @@ export async function fetchWorkflowCatalog(input: {
   organizationId: string;
   agentId?: string;
   status?: WorkflowStatus;
+  query?: string;
   page?: number;
   pageSize?: number;
 }) {
@@ -66,6 +67,7 @@ export async function fetchWorkflowCatalog(input: {
     organizationId: input.organizationId,
     agentId: input.agentId,
     status: input.status,
+    query: input.query,
     pagination: {
       page: input.page,
       pageSize: input.pageSize,
