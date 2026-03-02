@@ -14,7 +14,8 @@
     "prisma:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
     "worker": "tsx src/worker/index.ts",
-    "worker:dev": "tsx watch src/worker/index.ts"
+    "worker:dev": "tsx watch src/worker/index.ts",
+    "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook"
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",
@@ -26,6 +27,7 @@
     "prisma": "^6.16.3",
     "react": "^18",
     "react-dom": "^18",
+    "stripe": "^20.4.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
