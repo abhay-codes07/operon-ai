@@ -49,6 +49,21 @@ enum LogLevel {
   ERROR
 }
 
+enum BillingPlan {
+  FREE
+  STARTER
+  GROWTH
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+}
+
 model User {
   id            String            @id @default(cuid())
   name          String?
@@ -79,6 +94,8 @@ model Organization {
   workflows     Workflow[]
   executions    Execution[]
   executionLogs ExecutionLog[]
+  subscriptions Subscription[]
+  usageRecords  UsageRecord[]
 
   @@index([createdAt])
 }
@@ -218,4 +235,36 @@ model ExecutionLog {
   @@index([executionId, occurredAt])
   @@index([organizationId, occurredAt])
   @@index([organizationId, level, occurredAt])
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  organizationId       String
+  stripeCustomerId     String             @unique
+  stripeSubscriptionId String?            @unique
+  plan                 BillingPlan        @default(FREE)
+  status               SubscriptionStatus @default(TRIALING)
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  organization         Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status])
+}
+
+model UsageRecord {
+  id             String       @id @default(cuid())
+  organizationId String
+  metric         String
+  periodStart    DateTime
+  periodEnd      DateTime
+  quantity       Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, metric, periodStart, periodEnd])
+  @@index([organizationId, metric, periodStart])
 }
