@@ -6,6 +6,7 @@ import {
   getExecutionById,
   listExecutionLogs,
   listExecutions,
+  prepareExecutionForRetry,
   persistExecutionResult,
   updateExecutionStatus,
 } from "@/server/repositories/executions/execution-repository";
@@ -84,4 +85,11 @@ export async function saveExecutionResult(input: {
   errorMessage?: string;
 }) {
   return persistExecutionResult(input);
+}
+
+export async function resetExecutionForRetry(input: {
+  organizationId: string;
+  executionId: string;
+}) {
+  return prepareExecutionForRetry(input);
 }
