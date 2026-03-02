@@ -76,6 +76,16 @@ WebOps AI is not a chatbot and not a retrieval wrapper. The platform is designed
 - Workflow listing refinements: status filters, search, and step metadata
 - Workflows route loading and error boundaries
 
+## Phase 6 Scope (Completed)
+
+- Secure TinyFish API client with typed contracts and timeout handling
+- TinyFish request builder and response parser layers
+- Exponential-backoff retry strategy for transient provider failures
+- Execution orchestrator that updates status, logs events, and persists outputs
+- Screenshot artifact storage scaffold (`local` provider)
+- Protected workflow execution endpoint: `POST /api/internal/workflows/[workflowId]/execute`
+- Dashboard “Run Now” workflow action connected to TinyFish execution path
+
 ## Local Development
 
 ### 1. Install dependencies
@@ -137,6 +147,7 @@ src/
 - `GET/POST /api/internal/agents`
 - `GET/POST /api/internal/workflows`
 - `GET/POST /api/internal/executions`
+- `POST /api/internal/workflows/[workflowId]/execute`
 
 ## Engineering Principles
 
