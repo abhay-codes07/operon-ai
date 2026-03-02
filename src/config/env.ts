@@ -11,6 +11,9 @@ export type AppEnv = {
   TINYFISH_TIMEOUT_MS: number;
   SCREENSHOT_STORAGE_PROVIDER: "local";
   SCREENSHOT_STORAGE_BASE_PATH: string;
+  BULLMQ_QUEUE_PREFIX: string;
+  BULLMQ_EXECUTION_ATTEMPTS: number;
+  BULLMQ_EXECUTION_BACKOFF_MS: number;
 };
 
 type RequiredStringEnvKey =
@@ -22,7 +25,8 @@ type RequiredStringEnvKey =
   | "TINYFISH_API_KEY"
   | "TINYFISH_BASE_URL"
   | "TINYFISH_EXECUTE_PATH"
-  | "SCREENSHOT_STORAGE_BASE_PATH";
+  | "SCREENSHOT_STORAGE_BASE_PATH"
+  | "BULLMQ_QUEUE_PREFIX";
 
 const requiredEnvKeys: RequiredStringEnvKey[] = [
   "NEXTAUTH_URL",
@@ -64,6 +68,21 @@ function readTimeoutMs(value: string | undefined): number {
   return parsed;
 }
 
+function readBoundedInteger(
+  value: string | undefined,
+  fallback: number,
+  min: number,
+  max: number,
+): number {
+  const parsed = Number(value);
+
+  if (!Number.isInteger(parsed) || parsed < min || parsed > max) {
+    return fallback;
+  }
+
+  return parsed;
+}
+
 export function getAppEnv(): AppEnv {
   const missingKeys = requiredEnvKeys.filter((key) => {
     const value = process.env[key];
@@ -89,5 +108,18 @@ export function getAppEnv(): AppEnv {
     TINYFISH_TIMEOUT_MS: readTimeoutMs(process.env.TINYFISH_TIMEOUT_MS),
     SCREENSHOT_STORAGE_PROVIDER: "local",
     SCREENSHOT_STORAGE_BASE_PATH: readRequiredEnv("SCREENSHOT_STORAGE_BASE_PATH"),
+    BULLMQ_QUEUE_PREFIX: readRequiredEnv("BULLMQ_QUEUE_PREFIX"),
+    BULLMQ_EXECUTION_ATTEMPTS: readBoundedInteger(
+      process.env.BULLMQ_EXECUTION_ATTEMPTS,
+      3,
+      1,
+      10,
+    ),
+    BULLMQ_EXECUTION_BACKOFF_MS: readBoundedInteger(
+      process.env.BULLMQ_EXECUTION_BACKOFF_MS,
+      1000,
+      100,
+      60_000,
+    ),
   };
 }
