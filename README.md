@@ -19,13 +19,13 @@ WebOps AI is not a chatbot and not a retrieval wrapper. The platform is designed
 - Next.js 14 (App Router)
 - TypeScript (strict mode)
 - TailwindCSS
-- PostgreSQL + Prisma (upcoming phases)
-- NextAuth (upcoming phases)
+- PostgreSQL + Prisma
+- NextAuth (Credentials provider with secure JWT sessions)
 - Redis + BullMQ (upcoming phases)
 - Stripe billing scaffold (upcoming phases)
 - TinyFish Web Agent API integration (upcoming phases)
 
-## Phase 1 Scope (Current)
+## Phase 1 Scope (Completed)
 
 - Next.js project initialization
 - Strict TypeScript compiler settings
@@ -35,6 +35,15 @@ WebOps AI is not a chatbot and not a retrieval wrapper. The platform is designed
 - Modular codebase architecture foundations
 - Root layout shell and product metadata
 - Dashboard foundation UI for agent and execution overview
+
+## Phase 2 Scope (Completed)
+
+- NextAuth credentials authentication
+- User sign-up and sign-in flows
+- Multi-tenant organization model and membership roles
+- Middleware-based protected route handling
+- Tenant-aware server-side session and authorization guards
+- Seed script for owner workspace bootstrap
 
 ## Local Development
 
@@ -52,7 +61,13 @@ cp .env.example .env.local
 
 Fill the required values in `.env.local`.
 
-### 3. Start the app
+### 3. Generate Prisma client
+
+```bash
+npm run prisma:generate
+```
+
+### 4. Start the app
 
 ```bash
 npm run dev
@@ -68,6 +83,10 @@ The app runs on `http://localhost:3000`.
 - `npm run lint` - Run ESLint
 - `npm run format` - Auto-format repository files
 - `npm run format:check` - Verify formatting
+- `npm run prisma:generate` - Generate Prisma client
+- `npm run prisma:migrate:dev` - Run local development migrations
+- `npm run prisma:studio` - Open Prisma Studio
+- `npm run db:seed` - Seed owner user + demo organization
 
 ## Folder Structure
 
