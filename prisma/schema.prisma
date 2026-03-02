@@ -13,29 +13,72 @@ enum MembershipRole {
   MEMBER
 }
 
+enum AgentStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum WorkflowStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum ExecutionStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+  CANCELED
+}
+
+enum ExecutionTrigger {
+  MANUAL
+  SCHEDULED
+  API
+  RETRY
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
+}
+
 model User {
-  id            String        @id @default(cuid())
+  id            String            @id @default(cuid())
   name          String?
-  email         String        @unique
+  email         String            @unique
   emailVerified DateTime?
   passwordHash  String
   image         String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
   accounts      Account[]
   sessions      Session[]
   memberships   Membership[]
+  createdAgents Agent[]           @relation("AgentCreatedBy")
+  createdWorkflows Workflow[]     @relation("WorkflowCreatedBy")
+  requestedExecutions Execution[] @relation("ExecutionRequestedBy")
 
   @@index([createdAt])
 }
 
 model Organization {
-  id            String        @id @default(cuid())
+  id            String       @id @default(cuid())
   name          String
-  slug          String        @unique
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  slug          String       @unique
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
   memberships   Membership[]
+  agents        Agent[]
+  workflows     Workflow[]
+  executions    Execution[]
+  executionLogs ExecutionLog[]
 
   @@index([createdAt])
 }
@@ -91,4 +134,88 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Agent {
+  id             String      @id @default(cuid())
+  organizationId String
+  createdById    String
+  name           String
+  description    String?
+  status         AgentStatus @default(DRAFT)
+  metadata       Json?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy      User         @relation("AgentCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  workflows      Workflow[]
+  executions     Execution[]
+
+  @@index([organizationId, status])
+  @@index([organizationId, createdAt])
+  @@unique([organizationId, name])
+}
+
+model Workflow {
+  id             String         @id @default(cuid())
+  organizationId String
+  agentId        String
+  createdById    String
+  name           String
+  description    String?
+  status         WorkflowStatus @default(DRAFT)
+  scheduleCron   String?
+  definition     Json
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agent          Agent          @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  createdBy      User           @relation("WorkflowCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  executions     Execution[]
+
+  @@index([organizationId, status])
+  @@index([organizationId, agentId, createdAt])
+  @@unique([organizationId, agentId, name])
+}
+
+model Execution {
+  id             String           @id @default(cuid())
+  organizationId String
+  agentId        String
+  workflowId     String?
+  requestedById  String?
+  status         ExecutionStatus  @default(QUEUED)
+  trigger        ExecutionTrigger @default(MANUAL)
+  inputPayload   Json?
+  outputPayload  Json?
+  errorMessage   String?
+  startedAt      DateTime?
+  finishedAt     DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agent          Agent            @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  workflow       Workflow?        @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+  requestedBy    User?            @relation("ExecutionRequestedBy", fields: [requestedById], references: [id], onDelete: SetNull)
+  logs           ExecutionLog[]
+
+  @@index([organizationId, status, createdAt])
+  @@index([organizationId, agentId, createdAt])
+  @@index([workflowId, createdAt])
+}
+
+model ExecutionLog {
+  id             String     @id @default(cuid())
+  executionId    String
+  organizationId String
+  level          LogLevel   @default(INFO)
+  message        String
+  metadata       Json?
+  occurredAt     DateTime   @default(now())
+  execution      Execution  @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([executionId, occurredAt])
+  @@index([organizationId, occurredAt])
+  @@index([organizationId, level, occurredAt])
 }
