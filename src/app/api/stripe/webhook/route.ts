@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 
 import { getStripeClient } from "@/server/integrations/stripe/client";
-import { upsertOrganizationSubscription } from "@/server/repositories/billing/subscription-repository";
+import {
+  getSubscriptionByStripeCustomerId,
+  upsertOrganizationSubscription,
+} from "@/server/repositories/billing/subscription-repository";
 
 function mapStripeStatusToInternal(status: Stripe.Subscription.Status) {
   switch (status) {
@@ -64,17 +67,14 @@ export async function POST(request: Request) {
 
   if (event.type === "customer.subscription.updated") {
     const subscription = event.data.object as Stripe.Subscription;
+    const matched = await getSubscriptionByStripeCustomerId(String(subscription.customer));
 
-    const matched = await (async () => {
-      return null as { organizationId: string } | null;
-    })();
-
-    if (matched?.organizationId) {
+    if (matched) {
       await upsertOrganizationSubscription({
         organizationId: matched.organizationId,
         stripeCustomerId: String(subscription.customer),
         stripeSubscriptionId: subscription.id,
-        plan: "GROWTH",
+        plan: matched.plan,
         status: mapStripeStatusToInternal(subscription.status),
         currentPeriodStart: new Date(subscription.current_period_start * 1000),
         currentPeriodEnd: new Date(subscription.current_period_end * 1000),

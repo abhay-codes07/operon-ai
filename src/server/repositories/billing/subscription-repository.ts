@@ -22,6 +22,25 @@ export async function getOrganizationSubscription(
   });
 }
 
+export async function getSubscriptionByStripeCustomerId(
+  stripeCustomerId: string,
+): Promise<SubscriptionSnapshot | null> {
+  return prisma.subscription.findFirst({
+    where: { stripeCustomerId },
+    select: {
+      id: true,
+      organizationId: true,
+      stripeCustomerId: true,
+      stripeSubscriptionId: true,
+      plan: true,
+      status: true,
+      currentPeriodStart: true,
+      currentPeriodEnd: true,
+      cancelAtPeriodEnd: true,
+    },
+  });
+}
+
 export async function upsertOrganizationSubscription(input: {
   organizationId: string;
   stripeCustomerId: string;
