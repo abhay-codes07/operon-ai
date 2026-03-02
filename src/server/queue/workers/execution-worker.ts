@@ -1,11 +1,16 @@
 import { QueueEvents, Worker } from "bullmq";
 
-import { appendExecutionEvent } from "@/server/services/executions/execution-service";
+import {
+  appendExecutionEvent,
+  saveExecutionResult,
+  setExecutionStatus,
+} from "@/server/services/executions/execution-service";
 import { runExecutionWithTinyFish } from "@/server/services/executions/tinyfish-execution-runner";
 
 import { getQueueRedisConnection } from "../connection";
 import { executionJobName, type ExecutionJobData } from "../jobs/execution-job";
 import { getQueueName } from "../names";
+import { getExecutionQueue } from "../producers/execution-producer";
 
 let executionWorker: Worker<ExecutionJobData> | null = null;
 let executionQueueEvents: QueueEvents | null = null;
@@ -51,8 +56,48 @@ export function startExecutionWorker(): Worker<ExecutionJobData> {
     connection: getQueueRedisConnection(),
   });
 
-  executionQueueEvents.on("failed", ({ jobId, failedReason }) => {
+  executionQueueEvents.on("failed", async ({ jobId, failedReason }) => {
     console.error("[queue:execution] job failed", { jobId, failedReason });
+
+    if (!jobId) {
+      return;
+    }
+
+    const job = await getExecutionQueue().getJob(jobId);
+    if (!job?.data) {
+      return;
+    }
+
+    const isFinalAttempt =
+      typeof job.opts.attempts === "number" && job.attemptsMade >= job.opts.attempts;
+
+    if (!isFinalAttempt) {
+      return;
+    }
+
+    await setExecutionStatus({
+      organizationId: job.data.organizationId,
+      executionId: job.data.executionId,
+      status: "FAILED",
+    });
+
+    await saveExecutionResult({
+      organizationId: job.data.organizationId,
+      executionId: job.data.executionId,
+      errorMessage: failedReason,
+    });
+
+    await appendExecutionEvent({
+      organizationId: job.data.organizationId,
+      executionId: job.data.executionId,
+      level: "ERROR",
+      message: "Execution failed after queue retries were exhausted",
+      metadata: {
+        queueJobId: job.id,
+        attemptsMade: job.attemptsMade,
+        failedReason,
+      },
+    });
   });
 
   executionQueueEvents.on("completed", ({ jobId }) => {
