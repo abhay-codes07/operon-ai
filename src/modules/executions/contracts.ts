@@ -7,6 +7,8 @@ export type ExecutionListItem = {
   workflowId?: string | null;
   status: ExecutionStatus;
   trigger: ExecutionTrigger;
+  errorMessage?: string | null;
+  outputPayload?: Record<string, unknown> | null;
   createdAt: Date;
   startedAt?: Date | null;
   finishedAt?: Date | null;
@@ -18,5 +20,6 @@ export type ExecutionLogItem = {
   organizationId: string;
   level: LogLevel;
   message: string;
+  metadata?: Record<string, unknown> | null;
   occurredAt: Date;
 };
