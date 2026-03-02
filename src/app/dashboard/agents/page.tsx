@@ -1,3 +1,4 @@
+import { CreateAgentModal } from "@/components/dashboard/agents/create-agent-modal";
 import { AgentsTable } from "@/components/dashboard/agents/agents-table";
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -18,6 +19,7 @@ export default async function DashboardAgentsPage(): Promise<JSX.Element> {
         eyebrow="Agent Registry"
         title="Autonomous Web Agents"
         description="Provision and monitor the agents responsible for website workflow execution."
+        actions={<CreateAgentModal organizationName={user.organizationName} />}
       />
 
       <DashboardCard>
