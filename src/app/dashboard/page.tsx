@@ -1,12 +1,27 @@
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
+import { ErrorPanel } from "@/components/ui/feedback/error-panel";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { requireAuthenticatedUser } from "@/server/auth/authorization";
 
-export default async function DashboardPage(): Promise<JSX.Element> {
+type DashboardPageProps = {
+  searchParams?: {
+    error?: string;
+  };
+};
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps): Promise<JSX.Element> {
   const user = await requireAuthenticatedUser();
+  const hasRoleError = searchParams?.error === "insufficient-role";
 
   return (
     <div className="space-y-5">
+      {hasRoleError ? (
+        <ErrorPanel
+          title="Insufficient permissions"
+          description="Your current role cannot access the requested resource. Contact an organization owner to upgrade access."
+        />
+      ) : null}
+
       <DashboardCard
         title="Workspace Overview"
         description="Operational baseline for your multi-agent web automation environment."
