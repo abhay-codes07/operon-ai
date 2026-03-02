@@ -98,6 +98,17 @@ WebOps AI is not a chatbot and not a retrieval wrapper. The platform is designed
 - Dashboard queue metrics card for waiting/active/completed/failed jobs
 - Final-failure recovery handling when queue retries are exhausted
 
+## Phase 8 Scope (Completed)
+
+- Structured server logging primitives for execution observability
+- End-to-end trace ID propagation across API, queue, worker, and provider calls
+- Execution detail API endpoints with paginated timeline retrieval
+- Dedicated execution diagnostics page (`/dashboard/activity/[executionId]`)
+- In-context retry actions from timeline and detail views
+- Near-real-time activity updates via polling-driven live panels
+- Metadata-rich timeline rendering for log events
+- Observability and trace-correlation operational documentation
+
 ## Local Development
 
 ### 1. Install dependencies
