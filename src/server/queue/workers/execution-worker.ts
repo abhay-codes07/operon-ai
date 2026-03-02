@@ -5,6 +5,7 @@ import {
   saveExecutionResult,
   setExecutionStatus,
 } from "@/server/services/executions/execution-service";
+import { logError, logInfo } from "@/server/observability/logger";
 import { runExecutionWithTinyFish } from "@/server/services/executions/tinyfish-execution-runner";
 
 import { getQueueRedisConnection } from "../connection";
@@ -57,7 +58,13 @@ export function startExecutionWorker(): Worker<ExecutionJobData> {
   });
 
   executionQueueEvents.on("failed", async ({ jobId, failedReason }) => {
-    console.error("[queue:execution] job failed", { jobId, failedReason });
+    logError("Queue job failed", {
+      component: "execution-worker",
+      executionId: jobId ?? undefined,
+      metadata: {
+        failedReason,
+      },
+    });
 
     if (!jobId) {
       return;
@@ -101,7 +108,10 @@ export function startExecutionWorker(): Worker<ExecutionJobData> {
   });
 
   executionQueueEvents.on("completed", ({ jobId }) => {
-    console.log("[queue:execution] job completed", { jobId });
+    logInfo("Queue job completed", {
+      component: "execution-worker",
+      executionId: jobId ?? undefined,
+    });
   });
 
   return executionWorker;

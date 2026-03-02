@@ -1,4 +1,5 @@
 import { getAppEnv } from "@/config/env";
+import { logInfo } from "@/server/observability/logger";
 
 import type { TinyFishExecutionRequest, TinyFishExecutionResponse } from "./types";
 
@@ -40,6 +41,16 @@ export async function executeTinyFishWorkflow(
   const timeoutHandle = setTimeout(() => controller.abort(), config.timeoutMs);
 
   try {
+    logInfo("Dispatching TinyFish execution request", {
+      component: "tinyfish-client",
+      executionId: request.requestId,
+      workflowId: request.workflowId,
+      organizationId: request.organizationId,
+      metadata: {
+        stepCount: request.steps.length,
+      },
+    });
+
     const response = await fetch(`${config.baseUrl}${config.executePath}`, {
       method: "POST",
       headers: {
@@ -59,6 +70,13 @@ export async function executeTinyFishWorkflow(
         payload,
       );
     }
+
+    logInfo("TinyFish execution request accepted", {
+      component: "tinyfish-client",
+      executionId: request.requestId,
+      workflowId: request.workflowId,
+      organizationId: request.organizationId,
+    });
 
     return payload as TinyFishExecutionResponse;
   } finally {
