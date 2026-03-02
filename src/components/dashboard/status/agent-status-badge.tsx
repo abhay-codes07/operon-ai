@@ -1,5 +1,7 @@
 import { StatusBadge } from "@/components/ui/status-badge";
 
+import { formatStatusLabel } from "./status-utils";
+
 const agentStatusToVariant = {
   DRAFT: "neutral",
   ACTIVE: "success",
@@ -12,5 +14,5 @@ type AgentStatusBadgeProps = {
 };
 
 export function AgentStatusBadge({ status }: AgentStatusBadgeProps): JSX.Element {
-  return <StatusBadge label={status} variant={agentStatusToVariant[status]} />;
+  return <StatusBadge label={formatStatusLabel(status)} variant={agentStatusToVariant[status]} />;
 }

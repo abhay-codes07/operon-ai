@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils/cn";
 
-type BadgeVariant = "success" | "warning" | "danger" | "neutral";
+type BadgeVariant = "success" | "warning" | "danger" | "neutral" | "accent";
 
 type StatusBadgeProps = {
   label: string;
@@ -17,6 +17,9 @@ function getVariantClass(variant: BadgeVariant): string {
     case "danger":
       return "bg-rose-100 text-rose-700";
     case "neutral":
+      return "bg-slate-100 text-slate-700";
+    case "accent":
+      return "bg-sky-100 text-sky-700";
     default:
       return "bg-slate-100 text-slate-700";
   }

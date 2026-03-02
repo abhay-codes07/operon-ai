@@ -1,11 +1,13 @@
 import { StatusBadge } from "@/components/ui/status-badge";
 
+import { formatStatusLabel } from "./status-utils";
+
 const executionStatusVariant = {
   QUEUED: "neutral",
-  RUNNING: "warning",
+  RUNNING: "accent",
   SUCCEEDED: "success",
   FAILED: "danger",
-  CANCELED: "neutral",
+  CANCELED: "warning",
 } as const;
 
 type ExecutionStatusBadgeProps = {
@@ -13,5 +15,5 @@ type ExecutionStatusBadgeProps = {
 };
 
 export function ExecutionStatusBadge({ status }: ExecutionStatusBadgeProps): JSX.Element {
-  return <StatusBadge label={status} variant={executionStatusVariant[status]} />;
+  return <StatusBadge label={formatStatusLabel(status)} variant={executionStatusVariant[status]} />;
 }
