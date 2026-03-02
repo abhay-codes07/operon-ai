@@ -10,6 +10,7 @@ import { fetchWorkflowCatalog } from "@/server/services/workflows/workflow-servi
 type DashboardWorkflowsPageProps = {
   searchParams?: {
     status?: string;
+    query?: string;
   };
 };
 
@@ -17,6 +18,7 @@ export default async function DashboardWorkflowsPage({
   searchParams,
 }: DashboardWorkflowsPageProps): Promise<JSX.Element> {
   const user = await requireOrganizationRole("MEMBER");
+  const queryFilter = searchParams?.query?.trim();
   const statusFilter =
     searchParams?.status === "DRAFT" ||
     searchParams?.status === "ACTIVE" ||
@@ -33,6 +35,7 @@ export default async function DashboardWorkflowsPage({
   const workflows = await fetchWorkflowCatalog({
     organizationId: user.organizationId!,
     status: statusFilter,
+    query: queryFilter,
     page: 1,
     pageSize: 25,
   });
@@ -47,7 +50,19 @@ export default async function DashboardWorkflowsPage({
       />
 
       <DashboardCard>
-        <div className="mb-4">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <form method="GET" className="w-full md:max-w-sm">
+            <label htmlFor="workflow-query" className="sr-only">
+              Search workflows
+            </label>
+            <input
+              id="workflow-query"
+              name="query"
+              defaultValue={queryFilter}
+              placeholder="Search workflow by name or description"
+              className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+            />
+          </form>
           <StatusFilter
             options={[
               { label: "All", value: "ALL" },

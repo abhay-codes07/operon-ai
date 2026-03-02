@@ -65,6 +65,17 @@ WebOps AI is not a chatbot and not a retrieval wrapper. The platform is designed
 - Route-level loading skeletons and error boundaries for dashboard views
 - Interactive status filtering for operational list views
 
+## Phase 5 Scope (Completed)
+
+- Dedicated workflows dashboard surface and navigation
+- Natural-language task driven workflow creation modal
+- Scheduling controls with cron validation and normalization
+- Guardrail, timeout, and retry configuration in builder UX
+- Validated API payload pipeline for workflow persistence
+- Task-to-structured-definition transformation service
+- Workflow listing refinements: status filters, search, and step metadata
+- Workflows route loading and error boundaries
+
 ## Local Development
 
 ### 1. Install dependencies
