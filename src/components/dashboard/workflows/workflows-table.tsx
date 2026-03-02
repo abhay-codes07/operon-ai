@@ -6,6 +6,10 @@ type WorkflowTableItem = {
   description?: string | null;
   status: "DRAFT" | "ACTIVE" | "PAUSED" | "ARCHIVED";
   scheduleCron?: string | null;
+  definition: {
+    naturalLanguageTask: string;
+    steps: Array<{ id: string }>;
+  };
   createdAt: Date;
 };
 
@@ -30,7 +34,12 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
           <tr>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Workflow</th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Schedule</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Schedule
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Steps
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -38,12 +47,15 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
             <tr key={workflow.id} className="hover:bg-slate-50">
               <td className="px-4 py-3">
                 <p className="text-sm font-semibold text-slate-900">{workflow.name}</p>
-                <p className="text-xs text-slate-500">{workflow.description ?? "No description"}</p>
+                <p className="text-xs text-slate-500">
+                  {workflow.description ?? workflow.definition.naturalLanguageTask}
+                </p>
               </td>
               <td className="px-4 py-3">
                 <WorkflowStatusBadge status={workflow.status} />
               </td>
               <td className="px-4 py-3 text-sm text-slate-600">{workflow.scheduleCron ?? "Manual trigger"}</td>
+              <td className="px-4 py-3 text-sm text-slate-600">{workflow.definition.steps.length}</td>
             </tr>
           ))}
         </tbody>
