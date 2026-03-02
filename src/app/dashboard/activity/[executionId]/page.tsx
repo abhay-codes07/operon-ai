@@ -1,9 +1,7 @@
 import Link from "next/link";
 
-import { RetryExecutionButton } from "@/components/dashboard/activity/retry-execution-button";
+import { ExecutionDetailLivePanel } from "@/components/dashboard/activity/execution-detail-live-panel";
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
-import { ExecutionLogTimeline } from "@/components/dashboard/activity/execution-log-timeline";
-import { ExecutionStatusBadge } from "@/components/dashboard/status/execution-status-badge";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { fetchExecutionById, fetchExecutionTimeline } from "@/server/services/executions/execution-service";
 
@@ -40,55 +38,18 @@ export default async function DashboardExecutionDetailPage({
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center">
         <Link href="/dashboard/activity" className="text-sm font-medium text-slate-700 underline-offset-2 hover:underline">
           Back to Activity
         </Link>
-        {execution.status === "FAILED" ? <RetryExecutionButton executionId={execution.id} /> : null}
       </div>
-
-      <DashboardCard title={`Execution ${execution.id.slice(-8)}`} description="Detailed execution telemetry">
-        <div className="grid gap-4 md:grid-cols-4">
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Status</p>
-            <div className="mt-2">
-              <ExecutionStatusBadge status={execution.status} />
-            </div>
-          </article>
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Trigger</p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">{execution.trigger}</p>
-          </article>
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Agent</p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">{execution.agentId.slice(-8)}</p>
-          </article>
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Workflow</p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">{execution.workflowId?.slice(-8) ?? "N/A"}</p>
-          </article>
-        </div>
-
-        {execution.errorMessage ? (
-          <div className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-rose-700">Error</p>
-            <p className="mt-1 text-sm text-rose-700">{execution.errorMessage}</p>
-          </div>
-        ) : null}
-
-        {execution.outputPayload ? (
-          <div className="mt-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Output Payload</p>
-            <pre className="mt-2 max-h-80 overflow-auto rounded-lg border border-slate-200 bg-slate-950 p-3 text-xs text-slate-100">
-              {JSON.stringify(execution.outputPayload, null, 2)}
-            </pre>
-          </div>
-        ) : null}
-      </DashboardCard>
-
-      <DashboardCard title="Execution Timeline" description="Ordered events emitted during processing">
-        <ExecutionLogTimeline logs={timeline.items} />
-      </DashboardCard>
+      <ExecutionDetailLivePanel
+        initialExecution={execution}
+        initialLogs={timeline.items.map((item) => ({
+          ...item,
+          occurredAt: item.occurredAt.toISOString(),
+        }))}
+      />
     </div>
   );
 }
