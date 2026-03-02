@@ -1,8 +1,3 @@
-export type AgentStatus = "draft" | "active" | "paused";
+export type { AgentListItem as Agent } from "./contracts";
 
-export type Agent = {
-  id: string;
-  name: string;
-  status: AgentStatus;
-  createdAt: Date;
-};
+export type AgentStatus = "DRAFT" | "ACTIVE" | "PAUSED" | "ARCHIVED";

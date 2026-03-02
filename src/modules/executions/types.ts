@@ -1,9 +1,6 @@
-export type ExecutionStatus = "queued" | "running" | "completed" | "failed";
+export type {
+  ExecutionListItem as ExecutionRecord,
+  ExecutionLogItem,
+} from "./contracts";
 
-export type ExecutionRecord = {
-  id: string;
-  workflowName: string;
-  status: ExecutionStatus;
-  startedAt: Date;
-  endedAt?: Date;
-};
+export type ExecutionStatus = "QUEUED" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELED";

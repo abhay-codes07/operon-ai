@@ -45,6 +45,16 @@ WebOps AI is not a chatbot and not a retrieval wrapper. The platform is designed
 - Tenant-aware server-side session and authorization guards
 - Seed script for owner workspace bootstrap
 
+## Phase 3 Scope (Completed)
+
+- Prisma core models for `Agent`, `Workflow`, `Execution`, and `ExecutionLog`
+- Execution lifecycle enums and organization-scoped indexes
+- SQL migration artifact for production rollout
+- Type-safe domain contracts and validation schemas
+- Organization-scoped repositories with paginated queries
+- Service-layer orchestration for model lifecycle operations
+- Protected internal APIs for agent/workflow/execution persistence
+
 ## Local Development
 
 ### 1. Install dependencies
@@ -100,6 +110,12 @@ src/
   server/             # Server-side repositories and services (phase-based expansion)
   types/              # Shared TypeScript types
 ```
+
+## Internal API Surface (Phase 3)
+
+- `GET/POST /api/internal/agents`
+- `GET/POST /api/internal/workflows`
+- `GET/POST /api/internal/executions`
 
 ## Engineering Principles
 
