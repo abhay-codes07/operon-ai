@@ -42,6 +42,7 @@ export function StatusFilter({ options, queryKey = "status" }: StatusFilterProps
             type="button"
             key={option.value}
             onClick={() => onSelect(option.value)}
+            aria-pressed={isActive}
             className={cn(
               "rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors",
               isActive

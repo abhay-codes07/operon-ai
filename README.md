@@ -55,6 +55,16 @@ WebOps AI is not a chatbot and not a retrieval wrapper. The platform is designed
 - Service-layer orchestration for model lifecycle operations
 - Protected internal APIs for agent/workflow/execution persistence
 
+## Phase 4 Scope (Completed)
+
+- Enterprise dashboard shell with responsive sidebar navigation
+- Dedicated `Agents` management page and status-aware listing table
+- In-dashboard agent creation modal connected to protected APIs
+- Dedicated `Activity` page with execution and log timeline panels
+- Unified status badge system for agent/execution states
+- Route-level loading skeletons and error boundaries for dashboard views
+- Interactive status filtering for operational list views
+
 ## Local Development
 
 ### 1. Install dependencies

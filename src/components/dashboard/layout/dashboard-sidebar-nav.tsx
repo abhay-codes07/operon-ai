@@ -18,6 +18,7 @@ export function DashboardSidebarNav(): JSX.Element {
           <Link
             key={item.href}
             href={item.href}
+            aria-current={isActive ? "page" : undefined}
             className={cn(
               "block rounded-xl border px-4 py-3 transition-colors",
               isActive

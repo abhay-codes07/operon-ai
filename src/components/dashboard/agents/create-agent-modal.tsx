@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
@@ -16,6 +16,21 @@ export function CreateAgentModal({ organizationName }: CreateAgentModalProps): J
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function onKeydown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", onKeydown);
+    return () => window.removeEventListener("keydown", onKeydown);
+  }, [isOpen]);
 
   async function onCreateAgent(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -57,8 +72,16 @@ export function CreateAgentModal({ organizationName }: CreateAgentModalProps): J
       <Button onClick={() => setIsOpen(true)}>Create Agent</Button>
 
       {isOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/30 p-4">
-          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/30 p-4"
+          role="dialog"
+          aria-modal="true"
+          onMouseDown={() => setIsOpen(false)}
+        >
+          <div
+            className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
             <div className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Agent Setup</p>
               <h2 className="text-xl font-semibold text-slate-900">Create New Agent</h2>
