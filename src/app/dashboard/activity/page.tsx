@@ -1,14 +1,32 @@
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
+import { StatusFilter } from "@/components/dashboard/layout/status-filter";
 import { ExecutionLogTimeline } from "@/components/dashboard/activity/execution-log-timeline";
 import { ExecutionTimelineList } from "@/components/dashboard/activity/execution-timeline-list";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { fetchExecutionHistory, fetchExecutionTimeline } from "@/server/services/executions/execution-service";
 
-export default async function DashboardActivityPage(): Promise<JSX.Element> {
+type DashboardActivityPageProps = {
+  searchParams?: {
+    status?: string;
+  };
+};
+
+export default async function DashboardActivityPage({
+  searchParams,
+}: DashboardActivityPageProps): Promise<JSX.Element> {
   const user = await requireOrganizationRole("MEMBER");
+  const statusFilter =
+    searchParams?.status === "QUEUED" ||
+    searchParams?.status === "RUNNING" ||
+    searchParams?.status === "SUCCEEDED" ||
+    searchParams?.status === "FAILED" ||
+    searchParams?.status === "CANCELED"
+      ? searchParams.status
+      : undefined;
   const executionHistory = await fetchExecutionHistory({
     organizationId: user.organizationId!,
+    status: statusFilter,
     page: 1,
     pageSize: 12,
   });
@@ -29,6 +47,17 @@ export default async function DashboardActivityPage(): Promise<JSX.Element> {
         eyebrow="Execution Activity"
         title="Real-Time Activity Timeline"
         description="Track execution lifecycle events and inspect logs emitted by autonomous web workflows."
+      />
+
+      <StatusFilter
+        options={[
+          { label: "All", value: "ALL" },
+          { label: "Queued", value: "QUEUED" },
+          { label: "Running", value: "RUNNING" },
+          { label: "Succeeded", value: "SUCCEEDED" },
+          { label: "Failed", value: "FAILED" },
+          { label: "Canceled", value: "CANCELED" },
+        ]}
       />
 
       <div className="grid gap-5 xl:grid-cols-[1.2fr,1fr]">
