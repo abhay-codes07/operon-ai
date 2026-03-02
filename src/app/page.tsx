@@ -1,5 +1,6 @@
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { AppShell } from "@/components/layout/app-shell";
+import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -47,7 +48,7 @@ export default function Home(): JSX.Element {
         <SectionHeading
           eyebrow="Operations Command"
           title="Autonomous web workflows, with full execution traceability"
-          description="WebOps AI deploys deterministic AI agents that operate live browser workflows across your SaaS stack."
+          description={`${siteConfig.name} deploys deterministic AI agents that operate live browser workflows across your SaaS stack.`}
           actions={<Button>Create Agent</Button>}
         />
 
