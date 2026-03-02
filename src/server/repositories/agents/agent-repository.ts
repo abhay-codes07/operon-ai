@@ -3,11 +3,17 @@ import type { AgentStatus } from "@prisma/client";
 import type { AgentListItem } from "@/modules/agents/contracts";
 import { createAgentInputSchema, updateAgentStatusInputSchema } from "@/modules/agents/schemas";
 import { prisma } from "@/server/db/client";
+import {
+  normalizePagination,
+  type PaginationInput,
+  toPaginatedResult,
+} from "@/server/repositories/shared/pagination";
+import type { PaginatedResult } from "@/types/pagination";
 
 type ListAgentsInput = {
   organizationId: string;
   status?: AgentStatus;
-  limit?: number;
+  pagination?: PaginationInput;
 };
 
 export async function createAgent(input: unknown): Promise<AgentListItem> {
@@ -33,26 +39,34 @@ export async function createAgent(input: unknown): Promise<AgentListItem> {
   });
 }
 
-export async function listAgents(input: ListAgentsInput): Promise<AgentListItem[]> {
-  return prisma.agent.findMany({
-    where: {
-      organizationId: input.organizationId,
-      status: input.status,
-    },
-    select: {
-      id: true,
-      organizationId: true,
-      name: true,
-      description: true,
-      status: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: input.limit ?? 50,
-  });
+export async function listAgents(input: ListAgentsInput): Promise<PaginatedResult<AgentListItem>> {
+  const pagination = normalizePagination(input.pagination);
+  const where = {
+    organizationId: input.organizationId,
+    status: input.status,
+  };
+  const [items, total] = await Promise.all([
+    prisma.agent.findMany({
+      where,
+      select: {
+        id: true,
+        organizationId: true,
+        name: true,
+        description: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip: (pagination.page - 1) * pagination.pageSize,
+      take: pagination.pageSize,
+    }),
+    prisma.agent.count({ where }),
+  ]);
+
+  return toPaginatedResult(items, total, pagination);
 }
 
 export async function getAgentById(

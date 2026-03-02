@@ -6,12 +6,18 @@ import {
   updateWorkflowStatusSchema,
 } from "@/modules/workflows/schemas";
 import { prisma } from "@/server/db/client";
+import {
+  normalizePagination,
+  type PaginationInput,
+  toPaginatedResult,
+} from "@/server/repositories/shared/pagination";
+import type { PaginatedResult } from "@/types/pagination";
 
 type ListWorkflowsInput = {
   organizationId: string;
   agentId?: string;
   status?: WorkflowStatus;
-  limit?: number;
+  pagination?: PaginationInput;
 };
 
 export async function createWorkflow(input: unknown): Promise<WorkflowListItem> {
@@ -39,27 +45,37 @@ export async function createWorkflow(input: unknown): Promise<WorkflowListItem> 
   });
 }
 
-export async function listWorkflows(input: ListWorkflowsInput): Promise<WorkflowListItem[]> {
-  return prisma.workflow.findMany({
-    where: {
-      organizationId: input.organizationId,
-      agentId: input.agentId,
-      status: input.status,
-    },
-    select: {
-      id: true,
-      organizationId: true,
-      agentId: true,
-      name: true,
-      status: true,
-      scheduleCron: true,
-      createdAt: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: input.limit ?? 50,
-  });
+export async function listWorkflows(
+  input: ListWorkflowsInput,
+): Promise<PaginatedResult<WorkflowListItem>> {
+  const pagination = normalizePagination(input.pagination);
+  const where = {
+    organizationId: input.organizationId,
+    agentId: input.agentId,
+    status: input.status,
+  };
+  const [items, total] = await Promise.all([
+    prisma.workflow.findMany({
+      where,
+      select: {
+        id: true,
+        organizationId: true,
+        agentId: true,
+        name: true,
+        status: true,
+        scheduleCron: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip: (pagination.page - 1) * pagination.pageSize,
+      take: pagination.pageSize,
+    }),
+    prisma.workflow.count({ where }),
+  ]);
+
+  return toPaginatedResult(items, total, pagination);
 }
 
 export async function updateWorkflowStatus(input: unknown): Promise<WorkflowListItem> {
