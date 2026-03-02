@@ -1,3 +1,6 @@
+import Link from "next/link";
+
+import { RetryExecutionButton } from "@/components/dashboard/activity/retry-execution-button";
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { ExecutionLogTimeline } from "@/components/dashboard/activity/execution-log-timeline";
 import { ExecutionStatusBadge } from "@/components/dashboard/status/execution-status-badge";
@@ -37,6 +40,13 @@ export default async function DashboardExecutionDetailPage({
 
   return (
     <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <Link href="/dashboard/activity" className="text-sm font-medium text-slate-700 underline-offset-2 hover:underline">
+          Back to Activity
+        </Link>
+        {execution.status === "FAILED" ? <RetryExecutionButton executionId={execution.id} /> : null}
+      </div>
+
       <DashboardCard title={`Execution ${execution.id.slice(-8)}`} description="Detailed execution telemetry">
         <div className="grid gap-4 md:grid-cols-4">
           <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">

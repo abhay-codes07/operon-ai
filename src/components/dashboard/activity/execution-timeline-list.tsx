@@ -1,3 +1,6 @@
+﻿import Link from "next/link";
+
+import { RetryExecutionButton } from "@/components/dashboard/activity/retry-execution-button";
 import { ExecutionStatusBadge } from "@/components/dashboard/status/execution-status-badge";
 
 type ExecutionListItem = {
@@ -28,10 +31,20 @@ export function ExecutionTimelineList({ items }: ExecutionTimelineListProps): JS
         <article key={execution.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold text-slate-900">Execution {execution.id.slice(-8)}</p>
-              <p className="text-xs text-slate-500">Agent {execution.agentId.slice(-8)} � {execution.trigger}</p>
+              <Link
+                href={`/dashboard/activity/${execution.id}`}
+                className="text-sm font-semibold text-slate-900 underline-offset-2 hover:underline"
+              >
+                Execution {execution.id.slice(-8)}
+              </Link>
+              <p className="text-xs text-slate-500">
+                Agent {execution.agentId.slice(-8)} • {execution.trigger}
+              </p>
             </div>
-            <ExecutionStatusBadge status={execution.status} />
+            <div className="flex items-center gap-2">
+              <ExecutionStatusBadge status={execution.status} />
+              {execution.status === "FAILED" ? <RetryExecutionButton executionId={execution.id} compact /> : null}
+            </div>
           </div>
           <p className="mt-2 text-xs text-slate-500">
             {new Intl.DateTimeFormat("en-US", {
