@@ -3,8 +3,10 @@ import type { ExecutionStatus, ExecutionTrigger, LogLevel } from "@prisma/client
 import {
   appendExecutionLog,
   createExecution,
+  getExecutionById,
   listExecutionLogs,
   listExecutions,
+  persistExecutionResult,
   updateExecutionStatus,
 } from "@/server/repositories/executions/execution-repository";
 
@@ -69,4 +71,17 @@ export async function fetchExecutionTimeline(input: {
     page: input.page,
     pageSize: input.pageSize,
   });
+}
+
+export async function fetchExecutionById(input: { organizationId: string; executionId: string }) {
+  return getExecutionById(input.organizationId, input.executionId);
+}
+
+export async function saveExecutionResult(input: {
+  organizationId: string;
+  executionId: string;
+  outputPayload?: Record<string, unknown>;
+  errorMessage?: string;
+}) {
+  return persistExecutionResult(input);
 }

@@ -193,3 +193,68 @@ export async function updateExecutionStatus(
     },
   });
 }
+
+export async function getExecutionById(
+  organizationId: string,
+  executionId: string,
+): Promise<ExecutionListItem | null> {
+  return prisma.execution.findFirst({
+    where: {
+      organizationId,
+      id: executionId,
+    },
+    select: {
+      id: true,
+      organizationId: true,
+      agentId: true,
+      workflowId: true,
+      status: true,
+      trigger: true,
+      createdAt: true,
+      startedAt: true,
+      finishedAt: true,
+    },
+  });
+}
+
+export async function persistExecutionResult(input: {
+  organizationId: string;
+  executionId: string;
+  outputPayload?: Record<string, unknown>;
+  errorMessage?: string;
+}) {
+  const execution = await prisma.execution.findFirst({
+    where: {
+      id: input.executionId,
+      organizationId: input.organizationId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!execution) {
+    throw new Error("Execution not found for organization");
+  }
+
+  return prisma.execution.update({
+    where: {
+      id: input.executionId,
+    },
+    data: {
+      outputPayload: input.outputPayload,
+      errorMessage: input.errorMessage,
+    },
+    select: {
+      id: true,
+      organizationId: true,
+      agentId: true,
+      workflowId: true,
+      status: true,
+      trigger: true,
+      createdAt: true,
+      startedAt: true,
+      finishedAt: true,
+    },
+  });
+}

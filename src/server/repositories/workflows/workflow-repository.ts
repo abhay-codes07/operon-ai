@@ -136,3 +136,26 @@ export async function updateWorkflowStatus(input: unknown): Promise<WorkflowList
     },
   });
 }
+
+export async function getWorkflowById(
+  organizationId: string,
+  workflowId: string,
+): Promise<WorkflowListItem | null> {
+  return prisma.workflow.findFirst({
+    where: {
+      id: workflowId,
+      organizationId,
+    },
+    select: {
+      id: true,
+      organizationId: true,
+      agentId: true,
+      name: true,
+      description: true,
+      status: true,
+      scheduleCron: true,
+      definition: true,
+      createdAt: true,
+    },
+  });
+}

@@ -2,6 +2,7 @@ import type { WorkflowStatus } from "@prisma/client";
 
 import {
   createWorkflow,
+  getWorkflowById,
   listWorkflows,
   updateWorkflowStatus,
 } from "@/server/repositories/workflows/workflow-repository";
@@ -81,4 +82,8 @@ export async function changeWorkflowStatus(input: {
   status: WorkflowStatus;
 }) {
   return updateWorkflowStatus(input);
+}
+
+export async function fetchWorkflowById(input: { organizationId: string; workflowId: string }) {
+  return getWorkflowById(input.organizationId, input.workflowId);
 }
