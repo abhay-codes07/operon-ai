@@ -1,7 +1,5 @@
-import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
+import { ActivityLivePanel } from "@/components/dashboard/activity/activity-live-panel";
 import { StatusFilter } from "@/components/dashboard/layout/status-filter";
-import { ExecutionLogTimeline } from "@/components/dashboard/activity/execution-log-timeline";
-import { ExecutionTimelineList } from "@/components/dashboard/activity/execution-timeline-list";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { fetchExecutionHistory, fetchExecutionTimeline } from "@/server/services/executions/execution-service";
@@ -37,9 +35,17 @@ export default async function DashboardActivityPage({
         organizationId: user.organizationId!,
         executionId: latestExecution.id,
         page: 1,
-        pageSize: 20,
+        pageSize: 50,
       })
-    : { items: [] as Array<{ id: string; level: "DEBUG" | "INFO" | "WARN" | "ERROR"; message: string; occurredAt: Date }> };
+    : {
+        items: [] as Array<{
+          id: string;
+          level: "DEBUG" | "INFO" | "WARN" | "ERROR";
+          message: string;
+          metadata?: Record<string, unknown> | null;
+          occurredAt: Date;
+        }>,
+      };
 
   return (
     <div className="space-y-5">
@@ -60,18 +66,17 @@ export default async function DashboardActivityPage({
         ]}
       />
 
-      <div className="grid gap-5 xl:grid-cols-[1.2fr,1fr]">
-        <DashboardCard title="Recent Executions" description="Most recent runs across all workflow triggers.">
-          <ExecutionTimelineList items={executionHistory.items} />
-        </DashboardCard>
-
-        <DashboardCard
-          title="Execution Log Stream"
-          description={latestExecution ? `Latest execution: ${latestExecution.id.slice(-8)}` : "No executions yet"}
-        >
-          <ExecutionLogTimeline logs={timeline.items} />
-        </DashboardCard>
-      </div>
+      <ActivityLivePanel
+        initialExecutions={executionHistory.items.map((item) => ({
+          ...item,
+          createdAt: item.createdAt.toISOString(),
+        }))}
+        initialLogs={timeline.items.map((item) => ({
+          ...item,
+          occurredAt: item.occurredAt.toISOString(),
+        }))}
+        statusFilter={statusFilter}
+      />
     </div>
   );
 }
