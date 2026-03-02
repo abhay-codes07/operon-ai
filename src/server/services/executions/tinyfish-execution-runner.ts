@@ -5,6 +5,7 @@ import { executeTinyFishWorkflow, TinyFishApiError } from "@/server/integrations
 import { buildTinyFishExecutionRequest } from "@/server/integrations/tinyfish/request-builder";
 import { parseTinyFishExecutionResponse } from "@/server/integrations/tinyfish/response-parser";
 import { logInfo } from "@/server/observability/logger";
+import { recordExecutionUsage } from "@/server/services/billing/usage-service";
 import { persistScreenshotArtifact } from "@/server/services/storage/screenshot-storage";
 import { fetchWorkflowById } from "@/server/services/workflows/workflow-service";
 
@@ -148,6 +149,10 @@ export async function runExecutionWithTinyFish(
     executionId: input.executionId,
     status: parsed.status,
   });
+
+  if (parsed.status === "SUCCEEDED") {
+    await recordExecutionUsage(input.organizationId, 1);
+  }
 
   await appendExecutionEvent({
     organizationId: input.organizationId,
