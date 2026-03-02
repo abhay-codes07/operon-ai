@@ -19,4 +19,9 @@ export const dashboardNav = [
     label: "Workflows",
     description: "Builder and schedules",
   },
+  {
+    href: "/dashboard/billing",
+    label: "Billing",
+    description: "Plans and quota",
+  },
 ] as const;
