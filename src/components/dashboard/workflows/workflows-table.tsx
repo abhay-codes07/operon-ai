@@ -1,4 +1,5 @@
 import { WorkflowStatusBadge } from "@/components/dashboard/status/workflow-status-badge";
+import { RunWorkflowButton } from "@/components/dashboard/workflows/run-workflow-button";
 
 type WorkflowTableItem = {
   id: string;
@@ -40,6 +41,9 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
               Steps
             </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -56,6 +60,12 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
               </td>
               <td className="px-4 py-3 text-sm text-slate-600">{workflow.scheduleCron ?? "Manual trigger"}</td>
               <td className="px-4 py-3 text-sm text-slate-600">{workflow.definition.steps.length}</td>
+              <td className="px-4 py-3">
+                <RunWorkflowButton
+                  workflowId={workflow.id}
+                  disabled={workflow.status === "ARCHIVED" || workflow.status === "DRAFT"}
+                />
+              </td>
             </tr>
           ))}
         </tbody>
