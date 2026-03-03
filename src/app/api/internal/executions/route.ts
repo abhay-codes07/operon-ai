@@ -1,11 +1,22 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 import { requireOrganizationRole } from "@/server/auth/authorization";
+import { parseJsonBody, parsePositiveInt } from "@/server/api/validation";
 import {
   appendExecutionEvent,
   fetchExecutionHistory,
   queueExecution,
 } from "@/server/services/executions/execution-service";
+
+const executionStatusSchema = z.enum(["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCELED"]);
+const triggerSchema = z.enum(["MANUAL", "SCHEDULED", "API", "RETRY"]);
+const createExecutionSchema = z.object({
+  agentId: z.string().trim().min(1),
+  workflowId: z.string().trim().min(1).optional(),
+  trigger: triggerSchema.optional(),
+  inputPayload: z.record(z.string(), z.unknown()).optional(),
+});
 
 export async function GET(request: Request) {
   const user = await requireOrganizationRole("MEMBER");
@@ -13,16 +24,9 @@ export async function GET(request: Request) {
 
   const executions = await fetchExecutionHistory({
     organizationId: user.organizationId!,
-    status:
-      searchParams.get("status") === "QUEUED" ||
-      searchParams.get("status") === "RUNNING" ||
-      searchParams.get("status") === "SUCCEEDED" ||
-      searchParams.get("status") === "FAILED" ||
-      searchParams.get("status") === "CANCELED"
-        ? (searchParams.get("status") as "QUEUED" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELED")
-        : undefined,
-    page: Number(searchParams.get("page") ?? "1"),
-    pageSize: Number(searchParams.get("pageSize") ?? "20"),
+    status: executionStatusSchema.safeParse(searchParams.get("status")).data,
+    page: parsePositiveInt(searchParams.get("page"), 1, { min: 1, max: 1_000 }),
+    pageSize: parsePositiveInt(searchParams.get("pageSize"), 20, { min: 1, max: 100 }),
   });
 
   return NextResponse.json(executions);
@@ -30,26 +34,18 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const user = await requireOrganizationRole("MEMBER");
-  const body = (await request.json().catch(() => null)) as
-    | {
-        agentId?: string;
-        workflowId?: string;
-        trigger?: "MANUAL" | "SCHEDULED" | "API" | "RETRY";
-        inputPayload?: Record<string, unknown>;
-      }
-    | null;
-
-  if (!body?.agentId) {
-    return NextResponse.json({ error: "agentId is required" }, { status: 400 });
+  const { data, error } = await parseJsonBody(request, createExecutionSchema);
+  if (error) {
+    return error;
   }
 
   const execution = await queueExecution({
     organizationId: user.organizationId!,
-    agentId: body.agentId,
-    workflowId: body.workflowId,
+    agentId: data.agentId,
+    workflowId: data.workflowId,
     requestedById: user.id,
-    trigger: body.trigger,
-    inputPayload: body.inputPayload,
+    trigger: data.trigger,
+    inputPayload: data.inputPayload,
   });
 
   await appendExecutionEvent({
