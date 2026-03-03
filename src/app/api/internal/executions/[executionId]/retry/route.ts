@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createTraceId } from "@/server/observability/tracing";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer";
+import { enforceRateLimit } from "@/server/security/rate-limit";
 import {
   appendExecutionEvent,
   fetchExecutionById,
@@ -20,8 +21,18 @@ type RouteContext = {
   };
 };
 
-export async function POST(_request: Request, context: RouteContext) {
+export async function POST(request: Request, context: RouteContext) {
   const user = await requireOrganizationRole("MEMBER");
+  const throttleResponse = enforceRateLimit(
+    request,
+    "executions:retry",
+    { maxRequests: 15, windowMs: 60_000 },
+    user.id,
+  );
+  if (throttleResponse) {
+    return throttleResponse;
+  }
+
   const parsedParams = paramsSchema.safeParse(context.params);
   if (!parsedParams.success) {
     return NextResponse.json({ error: "Invalid execution identifier" }, { status: 400 });

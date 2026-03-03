@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createTraceId } from "@/server/observability/tracing";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer";
+import { enforceRateLimit } from "@/server/security/rate-limit";
 import { enforceExecutionQuotaOrThrow } from "@/server/services/billing/enforcement-service";
 import { appendExecutionEvent, queueExecution } from "@/server/services/executions/execution-service";
 import { fetchWorkflowById } from "@/server/services/workflows/workflow-service";
@@ -18,8 +19,18 @@ type RouteContext = {
   };
 };
 
-export async function POST(_request: Request, context: RouteContext) {
+export async function POST(request: Request, context: RouteContext) {
   const user = await requireOrganizationRole("MEMBER");
+  const throttleResponse = enforceRateLimit(
+    request,
+    "executions:trigger",
+    { maxRequests: 30, windowMs: 60_000 },
+    user.id,
+  );
+  if (throttleResponse) {
+    return throttleResponse;
+  }
+
   const parsedParams = paramsSchema.safeParse(context.params);
   if (!parsedParams.success) {
     return NextResponse.json({ error: "Invalid workflow identifier" }, { status: 400 });

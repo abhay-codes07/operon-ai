@@ -2,8 +2,10 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { parseJsonBody } from "@/server/api/validation";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { createCheckoutSession } from "@/server/integrations/stripe/checkout";
+import { enforceRateLimit } from "@/server/security/rate-limit";
 
 const checkoutSchema = z.object({
   plan: z.enum(["STARTER", "GROWTH"]),
@@ -11,11 +13,19 @@ const checkoutSchema = z.object({
 
 export async function POST(request: Request) {
   const user = await requireOrganizationRole("OWNER");
-  const body = await request.json().catch(() => null);
-  const parsed = checkoutSchema.safeParse(body);
+  const throttleResponse = enforceRateLimit(
+    request,
+    "billing:checkout",
+    { maxRequests: 8, windowMs: 60_000 },
+    user.id,
+  );
+  if (throttleResponse) {
+    return throttleResponse;
+  }
 
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid checkout payload" }, { status: 400 });
+  const { data, error } = await parseJsonBody(request, checkoutSchema);
+  if (error) {
+    return error;
   }
 
   const host = headers().get("host") ?? "localhost:3000";
@@ -25,7 +35,7 @@ export async function POST(request: Request) {
   const session = await createCheckoutSession({
     organizationId: user.organizationId!,
     customerEmail: user.email ?? "billing@webops.ai",
-    plan: parsed.data.plan,
+    plan: data.plan,
     successUrl: `${baseUrl}/dashboard/billing?checkout=success`,
     cancelUrl: `${baseUrl}/dashboard/billing?checkout=cancelled`,
   });

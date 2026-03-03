@@ -2,10 +2,12 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { toSlug } from "@/lib/utils/slug";
+import { parseJsonBody } from "@/server/api/validation";
 import {
   createUserWithOrganization,
   getUserByEmail,
 } from "@/server/repositories/auth/user-repository";
+import { enforceRateLimit } from "@/server/security/rate-limit";
 import { hashPassword } from "@/server/services/auth/password";
 
 const signUpSchema = z.object({
@@ -16,20 +18,20 @@ const signUpSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => null);
-  const parsed = signUpSchema.safeParse(body);
-
-  if (!parsed.success) {
-    return NextResponse.json(
-      {
-        error: "Invalid sign-up payload",
-        issues: parsed.error.flatten(),
-      },
-      { status: 400 },
-    );
+  const throttleResponse = enforceRateLimit(request, "auth:sign-up", {
+    maxRequests: 5,
+    windowMs: 60_000,
+  });
+  if (throttleResponse) {
+    return throttleResponse;
   }
 
-  const { email, password, fullName, organizationName } = parsed.data;
+  const { data, error } = await parseJsonBody(request, signUpSchema);
+  if (error) {
+    return error;
+  }
+
+  const { email, password, fullName, organizationName } = data;
   const existingUser = await getUserByEmail(email);
 
   if (existingUser) {
