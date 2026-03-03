@@ -1,125 +1,70 @@
 # WebOps AI
 
-WebOps AI is a SaaS platform for deploying AI web agents that execute real multi-step workflows on live websites.
+WebOps AI is a multi-tenant SaaS platform where businesses deploy AI web agents that execute real workflows on live websites using TinyFish.
 
-This repository contains the product foundation for a venture-backable, multi-tenant operations platform built with Next.js 14 and TypeScript.
+This product is built as a production-oriented foundation for a venture-scale company, not a hackathon demo.
 
-## Product Direction
+## Investor Positioning
 
-WebOps AI is not a chatbot and not a retrieval wrapper. The platform is designed to:
+- Category: AI-native web operations automation
+- Buyer: Growth, RevOps, QA, and internal automation teams
+- Core wedge: repeatable web workflows with execution traceability and org-level governance
+- Product moat: workflow + execution telemetry + billing + background orchestration in one control plane
 
-- Navigate websites through autonomous agents
-- Execute repeatable workflows with stateful sessions
-- Track execution lifecycle and structured logs
-- Store traceable run history for auditability
-- Surface operational visibility in a timeline-first dashboard
+## Product Capabilities
+
+- User signup and secure workspace access
+- Multi-tenant organizations with role-based permissions
+- Agent creation and workflow configuration (including schedule metadata)
+- Async workflow execution via queue workers
+- Execution timeline, logs, and retry actions
+- Billing scaffold with Stripe checkout + webhook reconciliation
+- Usage metering and quota enforcement
 
 ## Tech Stack
 
 - Next.js 14 (App Router)
 - TypeScript (strict mode)
 - TailwindCSS
-- PostgreSQL + Prisma
-- NextAuth (Credentials provider with secure JWT sessions)
-- Redis + BullMQ (upcoming phases)
-- Stripe billing scaffold (upcoming phases)
-- TinyFish Web Agent API integration (upcoming phases)
+- PostgreSQL + Prisma ORM
+- NextAuth (credentials sessions)
+- Redis + BullMQ
+- Stripe (billing scaffold)
+- TinyFish Web Agent API integration
+- Docker and Docker Compose
 
-## Phase 1 Scope (Completed)
+## Phase Delivery Snapshot
 
-- Next.js project initialization
-- Strict TypeScript compiler settings
-- Tailwind baseline and global design tokens
-- ESLint + Prettier integration
-- Environment variable contract + runtime validation utility
-- Modular codebase architecture foundations
-- Root layout shell and product metadata
-- Dashboard foundation UI for agent and execution overview
+### Phase 1-3
 
-## Phase 2 Scope (Completed)
+- Project foundation, auth, org tenancy, and core data models
 
-- NextAuth credentials authentication
-- User sign-up and sign-in flows
-- Multi-tenant organization model and membership roles
-- Middleware-based protected route handling
-- Tenant-aware server-side session and authorization guards
-- Seed script for owner workspace bootstrap
+### Phase 4-6
 
-## Phase 3 Scope (Completed)
+- Dashboard UX, workflow builder, and TinyFish execution integration
 
-- Prisma core models for `Agent`, `Workflow`, `Execution`, and `ExecutionLog`
-- Execution lifecycle enums and organization-scoped indexes
-- SQL migration artifact for production rollout
-- Type-safe domain contracts and validation schemas
-- Organization-scoped repositories with paginated queries
-- Service-layer orchestration for model lifecycle operations
-- Protected internal APIs for agent/workflow/execution persistence
+### Phase 7-9
 
-## Phase 4 Scope (Completed)
+- Background jobs, observability timeline, and billing/usage controls
 
-- Enterprise dashboard shell with responsive sidebar navigation
-- Dedicated `Agents` management page and status-aware listing table
-- In-dashboard agent creation modal connected to protected APIs
-- Dedicated `Activity` page with execution and log timeline panels
-- Unified status badge system for agent/execution states
-- Route-level loading skeletons and error boundaries for dashboard views
-- Interactive status filtering for operational list views
+### Phase 10
 
-## Phase 5 Scope (Completed)
+- Multi-stage Docker build and compose runtime
+- Production deployment runbook
+- Shared API validation hardening
+- Targeted rate limits for auth/billing/execution actions
+- Stripe webhook hardening with strict metadata checks
+- Security review document and architecture specification
+- Demo seed data for agents/workflows/executions/logs/billing
 
-- Dedicated workflows dashboard surface and navigation
-- Natural-language task driven workflow creation modal
-- Scheduling controls with cron validation and normalization
-- Guardrail, timeout, and retry configuration in builder UX
-- Validated API payload pipeline for workflow persistence
-- Task-to-structured-definition transformation service
-- Workflow listing refinements: status filters, search, and step metadata
-- Workflows route loading and error boundaries
+## Demo Flow (End of Phase 10)
 
-## Phase 6 Scope (Completed)
-
-- Secure TinyFish API client with typed contracts and timeout handling
-- TinyFish request builder and response parser layers
-- Exponential-backoff retry strategy for transient provider failures
-- Execution orchestrator that updates status, logs events, and persists outputs
-- Screenshot artifact storage scaffold (`local` provider)
-- Protected workflow execution endpoint: `POST /api/internal/workflows/[workflowId]/execute`
-- Dashboard “Run Now” workflow action connected to TinyFish execution path
-
-## Phase 7 Scope (Completed)
-
-- BullMQ + Redis background queue foundation
-- Typed queue config and reusable Redis connection layer
-- Execution job contracts and queue producer service
-- Dedicated worker runtime (`npm run worker`) for async processing
-- Async workflow execution endpoint dispatching to queue
-- Execution retry endpoint with lifecycle reset and re-dispatch
-- Queue health monitoring endpoint for operations visibility
-- Dashboard queue metrics card for waiting/active/completed/failed jobs
-- Final-failure recovery handling when queue retries are exhausted
-
-## Phase 8 Scope (Completed)
-
-- Structured server logging primitives for execution observability
-- End-to-end trace ID propagation across API, queue, worker, and provider calls
-- Execution detail API endpoints with paginated timeline retrieval
-- Dedicated execution diagnostics page (`/dashboard/activity/[executionId]`)
-- In-context retry actions from timeline and detail views
-- Near-real-time activity updates via polling-driven live panels
-- Metadata-rich timeline rendering for log events
-- Observability and trace-correlation operational documentation
-
-## Phase 9 Scope (Completed)
-
-- Stripe checkout and webhook scaffolding
-- Billing data models: subscriptions and usage records
-- Plan-based monthly execution limits
-- Usage metering on successful execution completion
-- Quota enforcement before execution dispatch
-- Billing summary internal API for subscription/usage snapshots
-- Billing dashboard with upgrade controls and usage visibility
-- Stripe webhook reconciliation by customer identity
-- Typed environment configuration for Stripe pricing and webhook secrets
+1. Sign up a user and bootstrap an organization.
+2. Create an agent from dashboard.
+3. Create a workflow and configure schedule/constraints.
+4. Trigger workflow execution.
+5. Inspect execution timeline and logs.
+6. Observe success/failure states and retry failures.
 
 ## Local Development
 
@@ -135,7 +80,7 @@ npm install
 cp .env.example .env.local
 ```
 
-Fill the required values in `.env.local`.
+Fill required values in `.env.local`.
 
 ### 3. Generate Prisma client
 
@@ -143,56 +88,67 @@ Fill the required values in `.env.local`.
 npm run prisma:generate
 ```
 
-### 4. Start the app
+### 4. Start app and worker
 
 ```bash
 npm run dev
+npm run worker:dev
 ```
 
-The app runs on `http://localhost:3000`.
+### 5. Seed demo data
 
-## Scripts
+```bash
+npm run db:seed
+```
 
-- `npm run dev` - Start local development server
-- `npm run build` - Build production bundle
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run format` - Auto-format repository files
-- `npm run format:check` - Verify formatting
-- `npm run prisma:generate` - Generate Prisma client
-- `npm run prisma:migrate:dev` - Run local development migrations
-- `npm run prisma:studio` - Open Prisma Studio
-- `npm run db:seed` - Seed owner user + demo organization
+## Docker Quick Start
+
+```bash
+docker compose up --build
+```
+
+Services:
+
+- App: `http://localhost:3000`
+- Postgres: `localhost:5432`
+- Redis: `localhost:6379`
+
+## Key Scripts
+
+- `npm run dev` - Next.js dev server
+- `npm run worker:dev` - BullMQ worker in watch mode
+- `npm run build` - Production app build
+- `npm run lint` - ESLint checks
+- `npm run prisma:migrate:dev` - Local migrations
+- `npm run db:seed` - Demo tenant and activity data
+
+## Documentation
+
+- Deployment guide: `docs/DEPLOYMENT.md`
+- Security review: `docs/SECURITY_REVIEW.md`
+- Architecture diagram and runtime model: `docs/ARCHITECTURE.md`
 
 ## Folder Structure
 
 ```text
 src/
-  app/                # Next.js App Router entrypoints
-  components/         # Shared UI and layout components
-  config/             # App/site/environment configuration
-  lib/                # Utility helpers
-  modules/            # Domain-level feature types and contracts
-  server/             # Server-side repositories and services (phase-based expansion)
-  types/              # Shared TypeScript types
+  app/                # Next.js routes and UI surfaces
+  components/         # Shared UI components
+  config/             # Environment and app configuration
+  lib/                # Shared utilities
+  modules/            # Domain-level types and schema contracts
+  server/             # Services, repositories, queue, integrations, security
+  worker/             # Queue worker runtime
+prisma/               # Schema, migrations, seed data
+docs/                 # Deployment, security, architecture
 ```
-
-## Internal API Surface (Phase 3)
-
-- `GET/POST /api/internal/agents`
-- `GET/POST /api/internal/workflows`
-- `GET/POST /api/internal/executions`
-- `POST /api/internal/workflows/[workflowId]/execute`
-- `POST /api/internal/executions/[executionId]/retry`
-- `GET /api/internal/queue/health`
-- `GET /api/internal/billing/summary`
 
 ## Engineering Principles
 
-- Strong typing and explicit boundaries by default
-- No placeholder architecture that cannot scale
-- Incremental delivery with production-oriented commit hygiene
-- Clear separation between UI, domain modules, and server orchestration layers
+- Strong type safety and explicit contracts
+- No placeholder architecture
+- Tenant isolation as a hard requirement
+- Incremental, reviewable commits suitable for startup velocity
 
 ## License
 
