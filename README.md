@@ -1,70 +1,81 @@
-# WebOps AI
+# Operon AI
 
-WebOps AI is a multi-tenant SaaS platform where businesses deploy AI web agents that execute real workflows on live websites using TinyFish.
+Operon AI is an AI-native SaaS platform for autonomous web operations.
 
-This product is built as a production-oriented foundation for a venture-scale company, not a hackathon demo.
+Teams use Operon AI to deploy agents that execute real workflows on live websites: navigation, session handling, multi-step actions, retries, and full audit history.
 
-## Investor Positioning
+Built for venture-scale growth from day one.
 
-- Category: AI-native web operations automation
-- Buyer: Growth, RevOps, QA, and internal automation teams
-- Core wedge: repeatable web workflows with execution traceability and org-level governance
-- Product moat: workflow + execution telemetry + billing + background orchestration in one control plane
+## One-Line Pitch
 
-## Product Capabilities
+Operon AI is the control plane for reliable AI web agents in production.
 
-- User signup and secure workspace access
-- Multi-tenant organizations with role-based permissions
-- Agent creation and workflow configuration (including schedule metadata)
-- Async workflow execution via queue workers
-- Execution timeline, logs, and retry actions
+## Why This Matters
+
+Browser work still powers critical operations across growth, RevOps, QA, and back-office teams. Most automation products break on real-world websites, lack observability, or cannot be governed safely in multi-tenant environments.
+
+Operon AI solves this with:
+
+- Workflow-driven execution, not prompt-only automation
+- Queue-backed reliability with retries and failure recovery
+- Tenant isolation and role-based access controls
+- Timeline-first execution observability
+- SaaS billing and usage controls out of the box
+
+## Product Overview
+
+Core product capabilities available now:
+
+- User signup and organization provisioning
+- Multi-tenant RBAC (owner/admin/member)
+- Agent and workflow creation
+- Manual and async workflow execution
+- Execution lifecycle tracking and structured logs
+- Retry operations for failed runs
 - Billing scaffold with Stripe checkout + webhook reconciliation
 - Usage metering and quota enforcement
 
-## Tech Stack
+## ICP and Wedge
 
-- Next.js 14 (App Router)
-- TypeScript (strict mode)
-- TailwindCSS
-- PostgreSQL + Prisma ORM
-- NextAuth (credentials sessions)
-- Redis + BullMQ
-- Stripe (billing scaffold)
-- TinyFish Web Agent API integration
-- Docker and Docker Compose
+- Initial ICP: startup and mid-market product teams with recurring browser workflows
+- Primary use cases: competitive monitoring, website QA, regression sweeps, operational back-office flows
+- Wedge: replace brittle scripts/manual browser labor with observable autonomous workflows
 
-## Phase Delivery Snapshot
+## Architecture Summary
 
-### Phase 1-3
+- Web app: Next.js 14 + TypeScript
+- Data layer: PostgreSQL + Prisma
+- Auth: NextAuth
+- Queueing: Redis + BullMQ
+- Billing: Stripe scaffold
+- Agent runtime integration: TinyFish Web Agent API
+- Deployment: Docker + Docker Compose
 
-- Project foundation, auth, org tenancy, and core data models
+See full architecture: `docs/ARCHITECTURE.md`
 
-### Phase 4-6
+## Production Readiness
 
-- Dashboard UX, workflow builder, and TinyFish execution integration
-
-### Phase 7-9
-
-- Background jobs, observability timeline, and billing/usage controls
-
-### Phase 10
+Phase 10 completion includes:
 
 - Multi-stage Docker build and compose runtime
-- Production deployment runbook
-- Shared API validation hardening
-- Targeted rate limits for auth/billing/execution actions
-- Stripe webhook hardening with strict metadata checks
-- Security review document and architecture specification
-- Demo seed data for agents/workflows/executions/logs/billing
+- Deployment runbook
+- Strict request validation across internal APIs
+- Route-level rate limiting for sensitive actions
+- Hardened Stripe webhook handling
+- Security review with residual risk register
+- Demo seed dataset for investor demos
 
-## Demo Flow (End of Phase 10)
+Security review: `docs/SECURITY_REVIEW.md`
+Deployment guide: `docs/DEPLOYMENT.md`
 
-1. Sign up a user and bootstrap an organization.
-2. Create an agent from dashboard.
-3. Create a workflow and configure schedule/constraints.
-4. Trigger workflow execution.
-5. Inspect execution timeline and logs.
-6. Observe success/failure states and retry failures.
+## Demo Flow
+
+1. Sign up and create organization.
+2. Create an agent.
+3. Define workflow and schedule metadata.
+4. Trigger execution.
+5. Inspect timeline and logs.
+6. Observe success/failure and retry.
 
 ## Local Development
 
@@ -80,15 +91,13 @@ npm install
 cp .env.example .env.local
 ```
 
-Fill required values in `.env.local`.
-
 ### 3. Generate Prisma client
 
 ```bash
 npm run prisma:generate
 ```
 
-### 4. Start app and worker
+### 4. Run app and worker
 
 ```bash
 npm run dev
@@ -122,33 +131,20 @@ Services:
 - `npm run prisma:migrate:dev` - Local migrations
 - `npm run db:seed` - Demo tenant and activity data
 
-## Documentation
-
-- Deployment guide: `docs/DEPLOYMENT.md`
-- Security review: `docs/SECURITY_REVIEW.md`
-- Architecture diagram and runtime model: `docs/ARCHITECTURE.md`
-
-## Folder Structure
+## Repository Structure
 
 ```text
 src/
-  app/                # Next.js routes and UI surfaces
+  app/                # Next.js routes and product UI
   components/         # Shared UI components
   config/             # Environment and app configuration
   lib/                # Shared utilities
-  modules/            # Domain-level types and schema contracts
+  modules/            # Domain schemas and contracts
   server/             # Services, repositories, queue, integrations, security
   worker/             # Queue worker runtime
 prisma/               # Schema, migrations, seed data
-docs/                 # Deployment, security, architecture
+docs/                 # Deployment, architecture, security
 ```
-
-## Engineering Principles
-
-- Strong type safety and explicit contracts
-- No placeholder architecture
-- Tenant isolation as a hard requirement
-- Incremental, reviewable commits suitable for startup velocity
 
 ## License
 
