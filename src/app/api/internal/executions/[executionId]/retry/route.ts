@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 import { createTraceId } from "@/server/observability/tracing";
 import { requireOrganizationRole } from "@/server/auth/authorization";
@@ -9,6 +10,10 @@ import {
   resetExecutionForRetry,
 } from "@/server/services/executions/execution-service";
 
+const paramsSchema = z.object({
+  executionId: z.string().trim().min(1),
+});
+
 type RouteContext = {
   params: {
     executionId: string;
@@ -17,9 +22,14 @@ type RouteContext = {
 
 export async function POST(_request: Request, context: RouteContext) {
   const user = await requireOrganizationRole("MEMBER");
+  const parsedParams = paramsSchema.safeParse(context.params);
+  if (!parsedParams.success) {
+    return NextResponse.json({ error: "Invalid execution identifier" }, { status: 400 });
+  }
+
   const execution = await fetchExecutionById({
     organizationId: user.organizationId!,
-    executionId: context.params.executionId,
+    executionId: parsedParams.data.executionId,
   });
 
   if (!execution) {

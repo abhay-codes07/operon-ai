@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 import { createTraceId } from "@/server/observability/tracing";
 import { requireOrganizationRole } from "@/server/auth/authorization";
@@ -6,6 +7,10 @@ import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer
 import { enforceExecutionQuotaOrThrow } from "@/server/services/billing/enforcement-service";
 import { appendExecutionEvent, queueExecution } from "@/server/services/executions/execution-service";
 import { fetchWorkflowById } from "@/server/services/workflows/workflow-service";
+
+const paramsSchema = z.object({
+  workflowId: z.string().trim().min(1),
+});
 
 type RouteContext = {
   params: {
@@ -15,9 +20,14 @@ type RouteContext = {
 
 export async function POST(_request: Request, context: RouteContext) {
   const user = await requireOrganizationRole("MEMBER");
+  const parsedParams = paramsSchema.safeParse(context.params);
+  if (!parsedParams.success) {
+    return NextResponse.json({ error: "Invalid workflow identifier" }, { status: 400 });
+  }
+
   const workflow = await fetchWorkflowById({
     organizationId: user.organizationId!,
-    workflowId: context.params.workflowId,
+    workflowId: parsedParams.data.workflowId,
   });
 
   if (!workflow) {
