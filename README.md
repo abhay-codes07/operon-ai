@@ -1,73 +1,60 @@
 # Operon AI
 
-## Category-Defining Statement
+## Category Thesis
 
-Operon AI is infrastructure for autonomous web operations.
-Teams run critical browser workflows through AI agents with control, reliability, and auditability.
+Operon AI defines the category of Autonomous Web Operations Infrastructure.
 
-## The Shift: Autonomous Web Operations
+It is the control layer for organizations that run revenue, product, and operational workflows across live websites, where execution reliability matters as much as intelligence.
 
-Revenue, support, compliance, and QA still run in the browser.
-The constraint is no longer model capability. The constraint is production reliability.
+## The New Operational Frontier
 
-Autonomous operations become standard when execution is repeatable, governed, and observable.
-Operon is built for that standard.
+The browser has become a production surface, not just a user interface.
+
+Critical business work now depends on repeated web interactions across fragmented systems. The bottleneck is no longer access to AI. The bottleneck is operating AI workflows with consistency, accountability, and control.
+
+Autonomous web workflows are becoming a core operating primitive. Operon turns that primitive into a system of record.
 
 ## What Operon Enables
 
-Operon converts manual browser work into managed systems.
-Workflows run consistently, failures recover predictably, and outcomes remain traceable.
+Operon converts fragile, manual browser work into governed operational throughput.
 
-Teams gain throughput without losing control.
+Teams ship faster without sacrificing oversight. Workflows execute with clear ownership, predictable recovery, and traceable outcomes. Operational decisions move from guesswork to evidence.
 
-## Designed for Teams Running Real Work
+The result is durable leverage: more work completed, fewer operational breaks, and a tighter path from intent to execution.
 
-Operon serves product, operations, and revenue teams with recurring browser-heavy workflows.
-It fits organizations where execution quality directly affects growth and reliability.
+## Who This Is For
 
-## Core System Pillars
+Operon serves product, growth, RevOps, QA, and operations teams that depend on recurring browser-based processes to run the business.
 
-**Workflow System**
-Agents execute explicit multi-step workflows, not ad hoc prompts.
+It fits organizations where workflow reliability directly influences revenue, customer experience, and delivery velocity.
 
-**Execution Reliability**
-Queue-backed orchestration and retry controls keep runs stable under load.
+## Core Product Tenets
 
-**Operational Visibility**
-Structured logs and timeline traces make every run inspectable.
+Operon is workflow-first. Agent behavior is defined, reviewable, and repeatable.
 
-**Tenant Governance**
-Multi-tenant boundaries and RBAC enforce access, ownership, and accountability.
+Operon is reliability-first. Execution is orchestrated for continuity under real operational conditions.
 
-**Commercial Control**
-Usage enforcement and billing integration align product behavior with account policy.
+Operon is accountability-first. Every run produces a clear operational trail.
 
-## Architecture Philosophy
+Operon is governance-first. Access, tenancy boundaries, and usage controls are non-negotiable system behavior.
 
-Operon treats automation as systems infrastructure.
-Execution state is durable, access is policy-driven, and runtime behavior is explicit.
+Operon is commercially aligned. Product usage and business model constraints remain in sync.
 
-The platform combines a typed application layer, durable data model, asynchronous execution fabric, and external web agent runtime.
-The result is predictable operations across app, worker, and tenant boundaries.
+## Demo Scenario
 
-## Why Operon Exists
+A growth operations lead creates a workflow to monitor competitor pricing changes and trigger internal follow-up.
 
-Teams need automation they can trust in production.
-Operon exists to make autonomous browser execution dependable, governable, and measurable.
+An agent executes the workflow on schedule, handles multi-step navigation, and records the full run context. The team reviews timeline events, validates outcomes, and retries failed runs with full traceability.
 
-## Production Deployment
+What was previously manual and intermittent becomes dependable and continuous.
 
-Operon ships as containerized web and worker services with isolated state backends.
-Environment-based configuration, queue isolation, and usage guardrails are part of the default operating model.
+## Engineering Posture
 
-## Demo Walkthrough
+Operon is engineered as operating infrastructure, not task automation.
 
-1. Create an account and workspace.
-2. Define an agent and workflow.
-3. Trigger execution on a live target.
-4. Review status, timeline, and logs.
-5. Retry failures and verify recovery.
-6. Inspect account usage controls.
+System boundaries are explicit. Execution state is durable. Operational behavior is observable. Governance is enforced at the platform level.
+
+The architecture is designed to preserve product velocity without compromising control.
 
 ## Local Development
 
@@ -80,21 +67,9 @@ npm run worker:dev
 npm run db:seed
 ```
 
-### Docker
+## Production Guide Notice
 
-```bash
-docker compose up --build
-```
+Production rollout guidance is documented in:
 
-## Repository Structure
-
-```text
-src/
-  app/
-  components/
-  config/
-  modules/
-  server/
-  worker/
-prisma/
-```
+- `docs/DEPLOYMENT.md`
+- `docs/ARCHITECTURE.md`
