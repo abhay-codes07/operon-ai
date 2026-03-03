@@ -1,81 +1,97 @@
 # Operon AI
 
-Operon AI is an AI-native SaaS platform for autonomous web operations.
+## Category-Defining Statement
 
-Teams use Operon AI to deploy agents that execute real workflows on live websites: navigation, session handling, multi-step actions, retries, and full audit history.
+Operon AI is the operating layer for autonomous web operations.
+It gives modern teams a reliable way to run critical browser workflows through AI agents, with the control, traceability, and uptime expectations of enterprise software.
 
-Built for venture-scale growth from day one.
+## The Shift: Autonomous Web Operations
 
-## One-Line Pitch
+Software teams already run revenue, support, compliance, and growth through browser-based systems. The interface to the internet is still the browser, and the browser is still full of repetitive operational work.
 
-Operon AI is the control plane for reliable AI web agents in production.
+The shift is no longer whether AI can perform these actions. The shift is whether those actions can be run as dependable production infrastructure.
 
-## Why This Matters
+Autonomous web operations becomes inevitable when three conditions are met: agents can execute multi-step tasks, organizations can govern access and risk, and teams can trust outcomes with full execution visibility. Operon is built around that convergence.
 
-Browser work still powers critical operations across growth, RevOps, QA, and back-office teams. Most automation products break on real-world websites, lack observability, or cannot be governed safely in multi-tenant environments.
+## What Operon Enables
 
-Operon AI solves this with:
+Operon turns web work from manual effort into managed systems.
 
-- Workflow-driven execution, not prompt-only automation
-- Queue-backed reliability with retries and failure recovery
-- Tenant isolation and role-based access controls
-- Timeline-first execution observability
-- SaaS billing and usage controls out of the box
+Teams move from one-off tasks to repeatable operations, from fragile scripts to auditable workflows, and from reactive firefighting to measurable execution quality.
 
-## Product Overview
+The result is simple: faster throughput, lower operational drag, and a durable automation layer that scales with the business.
 
-Core product capabilities available now:
+## Designed for Teams Running Real Work
 
-- User signup and organization provisioning
-- Multi-tenant RBAC (owner/admin/member)
-- Agent and workflow creation
-- Manual and async workflow execution
-- Execution lifecycle tracking and structured logs
-- Retry operations for failed runs
-- Billing scaffold with Stripe checkout + webhook reconciliation
-- Usage metering and quota enforcement
+Operon is designed for high-velocity product and operations organizations where browser workflows directly impact growth and reliability.
 
-## ICP and Wedge
+Primary teams include:
 
-- Initial ICP: startup and mid-market product teams with recurring browser workflows
-- Primary use cases: competitive monitoring, website QA, regression sweeps, operational back-office flows
-- Wedge: replace brittle scripts/manual browser labor with observable autonomous workflows
+- Growth and RevOps teams operating lead capture, enrichment, and market monitoring loops
+- Product and QA teams running recurring validation across live product surfaces
+- Operations teams managing repetitive, high-volume workflows across third-party web tools
 
-## Architecture Summary
+## Core System Pillars
 
-- Web app: Next.js 14 + TypeScript
-- Data layer: PostgreSQL + Prisma
-- Auth: NextAuth
-- Queueing: Redis + BullMQ
-- Billing: Stripe scaffold
-- Agent runtime integration: TinyFish Web Agent API
-- Deployment: Docker + Docker Compose
+**Workflow Intelligence**
+Operon models agent behavior as explicit, multi-step workflows so execution is structured, reviewable, and repeatable.
 
-See full architecture: `docs/ARCHITECTURE.md`
+**Reliable Execution Fabric**
+Queue-backed orchestration with retry controls ensures web tasks run predictably under real production conditions.
 
-## Production Readiness
+**Operational Visibility**
+Structured logs and timeline-based observability provide a clear narrative for every run, including failures and recovery paths.
 
-Phase 10 completion includes:
+**Tenant-Grade Governance**
+Multi-tenant architecture with role-based access control enforces clear boundaries for teams, permissions, and data ownership.
 
-- Multi-stage Docker build and compose runtime
-- Deployment runbook
-- Strict request validation across internal APIs
-- Route-level rate limiting for sensitive actions
-- Hardened Stripe webhook handling
-- Security review with residual risk register
-- Demo seed dataset for investor demos
+**Commercial Readiness**
+Billing and usage enforcement are integrated into the platform model so deployment and monetization can scale together.
 
-Security review: `docs/SECURITY_REVIEW.md`
-Deployment guide: `docs/DEPLOYMENT.md`
+## Architecture Philosophy
 
-## Demo Flow
+Operon is intentionally designed as software infrastructure, not an automation toy.
 
-1. Sign up and create organization.
-2. Create an agent.
-3. Define workflow and schedule metadata.
-4. Trigger execution.
-5. Inspect timeline and logs.
-6. Observe success/failure and retry.
+The application layer, execution layer, and data layer are separated with explicit contracts. Agent workflows are persisted and versionable. Execution state is durable. Access is policy-driven. Runtime concerns like retries, logging, and quota enforcement are treated as first-class system behavior.
+
+Stack decisions reflect this posture:
+
+- Next.js + TypeScript for product velocity with strict interfaces
+- PostgreSQL + Prisma for durable, relational execution history
+- Redis + BullMQ for controlled asynchronous job orchestration
+- NextAuth-based identity with organization-aware authorization
+- TinyFish Web Agent API for live web execution
+
+## Why Operon Exists
+
+Teams should not have to choose between speed and control when automating web operations.
+
+Operon exists to make autonomous browser work dependable enough for mission-critical workflows and clear enough for teams to trust at executive and operator levels alike.
+
+## Production Deployment
+
+Operon ships with a production-oriented deployment baseline:
+
+- Dockerized application and worker services
+- Redis and PostgreSQL service composition
+- Environment-driven configuration and secret boundaries
+- Deployment and security documentation for operational rollout
+
+For implementation details, see:
+
+- `docs/DEPLOYMENT.md`
+- `docs/SECURITY_REVIEW.md`
+- `docs/ARCHITECTURE.md`
+
+## Demo Walkthrough
+
+1. Create an account and provision an organization workspace.
+2. Define an agent aligned to a real operational objective.
+3. Configure a workflow with clear execution intent.
+4. Trigger a run against a live web target.
+5. Review timeline events, logs, and execution status.
+6. Retry failed runs and validate recovery behavior.
+7. Inspect usage and billing state in the account context.
 
 ## Local Development
 
@@ -97,55 +113,36 @@ cp .env.example .env.local
 npm run prisma:generate
 ```
 
-### 4. Run app and worker
+### 4. Start the app and worker
 
 ```bash
 npm run dev
 npm run worker:dev
 ```
 
-### 5. Seed demo data
+### 5. Seed local data
 
 ```bash
 npm run db:seed
 ```
 
-## Docker Quick Start
+### Docker quick start
 
 ```bash
 docker compose up --build
 ```
 
-Services:
-
-- App: `http://localhost:3000`
-- Postgres: `localhost:5432`
-- Redis: `localhost:6379`
-
-## Key Scripts
-
-- `npm run dev` - Next.js dev server
-- `npm run worker:dev` - BullMQ worker in watch mode
-- `npm run build` - Production app build
-- `npm run lint` - ESLint checks
-- `npm run prisma:migrate:dev` - Local migrations
-- `npm run db:seed` - Demo tenant and activity data
-
 ## Repository Structure
 
 ```text
 src/
-  app/                # Next.js routes and product UI
-  components/         # Shared UI components
-  config/             # Environment and app configuration
-  lib/                # Shared utilities
-  modules/            # Domain schemas and contracts
+  app/                # Routes and product surfaces
+  components/         # Shared UI
+  config/             # Runtime and environment configuration
+  lib/                # Utilities
+  modules/            # Domain contracts and schemas
   server/             # Services, repositories, queue, integrations, security
-  worker/             # Queue worker runtime
+  worker/             # Background execution runtime
 prisma/               # Schema, migrations, seed data
 docs/                 # Deployment, architecture, security
 ```
-
-## License
-
-Private repository. All rights reserved.
