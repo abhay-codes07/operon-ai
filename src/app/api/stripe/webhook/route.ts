@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
+import { z } from "zod";
 
 import { getAppEnv } from "@/config/env";
 import { getStripeClient } from "@/server/integrations/stripe/client";
+import { logWarn } from "@/server/observability/logger";
 import {
   getSubscriptionByStripeCustomerId,
   upsertOrganizationSubscription,
@@ -25,6 +27,11 @@ function mapStripeStatusToInternal(status: Stripe.Subscription.Status) {
   }
 }
 
+const checkoutMetadataSchema = z.object({
+  organizationId: z.string().trim().min(1),
+  plan: z.enum(["STARTER", "GROWTH"]),
+});
+
 export async function POST(request: Request) {
   const stripe = getStripeClient();
   const signature = request.headers.get("stripe-signature");
@@ -46,39 +53,58 @@ export async function POST(request: Request) {
     );
   }
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const organizationId = session.metadata?.organizationId;
-    const plan = session.metadata?.plan as "STARTER" | "GROWTH" | undefined;
+  try {
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const metadata = checkoutMetadataSchema.safeParse(session.metadata);
 
-    if (organizationId && session.customer && plan) {
+      if (!metadata.success || !session.customer) {
+        logWarn("Ignoring checkout session with incomplete metadata", {
+          component: "stripe-webhook",
+          metadata: {
+            eventId: event.id,
+          },
+        });
+        return NextResponse.json({ received: true });
+      }
+
       await upsertOrganizationSubscription({
-        organizationId,
+        organizationId: metadata.data.organizationId,
         stripeCustomerId: String(session.customer),
         stripeSubscriptionId: session.subscription ? String(session.subscription) : null,
-        plan,
+        plan: metadata.data.plan,
         status: "ACTIVE",
       });
     }
-  }
 
-  if (event.type === "customer.subscription.updated") {
-    const subscription = event.data.object as Stripe.Subscription;
-    const matched = await getSubscriptionByStripeCustomerId(String(subscription.customer));
+    if (event.type === "customer.subscription.updated") {
+      const subscription = event.data.object as Stripe.Subscription;
+      const matched = await getSubscriptionByStripeCustomerId(String(subscription.customer));
 
-    if (matched) {
-      await upsertOrganizationSubscription({
-        organizationId: matched.organizationId,
-        stripeCustomerId: String(subscription.customer),
-        stripeSubscriptionId: subscription.id,
-        plan: matched.plan,
-        status: mapStripeStatusToInternal(subscription.status),
-        currentPeriodStart: new Date(subscription.current_period_start * 1000),
-        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
-      });
+      if (matched) {
+        await upsertOrganizationSubscription({
+          organizationId: matched.organizationId,
+          stripeCustomerId: String(subscription.customer),
+          stripeSubscriptionId: subscription.id,
+          plan: matched.plan,
+          status: mapStripeStatusToInternal(subscription.status),
+          currentPeriodStart: new Date(subscription.current_period_start * 1000),
+          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        });
+      }
     }
-  }
 
-  return NextResponse.json({ received: true });
+    return NextResponse.json({ received: true });
+  } catch (error) {
+    logWarn("Stripe webhook processing failed", {
+      component: "stripe-webhook",
+      metadata: {
+        eventId: event.id,
+        type: event.type,
+        error: error instanceof Error ? error.message : "Unknown webhook error",
+      },
+    });
+    return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 });
+  }
 }
