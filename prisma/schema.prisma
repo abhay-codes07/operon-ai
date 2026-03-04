@@ -88,6 +88,27 @@ enum ChangeSeverity {
   HIGH
 }
 
+enum ExecutionControlAction {
+  PAUSE
+  RESUME
+  STEP
+  OVERRIDE_ACTION
+  STOP
+}
+
+enum ExecutionControlCommandStatus {
+  PENDING
+  APPLIED
+  REJECTED
+}
+
+enum ApprovalRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -118,6 +139,8 @@ model User {
   createdAgents Agent[]           @relation("AgentCreatedBy")
   createdWorkflows Workflow[]     @relation("WorkflowCreatedBy")
   requestedExecutions Execution[] @relation("ExecutionRequestedBy")
+  reviewedApprovals ApprovalRequest[] @relation("ApprovalReviewedBy")
+  debugSessions DebugSession[]
 
   @@index([createdAt])
 }
@@ -149,6 +172,11 @@ model Organization {
   changeEvents ChangeEvent[]
   selectorHistory SelectorHistory[]
   adaptiveWorkflows AdaptiveWorkflow[]
+  executionStreamEvents ExecutionStreamEvent[]
+  executionControlCommands ExecutionControlCommand[]
+  approvalRequests ApprovalRequest[]
+  systemFlags SystemFlag[]
+  debugSessions DebugSession[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -254,6 +282,7 @@ model Workflow {
   changeEvents   ChangeEvent[]
   selectorHistory SelectorHistory[]
   adaptiveWorkflow AdaptiveWorkflow?
+  approvalRequests ApprovalRequest[]
 
   @@index([organizationId, status])
   @@index([organizationId, agentId, createdAt])
@@ -288,6 +317,13 @@ model Execution {
   failureAnalysis FailureAnalysis?
   pageSnapshots  PageSnapshot[]
   changeEvents   ChangeEvent[]
+  streamEvents   ExecutionStreamEvent[]
+  controlCommands ExecutionControlCommand[]
+  approvalRequests ApprovalRequest[]
+  debugSessions  DebugSession[]
+  isPaused       Boolean          @default(false)
+  stepCursor     Int              @default(0)
+  debugMode      Boolean          @default(false)
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, agentId, createdAt])
@@ -596,6 +632,91 @@ model AdaptiveWorkflow {
   workflow           Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 
   @@index([organizationId, applied, updatedAt])
+}
+
+model ExecutionStreamEvent {
+  id             String       @id @default(cuid())
+  organizationId String
+  executionId    String
+  sequence       Int
+  eventType      String
+  payload        Json
+  occurredAt     DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  execution      Execution    @relation(fields: [executionId], references: [id], onDelete: Cascade)
+
+  @@unique([executionId, sequence])
+  @@index([organizationId, executionId, occurredAt])
+}
+
+model ExecutionControlCommand {
+  id             String                        @id @default(cuid())
+  organizationId String
+  executionId    String
+  action         ExecutionControlAction
+  status         ExecutionControlCommandStatus @default(PENDING)
+  reason         String?
+  payload        Json?
+  createdAt      DateTime                      @default(now())
+  appliedAt      DateTime?
+  organization   Organization                  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  execution      Execution                     @relation(fields: [executionId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, executionId, createdAt])
+  @@index([executionId, status, createdAt])
+}
+
+model ApprovalRequest {
+  id             String                @id @default(cuid())
+  organizationId String
+  executionId    String?
+  workflowId     String?
+  stepKey        String?
+  actionType     String
+  actionPayload  Json
+  status         ApprovalRequestStatus @default(PENDING)
+  requestedAt    DateTime              @default(now())
+  reviewedAt     DateTime?
+  reviewedById   String?
+  reviewNote     String?
+  expiresAt      DateTime?
+  organization   Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  execution      Execution?            @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  workflow       Workflow?             @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+  reviewedBy     User?                 @relation("ApprovalReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status, requestedAt])
+  @@index([executionId, status])
+}
+
+model SystemFlag {
+  id             String       @id @default(cuid())
+  organizationId String?
+  key            String
+  enabled        Boolean      @default(false)
+  metadata       Json?
+  updatedAt      DateTime     @updatedAt
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, key])
+  @@index([key, enabled, updatedAt])
+}
+
+model DebugSession {
+  id             String       @id @default(cuid())
+  organizationId String
+  executionId    String
+  userId         String?
+  active         Boolean      @default(true)
+  notes          String?
+  selectorPatch  Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  execution      Execution    @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, executionId, active])
 }
 
 model Subscription {
