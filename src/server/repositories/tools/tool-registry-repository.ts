@@ -145,6 +145,19 @@ export async function createToolExecution(input: unknown): Promise<ToolExecution
   });
 }
 
+export async function listToolExecutions(input: { organizationId: string; toolId: string }) {
+  return prisma.toolExecution.findMany({
+    where: {
+      organizationId: input.organizationId,
+      toolId: input.toolId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 100,
+  });
+}
+
 export async function incrementToolUsageAndReliability(input: {
   toolId: string;
   success: boolean;

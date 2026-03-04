@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { parseJsonBody } from "@/server/api/validation";
 import { requireOrganizationRole } from "@/server/auth/authorization";
+import { fetchToolExecutions } from "@/server/services/tools/tool-registry-service";
 import { learnFromToolExecution } from "@/server/services/tools/tool-learning-engine";
 
 const bodySchema = z.object({
@@ -17,6 +18,16 @@ type RouteContext = {
     toolId: string;
   };
 };
+
+export async function GET(_request: Request, context: RouteContext) {
+  const user = await requireOrganizationRole("MEMBER");
+  const items = await fetchToolExecutions({
+    organizationId: user.organizationId!,
+    toolId: context.params.toolId,
+  });
+
+  return NextResponse.json({ items });
+}
 
 export async function POST(request: Request, context: RouteContext) {
   const user = await requireOrganizationRole("ADMIN");

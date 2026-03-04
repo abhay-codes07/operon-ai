@@ -7,6 +7,7 @@ import {
   incrementToolUsageAndReliability,
   installToolToWorkflow,
   listTools,
+  listToolExecutions,
   listToolVersions,
   listWorkflowInstalledTools,
 } from "@/server/repositories/tools/tool-registry-repository";
@@ -78,4 +79,8 @@ export async function fetchInstalledTools(input: { organizationId: string; workf
 
 export async function fetchToolRegistryMetrics(organizationId: string) {
   return getToolRegistryMetrics(organizationId);
+}
+
+export async function fetchToolExecutions(input: { organizationId: string; toolId: string }) {
+  return listToolExecutions(input);
 }
