@@ -11,6 +11,7 @@ import {
   rememberExecutionPattern,
 } from "@/server/services/agents/memory-service";
 import { recordExecutionUsage } from "@/server/services/billing/usage-service";
+import { analyzeExecutionFailure } from "@/server/services/executions/failure-analysis-service";
 import {
   captureExecutionDomSnapshot,
   persistExecutionReplaySteps,
@@ -312,6 +313,13 @@ export async function runExecutionWithTinyFish(
     retriesUsed: 0,
     failureCategory: parsed.status === "FAILED" ? "UNKNOWN" : undefined,
   });
+
+  if (parsed.status === "FAILED") {
+    await analyzeExecutionFailure({
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+    });
+  }
 
   await appendExecutionEvent({
     organizationId: input.organizationId,
