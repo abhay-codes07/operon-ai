@@ -31,6 +31,8 @@ import {
 import { registerPageSnapshot } from "@/server/services/monitoring/change-radar-service";
 import { registerSelectorFailure } from "@/server/services/workflows/autonomy-engine";
 import { generateToolFromExecutionFailure } from "@/server/services/tools/tool-generation-service";
+import { fetchInstalledTools } from "@/server/services/tools/tool-registry-service";
+import { learnFromToolExecution } from "@/server/services/tools/tool-learning-engine";
 import {
   captureExecutionDomSnapshot,
   persistExecutionReplaySteps,
@@ -486,6 +488,24 @@ export async function runExecutionWithTinyFish(
       organizationId: input.organizationId,
       agentId: input.agentId,
       executionId: input.executionId,
+    }).catch(() => null);
+  }
+
+  const installedTools = await fetchInstalledTools({
+    organizationId: input.organizationId,
+    workflowId: workflow.id,
+  }).catch(() => []);
+  for (const installation of installedTools) {
+    await learnFromToolExecution({
+      organizationId: input.organizationId,
+      toolId: installation.toolId,
+      status: parsed.status === "FAILED" ? "FAILED" : "SUCCEEDED",
+      durationMs:
+        finalizedExecution.startedAt && finalizedExecution.finishedAt
+          ? finalizedExecution.finishedAt.getTime() - finalizedExecution.startedAt.getTime()
+          : 0,
+      executionId: input.executionId,
+      errorMessage: parsed.errorMessage,
     }).catch(() => null);
   }
 
