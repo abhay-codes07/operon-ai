@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ExecutionDetailLivePanel } from "@/components/dashboard/activity/execution-detail-live-panel";
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { requireOrganizationRole } from "@/server/auth/authorization";
+import { fetchExecutionReplay } from "@/server/services/executions/replay-service";
 import { fetchExecutionById, fetchExecutionTimeline } from "@/server/services/executions/execution-service";
 
 type DashboardExecutionDetailPageProps = {
@@ -29,12 +30,18 @@ export default async function DashboardExecutionDetailPage({
     );
   }
 
-  const timeline = await fetchExecutionTimeline({
-    organizationId: user.organizationId!,
-    executionId: execution.id,
-    page: 1,
-    pageSize: 100,
-  });
+  const [timeline, replay] = await Promise.all([
+    fetchExecutionTimeline({
+      organizationId: user.organizationId!,
+      executionId: execution.id,
+      page: 1,
+      pageSize: 100,
+    }),
+    fetchExecutionReplay({
+      organizationId: user.organizationId!,
+      executionId: execution.id,
+    }),
+  ]);
 
   return (
     <div className="space-y-5">
@@ -49,6 +56,13 @@ export default async function DashboardExecutionDetailPage({
           ...item,
           occurredAt: item.occurredAt.toISOString(),
         }))}
+        initialReplay={{
+          steps: replay.steps,
+          snapshots: replay.snapshots.map((item) => ({
+            ...item,
+            capturedAt: item.capturedAt.toISOString(),
+          })),
+        }}
       />
     </div>
   );

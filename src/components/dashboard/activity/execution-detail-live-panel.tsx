@@ -6,6 +6,7 @@ import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { ExecutionStatusBadge } from "@/components/dashboard/status/execution-status-badge";
 import { usePolling } from "@/lib/hooks/use-polling";
 
+import { ExecutionReplayViewer } from "./execution-replay-viewer";
 import { ExecutionLogTimeline } from "./execution-log-timeline";
 import { RetryExecutionButton } from "./retry-execution-button";
 
@@ -30,14 +31,34 @@ type ExecutionLog = {
 type ExecutionDetailLivePanelProps = {
   initialExecution: ExecutionDetail;
   initialLogs: ExecutionLog[];
+  initialReplay: {
+    steps: Array<{
+      id: string;
+      stepIndex: number;
+      stepKey: string;
+      action: string;
+      target?: string | null;
+      status: "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED" | "SKIPPED";
+      metadata?: Record<string, unknown> | null;
+    }>;
+    snapshots: Array<{
+      id: string;
+      executionStepId?: string | null;
+      pageUrl?: string | null;
+      domHtml: string;
+      capturedAt: string;
+    }>;
+  };
 };
 
 export function ExecutionDetailLivePanel({
   initialExecution,
   initialLogs,
+  initialReplay,
 }: ExecutionDetailLivePanelProps): JSX.Element {
   const [execution, setExecution] = useState(initialExecution);
   const [logs, setLogs] = useState(initialLogs);
+  const [replay, setReplay] = useState(initialReplay);
 
   const refresh = useCallback(async () => {
     const executionResponse = await fetch(`/api/internal/executions/${initialExecution.id}`, {
@@ -56,6 +77,15 @@ export function ExecutionDetailLivePanel({
     if (logsResponse.ok) {
       const logsPayload = (await logsResponse.json()) as { items: ExecutionLog[] };
       setLogs(logsPayload.items);
+    }
+
+    const replayResponse = await fetch(`/api/internal/executions/${initialExecution.id}/replay`, {
+      cache: "no-store",
+    });
+
+    if (replayResponse.ok) {
+      const replayPayload = (await replayResponse.json()) as typeof initialReplay;
+      setReplay(replayPayload);
     }
   }, [initialExecution.id]);
 
@@ -119,6 +149,13 @@ export function ExecutionDetailLivePanel({
 
       <DashboardCard title="Execution Timeline" description="Ordered events emitted during processing">
         <ExecutionLogTimeline logs={mappedLogs} />
+      </DashboardCard>
+
+      <DashboardCard
+        title="Deterministic Replay"
+        description="Stepwise replay with captured DOM snapshots for time-travel debugging"
+      >
+        <ExecutionReplayViewer steps={replay.steps} snapshots={replay.snapshots} />
       </DashboardCard>
     </>
   );
