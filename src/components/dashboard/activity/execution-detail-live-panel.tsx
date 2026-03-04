@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
@@ -177,7 +178,15 @@ export function ExecutionDetailLivePanel({
           <ExecutionStatusBadge status={execution.status} />
           <p className="text-xs text-slate-500">Auto-refresh enabled while execution is active</p>
         </div>
-        {execution.status === "FAILED" ? <RetryExecutionButton executionId={execution.id} /> : null}
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/dashboard/live/${execution.id}`}
+            className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            Live View
+          </Link>
+          {execution.status === "FAILED" ? <RetryExecutionButton executionId={execution.id} /> : null}
+        </div>
       </div>
 
       <DashboardCard title={`Execution ${execution.id.slice(-8)}`} description="Detailed execution telemetry">
