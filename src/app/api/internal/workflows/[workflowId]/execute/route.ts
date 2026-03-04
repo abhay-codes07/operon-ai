@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createTraceId } from "@/server/observability/tracing";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer";
+import { publishExecutionStreamEvent } from "@/server/services/control-plane/streaming-service";
 import { isAgentExecutionEnabled } from "@/server/services/control-plane/system-flag-service";
 import { enforceRateLimit } from "@/server/security/rate-limit";
 import { evaluateWorkflowAgainstPolicy } from "@/server/security/policy-engine";
@@ -112,6 +113,17 @@ export async function POST(request: Request, context: RouteContext) {
     message: "Execution enqueued for background processing",
     metadata: {
       queue: "execution",
+      traceId,
+    },
+  });
+
+  await publishExecutionStreamEvent({
+    organizationId: user.organizationId!,
+    executionId: execution.id,
+    eventType: "execution.enqueued",
+    payload: {
+      workflowId: workflow.id,
+      trigger: "MANUAL",
       traceId,
     },
   });

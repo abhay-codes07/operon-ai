@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createTraceId } from "@/server/observability/tracing";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer";
+import { publishExecutionStreamEvent } from "@/server/services/control-plane/streaming-service";
 import { enforceRateLimit } from "@/server/security/rate-limit";
 import {
   appendExecutionEvent,
@@ -75,6 +76,16 @@ export async function POST(request: Request, context: RouteContext) {
     metadata: {
       requestedByUserId: user.id,
       traceId,
+    },
+  });
+
+  await publishExecutionStreamEvent({
+    organizationId: user.organizationId!,
+    executionId: execution.id,
+    eventType: "execution.retry.enqueued",
+    payload: {
+      traceId,
+      requestedByUserId: user.id,
     },
   });
 
