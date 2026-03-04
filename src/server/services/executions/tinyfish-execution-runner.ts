@@ -11,6 +11,7 @@ import {
   applyPendingExecutionControlCommands,
   enqueueExecutionControlCommand,
 } from "@/server/services/control-plane/execution-control-service";
+import { ensureApprovalForStep } from "@/server/services/control-plane/approval-service";
 import {
   isAgentExecutionEnabled,
 } from "@/server/services/control-plane/system-flag-service";
@@ -298,6 +299,30 @@ export async function runExecutionWithTinyFish(
       similarityScore: 0,
       attempts: [],
     };
+
+    const approval = await ensureApprovalForStep({
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+      workflowId: workflow.id,
+      stepKey: replayStep.stepKey,
+      actionType: replayStep.action,
+      actionPayload: {
+        target: replayStep.target ?? null,
+      },
+    });
+    if (!approval.approved) {
+      await publishExecutionStreamEvent({
+        organizationId: input.organizationId,
+        executionId: input.executionId,
+        eventType: "approval.pending",
+        payload: {
+          approvalRequestId: approval.request?.id ?? null,
+          stepKey: replayStep.stepKey,
+          action: replayStep.action,
+        },
+      });
+      continue;
+    }
 
     await recordSelfHealingResolution({
       organizationId: input.organizationId,
