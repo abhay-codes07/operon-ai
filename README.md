@@ -68,6 +68,16 @@ Operational Guardrails enforce organization policy for domains, actions, and exe
 
 Workflow Simulation predicts path quality and selector risk before any live action is taken.
 
+Agent Reliability Scoring computes trust from success rate, retries, failure frequency, and runtime duration.
+
+Failure Root Cause Analysis classifies execution failures into structured categories with evidence from logs, steps, and DOM context.
+
+Cross-Agent Knowledge Graph shares domain intelligence and recurring signals across all agents in an organization.
+
+Web Change Radar computes DOM hashes, detects structural drift, and raises actionable change alerts in the dashboard.
+
+Autonomy Mode learns recurring selector failures and proposes safe adaptive workflow definitions for operator review.
+
 ## Local Development
 
 ```bash
