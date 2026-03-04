@@ -2,6 +2,7 @@ import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { ErrorPanel } from "@/components/ui/feedback/error-panel";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { requireAuthenticatedUser } from "@/server/auth/authorization";
+import { fetchChangeRadarFeed } from "@/server/services/monitoring/change-radar-service";
 import { getExecutionQueueHealth } from "@/server/queue/monitoring/health";
 
 type DashboardPageProps = {
@@ -14,6 +15,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const user = await requireAuthenticatedUser();
   const hasRoleError = searchParams?.error === "insufficient-role";
   const queueHealth = await getExecutionQueueHealth().catch(() => null);
+  const changeEvents = user.organizationId
+    ? await fetchChangeRadarFeed(user.organizationId).catch(() => [])
+    : [];
 
   return (
     <div className="space-y-5">
@@ -100,6 +104,26 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             </p>
           </article>
         </div>
+      </DashboardCard>
+
+      <DashboardCard title="Web Change Radar" description="Detected structural drift across monitored web surfaces.">
+        {changeEvents.length === 0 ? (
+          <p className="text-sm text-slate-600">No structural drift detected in recent executions.</p>
+        ) : (
+          <div className="space-y-2">
+            {changeEvents.slice(0, 8).map((event) => (
+              <article key={event.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-semibold text-slate-900">{event.pageSnapshot.url}</p>
+                  <span className="text-xs font-semibold text-slate-500">{event.severity}</span>
+                </div>
+                <p className="text-xs text-slate-600">
+                  {event.changeType} • {new Date(event.detectedAt).toLocaleString()}
+                </p>
+              </article>
+            ))}
+          </div>
+        )}
       </DashboardCard>
     </div>
   );
