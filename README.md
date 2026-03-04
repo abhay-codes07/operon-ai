@@ -80,6 +80,8 @@ Autonomy Mode learns recurring selector failures and proposes safe adaptive work
 
 Real-Time Agent Control Plane enables live session streaming, approval gates, runtime controls, emergency shutdown, and debug attach workflows.
 
+Dynamic Tool Generation Engine allows agents to generate, validate, version, install, and continuously optimize reusable automation tools from failed runs.
+
 ## Local Development
 
 ```bash
