@@ -56,6 +56,18 @@ System boundaries are explicit. Execution state is durable. Operational behavior
 
 The architecture is designed to preserve product velocity without compromising control.
 
+## Advanced Runtime Capabilities
+
+Deterministic Replay captures execution steps and DOM state for time-travel debugging.
+
+Self-Healing Execution resolves selector drift through semantic fallback strategies and scored recovery paths.
+
+Agent Memory persists run metadata and failure resolution patterns so future runs adapt with context.
+
+Operational Guardrails enforce organization policy for domains, actions, and execution windows before dispatch.
+
+Workflow Simulation predicts path quality and selector risk before any live action is taken.
+
 ## Local Development
 
 ```bash
