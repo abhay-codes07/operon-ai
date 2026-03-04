@@ -100,6 +100,10 @@ export async function runExecutionWithTinyFish(
   if (!workflow) {
     throw new Error("Workflow not found for organization");
   }
+  const installedTools = await fetchInstalledTools({
+    organizationId: input.organizationId,
+    workflowId: workflow.id,
+  }).catch(() => []);
 
   if (!(await isAgentExecutionEnabled())) {
     throw new Error("Agent execution disabled by global kill switch");
@@ -120,6 +124,23 @@ export async function runExecutionWithTinyFish(
       traceId: input.traceId,
     },
   });
+
+  if (installedTools.length > 0) {
+    await appendExecutionEvent({
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+      level: "INFO",
+      message: "Installed tools attached to execution context",
+      metadata: {
+        toolCount: installedTools.length,
+        tools: installedTools.map((item) => ({
+          toolId: item.toolId,
+          toolVersionId: item.toolVersionId,
+          name: item.tool.name,
+        })),
+      },
+    });
+  }
 
   await publishExecutionStreamEvent({
     organizationId: input.organizationId,
@@ -163,6 +184,11 @@ export async function runExecutionWithTinyFish(
           (step) => step.target,
         ),
       }),
+      installedTools: installedTools.map((tool) => ({
+        toolId: tool.toolId,
+        toolVersionId: tool.toolVersionId,
+        name: tool.tool.name,
+      })),
     },
   });
 
@@ -491,10 +517,6 @@ export async function runExecutionWithTinyFish(
     }).catch(() => null);
   }
 
-  const installedTools = await fetchInstalledTools({
-    organizationId: input.organizationId,
-    workflowId: workflow.id,
-  }).catch(() => []);
   for (const installation of installedTools) {
     await learnFromToolExecution({
       organizationId: input.organizationId,
