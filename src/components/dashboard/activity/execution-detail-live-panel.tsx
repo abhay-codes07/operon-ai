@@ -13,6 +13,7 @@ import { RetryExecutionButton } from "./retry-execution-button";
 import { SelfHealingPanel } from "./self-healing-panel";
 import { AgentMemoryPanel } from "./agent-memory-panel";
 import { FailureAnalysisPanel } from "./failure-analysis-panel";
+import { DebugSessionPanel } from "./debug-session-panel";
 
 type ExecutionDetail = {
   id: string;
@@ -77,6 +78,11 @@ type ExecutionDetailLivePanelProps = {
     evidence?: Record<string, unknown> | null;
     updatedAt: string;
   } | null;
+  initialDebugSessions: Array<{
+    id: string;
+    notes?: string | null;
+    createdAt: string;
+  }>;
 };
 
 export function ExecutionDetailLivePanel({
@@ -86,6 +92,7 @@ export function ExecutionDetailLivePanel({
   initialSelfHealingRecords,
   initialMemoryEntries,
   initialFailureAnalysis,
+  initialDebugSessions,
 }: ExecutionDetailLivePanelProps): JSX.Element {
   const [execution, setExecution] = useState(initialExecution);
   const [logs, setLogs] = useState(initialLogs);
@@ -250,6 +257,13 @@ export function ExecutionDetailLivePanel({
         description="Automated classification generated from logs, failed steps, and DOM capture context"
       >
         <FailureAnalysisPanel analysis={failureAnalysis} />
+      </DashboardCard>
+
+      <DashboardCard
+        title="Execution Debug Mode"
+        description="Attach to running agents for step inspection and selector correction"
+      >
+        <DebugSessionPanel executionId={execution.id} initialSessions={initialDebugSessions} />
       </DashboardCard>
     </>
   );

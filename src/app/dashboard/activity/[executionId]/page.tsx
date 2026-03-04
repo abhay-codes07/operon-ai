@@ -4,6 +4,7 @@ import { ExecutionDetailLivePanel } from "@/components/dashboard/activity/execut
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { fetchAgentMemoryContext } from "@/server/services/agents/memory-service";
+import { fetchActiveDebugSessions } from "@/server/services/control-plane/debug-session-manager";
 import { fetchFailureAnalysis } from "@/server/services/executions/failure-analysis-service";
 import { fetchExecutionReplay } from "@/server/services/executions/replay-service";
 import { fetchExecutionById, fetchExecutionTimeline } from "@/server/services/executions/execution-service";
@@ -33,7 +34,7 @@ export default async function DashboardExecutionDetailPage({
     );
   }
 
-  const [timeline, replay, selfHealingRecords, memoryEntries, failureAnalysis] = await Promise.all([
+  const [timeline, replay, selfHealingRecords, memoryEntries, failureAnalysis, debugSessions] = await Promise.all([
     fetchExecutionTimeline({
       organizationId: user.organizationId!,
       executionId: execution.id,
@@ -54,6 +55,10 @@ export default async function DashboardExecutionDetailPage({
       workflowId: execution.workflowId ?? undefined,
     }),
     fetchFailureAnalysis({
+      organizationId: user.organizationId!,
+      executionId: execution.id,
+    }),
+    fetchActiveDebugSessions({
       organizationId: user.organizationId!,
       executionId: execution.id,
     }),
@@ -98,6 +103,11 @@ export default async function DashboardExecutionDetailPage({
               }
             : null
         }
+        initialDebugSessions={debugSessions.map((session) => ({
+          id: session.id,
+          notes: session.notes ?? null,
+          createdAt: session.createdAt.toISOString(),
+        }))}
       />
     </div>
   );
