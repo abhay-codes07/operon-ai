@@ -34,14 +34,22 @@ export async function POST(request: Request, context: RouteContext) {
     return error;
   }
 
-  const installed = await installTool({
-    organizationId: user.organizationId!,
-    workflowId: context.params.workflowId,
-    toolId: data.toolId,
-    toolVersionId: data.toolVersionId,
-    installedById: user.id,
-    config: data.config,
-  });
+  let installed;
+  try {
+    installed = await installTool({
+      organizationId: user.organizationId!,
+      workflowId: context.params.workflowId,
+      toolId: data.toolId,
+      toolVersionId: data.toolVersionId,
+      installedById: user.id,
+      config: data.config,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Tool installation failed" },
+      { status: 400 },
+    );
+  }
 
   return NextResponse.json({ installed }, { status: 201 });
 }

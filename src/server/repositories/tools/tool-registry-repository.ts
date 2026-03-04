@@ -174,6 +174,21 @@ export async function incrementToolUsageAndReliability(input: {
 
 export async function installToolToWorkflow(input: unknown) {
   const parsed = installToolSchema.parse(input);
+  const version = await prisma.toolVersion.findFirst({
+    where: {
+      id: parsed.toolVersionId,
+      toolId: parsed.toolId,
+      organizationId: parsed.organizationId,
+    },
+    select: {
+      id: true,
+      validated: true,
+    },
+  });
+
+  if (!version || !version.validated) {
+    throw new Error("Cannot install unvalidated tool version");
+  }
 
   return prisma.toolInstallation.upsert({
     where: {
