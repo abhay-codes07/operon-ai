@@ -6,6 +6,10 @@ import { buildTinyFishExecutionRequest } from "@/server/integrations/tinyfish/re
 import { parseTinyFishExecutionResponse } from "@/server/integrations/tinyfish/response-parser";
 import { logInfo } from "@/server/observability/logger";
 import { recordExecutionUsage } from "@/server/services/billing/usage-service";
+import {
+  captureExecutionDomSnapshot,
+  persistExecutionReplaySteps,
+} from "@/server/services/executions/replay-service";
 import { persistScreenshotArtifact } from "@/server/services/storage/screenshot-storage";
 import { fetchWorkflowById } from "@/server/services/workflows/workflow-service";
 
@@ -22,6 +26,29 @@ type RunTinyFishExecutionInput = {
   workflowId: string;
   traceId?: string;
 };
+
+type WorkflowDefinitionStep = {
+  id: string;
+  action: string;
+  target: string;
+  expectedOutcome: string;
+};
+
+function toReplayStepStatus(
+  overallStatus: ExecutionStatus,
+  stepIndex: number,
+  totalSteps: number,
+): "SUCCEEDED" | "FAILED" | "SKIPPED" {
+  if (overallStatus === "SUCCEEDED") {
+    return "SUCCEEDED";
+  }
+
+  if (overallStatus === "FAILED") {
+    return stepIndex === totalSteps - 1 ? "FAILED" : "SUCCEEDED";
+  }
+
+  return "SKIPPED";
+}
 
 function shouldRetryTinyFishError(error: unknown): boolean {
   if (error instanceof TinyFishApiError) {
@@ -72,7 +99,7 @@ export async function runExecutionWithTinyFish(
     workflowName: workflow.name,
     definition: definition as {
       naturalLanguageTask: string;
-      steps: Array<{ id: string; action: string; target: string; expectedOutcome: string }>;
+      steps: WorkflowDefinitionStep[];
       guardrails: string[];
       timeoutSeconds: number;
       retryLimit: number;
@@ -104,6 +131,40 @@ export async function runExecutionWithTinyFish(
   );
 
   const parsed = parseTinyFishExecutionResponse(providerResponse);
+
+  const workflowSteps = (definition as { steps?: WorkflowDefinitionStep[] }).steps ?? [];
+  const replaySteps = await persistExecutionReplaySteps({
+    organizationId: input.organizationId,
+    executionId: input.executionId,
+    steps: workflowSteps.map((step, index) => ({
+      stepIndex: index,
+      stepKey: step.id,
+      action: step.action,
+      target: step.target,
+      status: toReplayStepStatus(parsed.status, index, workflowSteps.length),
+      metadata: {
+        expectedOutcome: step.expectedOutcome,
+        providerExecutionId: parsed.providerExecutionId,
+      },
+      startedAt: new Date(),
+      finishedAt: new Date(),
+    })),
+  });
+
+  for (const replayStep of replaySteps) {
+    await captureExecutionDomSnapshot({
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+      executionStepId: replayStep.id,
+      pageUrl: `https://replay.operon.ai/${input.executionId}/steps/${replayStep.stepIndex}`,
+      domHtml: `<html><body><h1>Replay Snapshot</h1><p>Execution: ${input.executionId}</p><p>Step: ${replayStep.stepKey}</p><p>Action: ${replayStep.action}</p></body></html>`,
+      metadata: {
+        source: "tinyfish-replay-capture",
+        traceId: input.traceId,
+        stepStatus: replayStep.status,
+      },
+    });
+  }
 
   for (const log of parsed.logs) {
     await appendExecutionEvent({
