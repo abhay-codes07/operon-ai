@@ -6,6 +6,7 @@ import {
   setExecutionStatus,
 } from "@/server/services/executions/execution-service";
 import { logError, logInfo } from "@/server/observability/logger";
+import { publishExecutionStreamEvent } from "@/server/services/control-plane/streaming-service";
 import { runExecutionWithTinyFish } from "@/server/services/executions/tinyfish-execution-runner";
 
 import { getQueueRedisConnection } from "../connection";
@@ -38,6 +39,16 @@ export function startExecutionWorker(): Worker<ExecutionJobData> {
           attempt: job.attemptsMade + 1,
           queueJobId: job.id,
           traceId: job.data.traceId,
+        },
+      });
+
+      await publishExecutionStreamEvent({
+        organizationId: job.data.organizationId,
+        executionId: job.data.executionId,
+        eventType: "worker.picked",
+        payload: {
+          queueJobId: job.id,
+          attempt: job.attemptsMade + 1,
         },
       });
 
@@ -117,6 +128,17 @@ export function startExecutionWorker(): Worker<ExecutionJobData> {
         attemptsMade: job.attemptsMade,
         failedReason,
         traceId: job.data.traceId,
+      },
+    });
+
+    await publishExecutionStreamEvent({
+      organizationId: job.data.organizationId,
+      executionId: job.data.executionId,
+      eventType: "worker.failed",
+      payload: {
+        queueJobId: job.id,
+        attemptsMade: job.attemptsMade,
+        failedReason,
       },
     });
   });
