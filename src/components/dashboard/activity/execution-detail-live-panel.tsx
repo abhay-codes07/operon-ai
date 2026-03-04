@@ -14,6 +14,7 @@ import { SelfHealingPanel } from "./self-healing-panel";
 import { AgentMemoryPanel } from "./agent-memory-panel";
 import { FailureAnalysisPanel } from "./failure-analysis-panel";
 import { DebugSessionPanel } from "./debug-session-panel";
+import { GenerateToolButton } from "./generate-tool-button";
 
 type ExecutionDetail = {
   id: string;
@@ -192,6 +193,9 @@ export function ExecutionDetailLivePanel({
           >
             Live View
           </Link>
+          {execution.status === "FAILED" ? (
+            <GenerateToolButton executionId={execution.id} agentId={execution.agentId} />
+          ) : null}
           {execution.status === "FAILED" ? <RetryExecutionButton executionId={execution.id} /> : null}
         </div>
       </div>
