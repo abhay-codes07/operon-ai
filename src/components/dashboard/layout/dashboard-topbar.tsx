@@ -1,4 +1,5 @@
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { EmergencyStopButton } from "@/components/dashboard/control-plane/emergency-stop-button";
 
 type DashboardTopbarProps = {
   organizationName?: string;
@@ -11,7 +12,10 @@ export function DashboardTopbar({ organizationName }: DashboardTopbarProps): JSX
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Organization</p>
         <p className="text-sm font-semibold text-slate-900">{organizationName ?? "Unassigned workspace"}</p>
       </div>
-      <SignOutButton />
+      <div className="flex items-center gap-2">
+        <EmergencyStopButton />
+        <SignOutButton />
+      </div>
     </header>
   );
 }
