@@ -78,6 +78,8 @@ Web Change Radar computes DOM hashes, detects structural drift, and raises actio
 
 Autonomy Mode learns recurring selector failures and proposes safe adaptive workflow definitions for operator review.
 
+Real-Time Agent Control Plane enables live session streaming, approval gates, runtime controls, emergency shutdown, and debug attach workflows.
+
 ## Local Development
 
 ```bash
@@ -87,6 +89,12 @@ npm run prisma:generate
 npm run dev
 npm run worker:dev
 npm run db:seed
+```
+
+Control plane websocket gateway:
+
+```bash
+npm run control-plane:dev
 ```
 
 ## Production Guide Notice
