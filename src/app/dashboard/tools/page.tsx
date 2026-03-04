@@ -2,7 +2,7 @@ import { ToolCard } from "@/components/dashboard/tools/tool-card";
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { requireOrganizationRole } from "@/server/auth/authorization";
-import { retrieveToolCatalog } from "@/server/services/tools/tool-registry-service";
+import { fetchToolRegistryMetrics, retrieveToolCatalog } from "@/server/services/tools/tool-registry-service";
 import { fetchWorkflowCatalog } from "@/server/services/workflows/workflow-service";
 
 type DashboardToolsPageProps = {
@@ -17,7 +17,7 @@ export default async function DashboardToolsPage({
   const user = await requireOrganizationRole("MEMBER");
   const query = searchParams?.query?.trim();
 
-  const [tools, workflows] = await Promise.all([
+  const [tools, workflows, metrics] = await Promise.all([
     retrieveToolCatalog({
       organizationId: user.organizationId!,
       query,
@@ -27,6 +27,7 @@ export default async function DashboardToolsPage({
       page: 1,
       pageSize: 100,
     }),
+    fetchToolRegistryMetrics(user.organizationId!),
   ]);
 
   return (
@@ -37,6 +38,26 @@ export default async function DashboardToolsPage({
         description="Search, evaluate, and install reusable generated automation tools."
       />
       <DashboardCard>
+        <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs text-slate-500">Registered Tools</p>
+            <p className="mt-1 text-xl font-semibold text-slate-900">{metrics.toolCount}</p>
+          </article>
+          <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs text-slate-500">Validated Versions</p>
+            <p className="mt-1 text-xl font-semibold text-slate-900">{metrics.validatedVersionCount}</p>
+          </article>
+          <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs text-slate-500">Tool Executions</p>
+            <p className="mt-1 text-xl font-semibold text-slate-900">{metrics.toolExecutionCount}</p>
+          </article>
+          <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs text-slate-500">Avg Reliability</p>
+            <p className="mt-1 text-xl font-semibold text-slate-900">
+              {metrics.averageReliability.toFixed(1)}
+            </p>
+          </article>
+        </div>
         <form method="GET" className="mb-4 md:max-w-sm">
           <label htmlFor="tool-query" className="sr-only">
             Search tools

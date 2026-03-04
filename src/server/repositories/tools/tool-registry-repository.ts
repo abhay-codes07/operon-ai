@@ -213,3 +213,33 @@ export async function listWorkflowInstalledTools(input: { organizationId: string
     },
   });
 }
+
+export async function getToolRegistryMetrics(organizationId: string) {
+  const [toolCount, validatedVersionCount, toolExecutionCount, avgReliability] = await Promise.all([
+    prisma.tool.count({
+      where: { organizationId },
+    }),
+    prisma.toolVersion.count({
+      where: {
+        organizationId,
+        validated: true,
+      },
+    }),
+    prisma.toolExecution.count({
+      where: { organizationId },
+    }),
+    prisma.tool.aggregate({
+      where: { organizationId },
+      _avg: {
+        reliabilityScore: true,
+      },
+    }),
+  ]);
+
+  return {
+    toolCount,
+    validatedVersionCount,
+    toolExecutionCount,
+    averageReliability: avgReliability._avg.reliabilityScore ?? 0,
+  };
+}

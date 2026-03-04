@@ -2,6 +2,7 @@ import {
   createTool,
   createToolExecution,
   createToolVersion,
+  getToolRegistryMetrics,
   getToolById,
   incrementToolUsageAndReliability,
   installToolToWorkflow,
@@ -73,4 +74,8 @@ export async function installTool(input: {
 
 export async function fetchInstalledTools(input: { organizationId: string; workflowId: string }) {
   return listWorkflowInstalledTools(input);
+}
+
+export async function fetchToolRegistryMetrics(organizationId: string) {
+  return getToolRegistryMetrics(organizationId);
 }
