@@ -134,7 +134,7 @@ export function ExecutionDetailLivePanel({
       };
       setMemoryEntries(memoryPayload.memory);
     }
-  }, [initialExecution.id]);
+  }, [initialExecution.id, initialExecution.agentId, initialExecution.workflowId]);
 
   usePolling(refresh, 4000, execution.status === "RUNNING" || execution.status === "QUEUED");
 
