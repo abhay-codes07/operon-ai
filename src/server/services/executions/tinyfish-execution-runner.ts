@@ -12,6 +12,7 @@ import {
 } from "@/server/services/agents/memory-service";
 import { recordExecutionUsage } from "@/server/services/billing/usage-service";
 import { analyzeExecutionFailure } from "@/server/services/executions/failure-analysis-service";
+import { ingestExecutionKnowledge } from "@/server/services/knowledge/knowledge-graph-service";
 import {
   captureExecutionDomSnapshot,
   persistExecutionReplaySteps,
@@ -314,12 +315,23 @@ export async function runExecutionWithTinyFish(
     failureCategory: parsed.status === "FAILED" ? "UNKNOWN" : undefined,
   });
 
-  if (parsed.status === "FAILED") {
-    await analyzeExecutionFailure({
-      organizationId: input.organizationId,
-      executionId: input.executionId,
-    });
-  }
+  const analysis =
+    parsed.status === "FAILED"
+      ? await analyzeExecutionFailure({
+          organizationId: input.organizationId,
+          executionId: input.executionId,
+        })
+      : null;
+
+  await ingestExecutionKnowledge({
+    organizationId: input.organizationId,
+    agentId: input.agentId,
+    executionId: input.executionId,
+    workflowId: workflow.id,
+    status: parsed.status === "FAILED" ? "FAILED" : "SUCCEEDED",
+    stepTargets: workflowSteps.map((step) => step.target),
+    failureCategory: analysis?.category,
+  });
 
   await appendExecutionEvent({
     organizationId: input.organizationId,
