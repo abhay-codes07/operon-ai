@@ -24,4 +24,9 @@ export const dashboardNav = [
     label: "Billing",
     description: "Plans and quota",
   },
+  {
+    href: "/dashboard/security",
+    label: "Security",
+    description: "Operational guardrails",
+  },
 ] as const;
