@@ -1,10 +1,12 @@
 import { AgentStatusBadge } from "@/components/dashboard/status/agent-status-badge";
+import { ReliabilityScoreBadge } from "@/components/dashboard/agents/reliability-score-badge";
 
 type AgentListItem = {
   id: string;
   name: string;
   description?: string | null;
   status: "DRAFT" | "ACTIVE" | "PAUSED" | "ARCHIVED";
+  reliabilityScore?: number | null;
   createdAt: Date;
 };
 
@@ -29,6 +31,9 @@ export function AgentsTable({ agents }: AgentsTableProps): JSX.Element {
           <tr>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Name</th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Reliability
+            </th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Created</th>
           </tr>
         </thead>
@@ -41,6 +46,9 @@ export function AgentsTable({ agents }: AgentsTableProps): JSX.Element {
               </td>
               <td className="px-4 py-3">
                 <AgentStatusBadge status={agent.status} />
+              </td>
+              <td className="px-4 py-3">
+                <ReliabilityScoreBadge score={agent.reliabilityScore} />
               </td>
               <td className="px-4 py-3 text-sm text-slate-600">
                 {new Intl.DateTimeFormat("en-US", {

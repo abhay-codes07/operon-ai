@@ -20,6 +20,11 @@ export const dashboardNav = [
     description: "Builder and schedules",
   },
   {
+    href: "/dashboard/reliability",
+    label: "Reliability",
+    description: "Agent trust scorecards",
+  },
+  {
     href: "/dashboard/billing",
     label: "Billing",
     description: "Plans and quota",
