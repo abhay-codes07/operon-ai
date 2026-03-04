@@ -10,6 +10,10 @@ import {
   captureExecutionDomSnapshot,
   persistExecutionReplaySteps,
 } from "@/server/services/executions/replay-service";
+import {
+  recordSelfHealingResolution,
+  resolveSelectorWithFallback,
+} from "@/server/services/executions/self-healing-service";
 import { persistScreenshotArtifact } from "@/server/services/storage/screenshot-storage";
 import { fetchWorkflowById } from "@/server/services/workflows/workflow-service";
 
@@ -137,6 +141,24 @@ export async function runExecutionWithTinyFish(
     organizationId: input.organizationId,
     executionId: input.executionId,
     steps: workflowSteps.map((step, index) => ({
+      ...(() => {
+        const healing = resolveSelectorWithFallback({
+          requestedSelector: step.target,
+          semanticHint: `${step.action} ${step.expectedOutcome}`,
+          retryLimit: 2,
+          candidates: [
+            { selector: step.target },
+            { selector: `[data-testid='${step.id}']`, semanticLabel: step.expectedOutcome },
+            { selector: `[aria-label*='${step.action}']`, semanticLabel: step.action },
+          ],
+        });
+        return {
+          resolvedSelector: healing.resolvedSelector,
+          healingStrategy: healing.strategy,
+          healingScore: healing.similarityScore,
+          healingAttempts: healing.attempts,
+        };
+      })(),
       stepIndex: index,
       stepKey: step.id,
       action: step.action,
@@ -145,6 +167,18 @@ export async function runExecutionWithTinyFish(
       metadata: {
         expectedOutcome: step.expectedOutcome,
         providerExecutionId: parsed.providerExecutionId,
+        selfHealing: {
+          strategy: resolveSelectorWithFallback({
+            requestedSelector: step.target,
+            semanticHint: `${step.action} ${step.expectedOutcome}`,
+            retryLimit: 2,
+            candidates: [
+              { selector: step.target },
+              { selector: `[data-testid='${step.id}']`, semanticLabel: step.expectedOutcome },
+              { selector: `[aria-label*='${step.action}']`, semanticLabel: step.action },
+            ],
+          }),
+        },
       },
       startedAt: new Date(),
       finishedAt: new Date(),
@@ -152,6 +186,34 @@ export async function runExecutionWithTinyFish(
   });
 
   for (const replayStep of replaySteps) {
+    const healing = (replayStep.metadata?.selfHealing as
+      | {
+          resolvedSelector?: string;
+          strategy?: string;
+          similarityScore?: number;
+          attempts?: Array<{ attempt: number; selector: string; score: number }>;
+        }
+      | undefined) ?? {
+      resolvedSelector: replayStep.target ?? replayStep.stepKey,
+      strategy: "selector-default",
+      similarityScore: 0,
+      attempts: [],
+    };
+
+    await recordSelfHealingResolution({
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+      executionStepId: replayStep.id,
+      originalSelector: replayStep.target ?? undefined,
+      resolvedSelector: healing.resolvedSelector ?? replayStep.target ?? replayStep.stepKey,
+      strategy: healing.strategy ?? "selector-default",
+      similarityScore: healing.similarityScore ?? 0,
+      success: replayStep.status !== "FAILED",
+      metadata: {
+        attempts: healing.attempts ?? [],
+      },
+    });
+
     await captureExecutionDomSnapshot({
       organizationId: input.organizationId,
       executionId: input.executionId,
