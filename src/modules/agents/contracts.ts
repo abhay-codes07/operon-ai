@@ -6,6 +6,7 @@ export type AgentListItem = {
   name: string;
   description?: string | null;
   status: AgentStatus;
+  reliabilityScore?: number | null;
   createdAt: Date;
   updatedAt: Date;
 };

@@ -33,10 +33,18 @@ export async function createAgent(input: unknown): Promise<AgentListItem> {
       name: true,
       description: true,
       status: true,
+      reliability: {
+        select: {
+          reliabilityScore: true,
+        },
+      },
       createdAt: true,
       updatedAt: true,
     },
-  });
+  }).then((item) => ({
+    ...item,
+    reliabilityScore: item.reliability?.reliabilityScore ?? null,
+  }));
 }
 
 export async function listAgents(input: ListAgentsInput): Promise<PaginatedResult<AgentListItem>> {
@@ -54,6 +62,11 @@ export async function listAgents(input: ListAgentsInput): Promise<PaginatedResul
         name: true,
         description: true,
         status: true,
+        reliability: {
+          select: {
+            reliabilityScore: true,
+          },
+        },
         createdAt: true,
         updatedAt: true,
       },
@@ -64,6 +77,12 @@ export async function listAgents(input: ListAgentsInput): Promise<PaginatedResul
       take: pagination.pageSize,
     }),
     prisma.agent.count({ where }),
+  ]).then(([items, total]) => [
+    items.map((item) => ({
+      ...item,
+      reliabilityScore: item.reliability?.reliabilityScore ?? null,
+    })),
+    total,
   ]);
 
   return toPaginatedResult(items, total, pagination);
@@ -84,10 +103,22 @@ export async function getAgentById(
       name: true,
       description: true,
       status: true,
+      reliability: {
+        select: {
+          reliabilityScore: true,
+        },
+      },
       createdAt: true,
       updatedAt: true,
     },
-  });
+  }).then((item) =>
+    item
+      ? {
+          ...item,
+          reliabilityScore: item.reliability?.reliabilityScore ?? null,
+        }
+      : null,
+  );
 }
 
 export async function updateAgentStatus(input: unknown): Promise<AgentListItem> {
@@ -111,8 +142,16 @@ export async function updateAgentStatus(input: unknown): Promise<AgentListItem> 
       name: true,
       description: true,
       status: true,
+      reliability: {
+        select: {
+          reliabilityScore: true,
+        },
+      },
       createdAt: true,
       updatedAt: true,
     },
-  });
+  }).then((item) => ({
+    ...item,
+    reliabilityScore: item.reliability?.reliabilityScore ?? null,
+  }));
 }
