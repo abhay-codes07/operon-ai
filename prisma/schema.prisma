@@ -49,6 +49,25 @@ enum LogLevel {
   ERROR
 }
 
+enum ExecutionStepStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+  SKIPPED
+}
+
+enum MemoryKind {
+  RUN_METADATA
+  PATTERN
+  FAILURE_RESOLUTION
+}
+
+enum SimulationStatus {
+  READY
+  FAILED
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -94,6 +113,12 @@ model Organization {
   workflows     Workflow[]
   executions    Execution[]
   executionLogs ExecutionLog[]
+  executionSteps ExecutionStep[]
+  domSnapshots  DomSnapshot[]
+  selfHealingRecords SelfHealingRecord[]
+  agentMemories AgentMemory[]
+  securityPolicy OrganizationSecurityPolicy?
+  workflowSimulations WorkflowSimulation[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -167,6 +192,7 @@ model Agent {
   createdBy      User         @relation("AgentCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
   workflows      Workflow[]
   executions     Execution[]
+  memories       AgentMemory[]
 
   @@index([organizationId, status])
   @@index([organizationId, createdAt])
@@ -189,6 +215,8 @@ model Workflow {
   agent          Agent          @relation(fields: [agentId], references: [id], onDelete: Cascade)
   createdBy      User           @relation("WorkflowCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
   executions     Execution[]
+  memories       AgentMemory[]
+  simulations    WorkflowSimulation[]
 
   @@index([organizationId, status])
   @@index([organizationId, agentId, createdAt])
@@ -215,6 +243,10 @@ model Execution {
   workflow       Workflow?        @relation(fields: [workflowId], references: [id], onDelete: SetNull)
   requestedBy    User?            @relation("ExecutionRequestedBy", fields: [requestedById], references: [id], onDelete: SetNull)
   logs           ExecutionLog[]
+  steps          ExecutionStep[]
+  snapshots      DomSnapshot[]
+  selfHealingRecords SelfHealingRecord[]
+  memoryEntries  AgentMemory[]    @relation("MemorySourceExecution")
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, agentId, createdAt])
@@ -235,6 +267,116 @@ model ExecutionLog {
   @@index([executionId, occurredAt])
   @@index([organizationId, occurredAt])
   @@index([organizationId, level, occurredAt])
+}
+
+model ExecutionStep {
+  id             String              @id @default(cuid())
+  executionId    String
+  organizationId String
+  stepIndex      Int
+  stepKey        String
+  action         String
+  target         String?
+  status         ExecutionStepStatus @default(PENDING)
+  startedAt      DateTime?
+  finishedAt     DateTime?
+  metadata       Json?
+  createdAt      DateTime            @default(now())
+  execution      Execution           @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  snapshots      DomSnapshot[]
+  selfHealingRecords SelfHealingRecord[]
+
+  @@unique([executionId, stepIndex])
+  @@index([organizationId, executionId, stepIndex])
+}
+
+model DomSnapshot {
+  id              String        @id @default(cuid())
+  executionId     String
+  executionStepId String?
+  organizationId  String
+  pageUrl         String?
+  domHtml         String        @db.Text
+  metadata        Json?
+  capturedAt      DateTime      @default(now())
+  execution       Execution     @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  executionStep   ExecutionStep? @relation(fields: [executionStepId], references: [id], onDelete: SetNull)
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, executionId, capturedAt])
+  @@index([executionStepId, capturedAt])
+}
+
+model SelfHealingRecord {
+  id               String       @id @default(cuid())
+  organizationId   String
+  executionId      String
+  executionStepId  String?
+  originalSelector String?
+  resolvedSelector String
+  strategy         String
+  similarityScore  Float
+  success          Boolean      @default(true)
+  metadata         Json?
+  createdAt        DateTime     @default(now())
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  execution        Execution    @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  executionStep    ExecutionStep? @relation(fields: [executionStepId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, executionId, createdAt])
+}
+
+model AgentMemory {
+  id                String       @id @default(cuid())
+  organizationId    String
+  agentId           String
+  workflowId        String?
+  sourceExecutionId String?
+  kind              MemoryKind
+  memoryKey         String
+  memoryValue       Json
+  confidence        Float?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agent             Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  workflow          Workflow?    @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+  sourceExecution   Execution?   @relation("MemorySourceExecution", fields: [sourceExecutionId], references: [id], onDelete: SetNull)
+
+  @@unique([organizationId, agentId, workflowId, memoryKey])
+  @@index([organizationId, agentId, kind, updatedAt])
+}
+
+model OrganizationSecurityPolicy {
+  id                   String       @id @default(cuid())
+  organizationId       String       @unique
+  domainAllowlist      Json
+  restrictedActions    Json
+  allowedWindowStartHr Int?
+  allowedWindowEndHr   Int?
+  timezone             String       @default("UTC")
+  requireHttps         Boolean      @default(true)
+  metadata             Json?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model WorkflowSimulation {
+  id             String           @id @default(cuid())
+  organizationId String
+  workflowId     String
+  requestedById  String?
+  status         SimulationStatus @default(READY)
+  predictedPath  Json
+  warnings       Json
+  createdAt      DateTime         @default(now())
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  workflow       Workflow         @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  requestedBy    User?            @relation(fields: [requestedById], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, workflowId, createdAt])
 }
 
 model Subscription {
