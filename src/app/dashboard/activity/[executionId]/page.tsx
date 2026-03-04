@@ -5,6 +5,7 @@ import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { fetchExecutionReplay } from "@/server/services/executions/replay-service";
 import { fetchExecutionById, fetchExecutionTimeline } from "@/server/services/executions/execution-service";
+import { fetchSelfHealingTimeline } from "@/server/services/executions/self-healing-service";
 
 type DashboardExecutionDetailPageProps = {
   params: {
@@ -30,7 +31,7 @@ export default async function DashboardExecutionDetailPage({
     );
   }
 
-  const [timeline, replay] = await Promise.all([
+  const [timeline, replay, selfHealingRecords] = await Promise.all([
     fetchExecutionTimeline({
       organizationId: user.organizationId!,
       executionId: execution.id,
@@ -38,6 +39,10 @@ export default async function DashboardExecutionDetailPage({
       pageSize: 100,
     }),
     fetchExecutionReplay({
+      organizationId: user.organizationId!,
+      executionId: execution.id,
+    }),
+    fetchSelfHealingTimeline({
       organizationId: user.organizationId!,
       executionId: execution.id,
     }),
@@ -63,6 +68,10 @@ export default async function DashboardExecutionDetailPage({
             capturedAt: item.capturedAt.toISOString(),
           })),
         }}
+        initialSelfHealingRecords={selfHealingRecords.map((item) => ({
+          ...item,
+          createdAt: item.createdAt.toISOString(),
+        }))}
       />
     </div>
   );

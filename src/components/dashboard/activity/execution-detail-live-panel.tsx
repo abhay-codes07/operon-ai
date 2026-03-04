@@ -9,6 +9,7 @@ import { usePolling } from "@/lib/hooks/use-polling";
 import { ExecutionReplayViewer } from "./execution-replay-viewer";
 import { ExecutionLogTimeline } from "./execution-log-timeline";
 import { RetryExecutionButton } from "./retry-execution-button";
+import { SelfHealingPanel } from "./self-healing-panel";
 
 type ExecutionDetail = {
   id: string;
@@ -49,16 +50,27 @@ type ExecutionDetailLivePanelProps = {
       capturedAt: string;
     }>;
   };
+  initialSelfHealingRecords: Array<{
+    id: string;
+    originalSelector?: string | null;
+    resolvedSelector: string;
+    strategy: string;
+    similarityScore: number;
+    success: boolean;
+    createdAt: string;
+  }>;
 };
 
 export function ExecutionDetailLivePanel({
   initialExecution,
   initialLogs,
   initialReplay,
+  initialSelfHealingRecords,
 }: ExecutionDetailLivePanelProps): JSX.Element {
   const [execution, setExecution] = useState(initialExecution);
   const [logs, setLogs] = useState(initialLogs);
   const [replay, setReplay] = useState(initialReplay);
+  const [selfHealingRecords, setSelfHealingRecords] = useState(initialSelfHealingRecords);
 
   const refresh = useCallback(async () => {
     const executionResponse = await fetch(`/api/internal/executions/${initialExecution.id}`, {
@@ -86,6 +98,17 @@ export function ExecutionDetailLivePanel({
     if (replayResponse.ok) {
       const replayPayload = (await replayResponse.json()) as typeof initialReplay;
       setReplay(replayPayload);
+    }
+
+    const selfHealingResponse = await fetch(`/api/internal/executions/${initialExecution.id}/self-healing`, {
+      cache: "no-store",
+    });
+
+    if (selfHealingResponse.ok) {
+      const selfHealingPayload = (await selfHealingResponse.json()) as {
+        records: typeof initialSelfHealingRecords;
+      };
+      setSelfHealingRecords(selfHealingPayload.records);
     }
   }, [initialExecution.id]);
 
@@ -156,6 +179,10 @@ export function ExecutionDetailLivePanel({
         description="Stepwise replay with captured DOM snapshots for time-travel debugging"
       >
         <ExecutionReplayViewer steps={replay.steps} snapshots={replay.snapshots} />
+      </DashboardCard>
+
+      <DashboardCard title="Self-Healing Decisions" description="Selector fallback and semantic recovery actions">
+        <SelfHealingPanel records={selfHealingRecords} />
       </DashboardCard>
     </>
   );
