@@ -13,6 +13,7 @@ import {
 import { recordExecutionUsage } from "@/server/services/billing/usage-service";
 import { analyzeExecutionFailure } from "@/server/services/executions/failure-analysis-service";
 import { ingestExecutionKnowledge } from "@/server/services/knowledge/knowledge-graph-service";
+import { registerPageSnapshot } from "@/server/services/monitoring/change-radar-service";
 import {
   captureExecutionDomSnapshot,
   persistExecutionReplaySteps,
@@ -237,6 +238,19 @@ export async function runExecutionWithTinyFish(
         traceId: input.traceId,
         stepStatus: replayStep.status,
       },
+    });
+
+    const targetUrl = replayStep.target?.startsWith("http")
+      ? replayStep.target
+      : `https://synthetic.operon.ai/${workflow.id}/step/${replayStep.stepIndex}`;
+
+    await registerPageSnapshot({
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+      workflowId: workflow.id,
+      url: targetUrl,
+      domContent: `${replayStep.stepKey}:${replayStep.action}:${replayStep.status}`,
+      snapshotRef: replayStep.id,
     });
   }
 
