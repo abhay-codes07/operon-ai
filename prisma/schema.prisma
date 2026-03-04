@@ -109,6 +109,11 @@ enum ApprovalRequestStatus {
   EXPIRED
 }
 
+enum ToolExecutionStatus {
+  SUCCEEDED
+  FAILED
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -141,6 +146,7 @@ model User {
   requestedExecutions Execution[] @relation("ExecutionRequestedBy")
   reviewedApprovals ApprovalRequest[] @relation("ApprovalReviewedBy")
   debugSessions DebugSession[]
+  installedTools ToolInstallation[]
 
   @@index([createdAt])
 }
@@ -177,6 +183,10 @@ model Organization {
   approvalRequests ApprovalRequest[]
   systemFlags SystemFlag[]
   debugSessions DebugSession[]
+  tools Tool[]
+  toolVersions ToolVersion[]
+  toolExecutions ToolExecution[]
+  toolInstallations ToolInstallation[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -254,6 +264,7 @@ model Agent {
   reliability    AgentReliability?
   executionMetrics ExecutionMetric[]
   insights       AgentInsight[]
+  generatedTools Tool[]
 
   @@index([organizationId, status])
   @@index([organizationId, createdAt])
@@ -283,6 +294,7 @@ model Workflow {
   selectorHistory SelectorHistory[]
   adaptiveWorkflow AdaptiveWorkflow?
   approvalRequests ApprovalRequest[]
+  installedTools ToolInstallation[]
 
   @@index([organizationId, status])
   @@index([organizationId, agentId, createdAt])
@@ -324,6 +336,7 @@ model Execution {
   isPaused       Boolean          @default(false)
   stepCursor     Int              @default(0)
   debugMode      Boolean          @default(false)
+  toolExecutions ToolExecution[]
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, agentId, createdAt])
@@ -717,6 +730,87 @@ model DebugSession {
   user           User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([organizationId, executionId, active])
+}
+
+model Tool {
+  id               String       @id @default(cuid())
+  organizationId   String
+  createdByAgentId String?
+  name             String
+  description      String
+  usageCount       Int          @default(0)
+  reliabilityScore Float        @default(0)
+  currentVersionId String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdByAgent   Agent?       @relation(fields: [createdByAgentId], references: [id], onDelete: SetNull)
+  currentVersion   ToolVersion? @relation("CurrentToolVersion", fields: [currentVersionId], references: [id], onDelete: SetNull)
+  versions         ToolVersion[] @relation("ToolVersions")
+  executions       ToolExecution[]
+  installations    ToolInstallation[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId, reliabilityScore, usageCount])
+}
+
+model ToolVersion {
+  id             String       @id @default(cuid())
+  organizationId String
+  toolId         String
+  versionNumber  Int
+  workflowSteps  Json
+  validationScore Float       @default(0)
+  validated      Boolean      @default(false)
+  notes          String?
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  tool           Tool         @relation("ToolVersions", fields: [toolId], references: [id], onDelete: Cascade)
+  executions     ToolExecution[]
+  installations  ToolInstallation[]
+
+  @@unique([toolId, versionNumber])
+  @@index([organizationId, validated, createdAt])
+}
+
+model ToolExecution {
+  id             String             @id @default(cuid())
+  organizationId String
+  toolId         String
+  toolVersionId  String
+  executionId    String?
+  status         ToolExecutionStatus
+  durationMs     Int
+  output         Json?
+  errorMessage   String?
+  createdAt      DateTime           @default(now())
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  tool           Tool               @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  toolVersion    ToolVersion        @relation(fields: [toolVersionId], references: [id], onDelete: Cascade)
+  execution      Execution?         @relation(fields: [executionId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, toolId, createdAt])
+  @@index([organizationId, status, createdAt])
+}
+
+model ToolInstallation {
+  id             String       @id @default(cuid())
+  organizationId String
+  workflowId     String
+  toolId         String
+  toolVersionId  String
+  installedById  String?
+  config         Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  workflow       Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  tool           Tool         @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  toolVersion    ToolVersion  @relation(fields: [toolVersionId], references: [id], onDelete: Cascade)
+  installedBy    User?        @relation(fields: [installedById], references: [id], onDelete: SetNull)
+
+  @@unique([workflowId, toolId])
+  @@index([organizationId, workflowId, createdAt])
 }
 
 model Subscription {
