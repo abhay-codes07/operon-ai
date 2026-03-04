@@ -30,6 +30,11 @@ export const dashboardNav = [
     description: "Cross-agent learning graph",
   },
   {
+    href: "/dashboard/control-plane",
+    label: "Control Plane",
+    description: "Approvals and live controls",
+  },
+  {
     href: "/dashboard/billing",
     label: "Billing",
     description: "Plans and quota",
