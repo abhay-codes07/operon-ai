@@ -11,6 +11,7 @@ import { ExecutionLogTimeline } from "./execution-log-timeline";
 import { RetryExecutionButton } from "./retry-execution-button";
 import { SelfHealingPanel } from "./self-healing-panel";
 import { AgentMemoryPanel } from "./agent-memory-panel";
+import { FailureAnalysisPanel } from "./failure-analysis-panel";
 
 type ExecutionDetail = {
   id: string;
@@ -68,6 +69,13 @@ type ExecutionDetailLivePanelProps = {
     confidence?: number | null;
     updatedAt: string;
   }>;
+  initialFailureAnalysis?: {
+    id: string;
+    category: "SELECTOR_DRIFT" | "NAVIGATION_FAILURE" | "AUTHENTICATION_ISSUE" | "PAGE_LOAD_TIMEOUT" | "UNKNOWN";
+    summary: string;
+    evidence?: Record<string, unknown> | null;
+    updatedAt: string;
+  } | null;
 };
 
 export function ExecutionDetailLivePanel({
@@ -76,12 +84,14 @@ export function ExecutionDetailLivePanel({
   initialReplay,
   initialSelfHealingRecords,
   initialMemoryEntries,
+  initialFailureAnalysis,
 }: ExecutionDetailLivePanelProps): JSX.Element {
   const [execution, setExecution] = useState(initialExecution);
   const [logs, setLogs] = useState(initialLogs);
   const [replay, setReplay] = useState(initialReplay);
   const [selfHealingRecords, setSelfHealingRecords] = useState(initialSelfHealingRecords);
   const [memoryEntries, setMemoryEntries] = useState(initialMemoryEntries);
+  const [failureAnalysis, setFailureAnalysis] = useState(initialFailureAnalysis ?? null);
 
   const refresh = useCallback(async () => {
     const executionResponse = await fetch(`/api/internal/executions/${initialExecution.id}`, {
@@ -133,6 +143,19 @@ export function ExecutionDetailLivePanel({
         memory: typeof initialMemoryEntries;
       };
       setMemoryEntries(memoryPayload.memory);
+    }
+
+    const failureAnalysisResponse = await fetch(
+      `/api/internal/executions/${initialExecution.id}/failure-analysis`,
+      {
+        cache: "no-store",
+      },
+    );
+    if (failureAnalysisResponse.ok) {
+      const failureAnalysisPayload = (await failureAnalysisResponse.json()) as {
+        analysis?: typeof initialFailureAnalysis;
+      };
+      setFailureAnalysis(failureAnalysisPayload.analysis ?? null);
     }
   }, [initialExecution.id, initialExecution.agentId, initialExecution.workflowId]);
 
@@ -211,6 +234,13 @@ export function ExecutionDetailLivePanel({
 
       <DashboardCard title="Agent Memory Context" description="Learned patterns and failure resolutions reused by future runs">
         <AgentMemoryPanel entries={memoryEntries} />
+      </DashboardCard>
+
+      <DashboardCard
+        title="Failure Root Cause Analysis"
+        description="Automated classification generated from logs, failed steps, and DOM capture context"
+      >
+        <FailureAnalysisPanel analysis={failureAnalysis} />
       </DashboardCard>
     </>
   );

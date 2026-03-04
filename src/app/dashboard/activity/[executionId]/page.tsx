@@ -4,6 +4,7 @@ import { ExecutionDetailLivePanel } from "@/components/dashboard/activity/execut
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { fetchAgentMemoryContext } from "@/server/services/agents/memory-service";
+import { fetchFailureAnalysis } from "@/server/services/executions/failure-analysis-service";
 import { fetchExecutionReplay } from "@/server/services/executions/replay-service";
 import { fetchExecutionById, fetchExecutionTimeline } from "@/server/services/executions/execution-service";
 import { fetchSelfHealingTimeline } from "@/server/services/executions/self-healing-service";
@@ -32,7 +33,7 @@ export default async function DashboardExecutionDetailPage({
     );
   }
 
-  const [timeline, replay, selfHealingRecords, memoryEntries] = await Promise.all([
+  const [timeline, replay, selfHealingRecords, memoryEntries, failureAnalysis] = await Promise.all([
     fetchExecutionTimeline({
       organizationId: user.organizationId!,
       executionId: execution.id,
@@ -51,6 +52,10 @@ export default async function DashboardExecutionDetailPage({
       organizationId: user.organizationId!,
       agentId: execution.agentId,
       workflowId: execution.workflowId ?? undefined,
+    }),
+    fetchFailureAnalysis({
+      organizationId: user.organizationId!,
+      executionId: execution.id,
     }),
   ]);
 
@@ -84,6 +89,15 @@ export default async function DashboardExecutionDetailPage({
           confidence: item.confidence ?? null,
           memoryValue: item.memoryValue as Record<string, unknown>,
         }))}
+        initialFailureAnalysis={
+          failureAnalysis
+            ? {
+                ...failureAnalysis,
+                updatedAt: failureAnalysis.updatedAt.toISOString(),
+                evidence: (failureAnalysis.evidence as Record<string, unknown> | null) ?? null,
+              }
+            : null
+        }
       />
     </div>
   );
