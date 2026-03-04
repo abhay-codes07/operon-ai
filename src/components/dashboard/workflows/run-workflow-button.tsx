@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { AutonomyModePanel } from "@/components/dashboard/workflows/autonomy-mode-panel";
 import { SimulationPreviewPanel } from "@/components/dashboard/workflows/simulation-preview-panel";
 
 type RunWorkflowButtonProps = {
@@ -15,6 +16,7 @@ export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonPro
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
+  const [isAutonomyLoading, setIsAutonomyLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [simulation, setSimulation] = useState<{
     id: string;
@@ -28,6 +30,20 @@ export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonPro
     }>;
     warnings: string[];
     createdAt: string;
+  } | null>(null);
+  const [autonomy, setAutonomy] = useState<{
+    proposal: {
+      adaptationVersion: number;
+      notes?: string | null;
+    } | null;
+    selectorHistory: Array<{
+      id: string;
+      stepKey: string;
+      originalSelector: string;
+      alternativeSelector: string;
+      failCount: number;
+      confidence: number;
+    }>;
   } | null>(null);
 
   async function onRunWorkflow() {
@@ -81,6 +97,37 @@ export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonPro
     setSimulation(payload.simulation);
   }
 
+  async function onAutonomyMode() {
+    setIsAutonomyLoading(true);
+    setError(null);
+    const response = await fetch(`/api/internal/workflows/${workflowId}/autonomy`, {
+      method: "POST",
+    });
+    setIsAutonomyLoading(false);
+
+    if (!response.ok) {
+      const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+      setError(payload?.error ?? "Autonomy proposal failed");
+      return;
+    }
+
+    const payload = (await response.json()) as {
+      proposal: {
+        adaptationVersion: number;
+        notes?: string | null;
+      } | null;
+      selectorHistory: Array<{
+        id: string;
+        stepKey: string;
+        originalSelector: string;
+        alternativeSelector: string;
+        failCount: number;
+        confidence: number;
+      }>;
+    };
+    setAutonomy(payload);
+  }
+
   return (
     <div className="flex flex-col items-start gap-1">
       <div className="flex items-center gap-2">
@@ -95,8 +142,17 @@ export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonPro
         >
           {isSimulating ? "Simulating..." : "Simulate"}
         </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={onAutonomyMode}
+          disabled={disabled || isAutonomyLoading}
+        >
+          {isAutonomyLoading ? "Learning..." : "Autonomy"}
+        </Button>
       </div>
       {simulation ? <SimulationPreviewPanel simulation={simulation} /> : null}
+      {autonomy ? <AutonomyModePanel payload={autonomy} /> : null}
       {error ? <p className="text-xs text-rose-700">{error}</p> : null}
     </div>
   );
