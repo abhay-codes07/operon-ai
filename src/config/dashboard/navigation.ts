@@ -25,6 +25,11 @@ export const dashboardNav = [
     description: "Agent trust scorecards",
   },
   {
+    href: "/dashboard/knowledge",
+    label: "Knowledge",
+    description: "Cross-agent learning graph",
+  },
+  {
     href: "/dashboard/billing",
     label: "Billing",
     description: "Plans and quota",
