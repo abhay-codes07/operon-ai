@@ -14,6 +14,7 @@ import { recordExecutionUsage } from "@/server/services/billing/usage-service";
 import { analyzeExecutionFailure } from "@/server/services/executions/failure-analysis-service";
 import { ingestExecutionKnowledge } from "@/server/services/knowledge/knowledge-graph-service";
 import { registerPageSnapshot } from "@/server/services/monitoring/change-radar-service";
+import { registerSelectorFailure } from "@/server/services/workflows/autonomy-engine";
 import {
   captureExecutionDomSnapshot,
   persistExecutionReplaySteps,
@@ -226,6 +227,17 @@ export async function runExecutionWithTinyFish(
         attempts: healing.attempts ?? [],
       },
     });
+
+    if (replayStep.status === "FAILED" && replayStep.target) {
+      await registerSelectorFailure({
+        organizationId: input.organizationId,
+        workflowId: workflow.id,
+        stepKey: replayStep.stepKey,
+        originalSelector: replayStep.target,
+        alternativeSelector: healing.resolvedSelector ?? replayStep.target,
+        confidence: healing.similarityScore ?? 0,
+      });
+    }
 
     await captureExecutionDomSnapshot({
       organizationId: input.organizationId,
