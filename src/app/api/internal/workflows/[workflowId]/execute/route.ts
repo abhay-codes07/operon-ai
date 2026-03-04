@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createTraceId } from "@/server/observability/tracing";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer";
+import { isAgentExecutionEnabled } from "@/server/services/control-plane/system-flag-service";
 import { enforceRateLimit } from "@/server/security/rate-limit";
 import { evaluateWorkflowAgainstPolicy } from "@/server/security/policy-engine";
 import { enforceExecutionQuotaOrThrow } from "@/server/services/billing/enforcement-service";
@@ -22,6 +23,16 @@ type RouteContext = {
 
 export async function POST(request: Request, context: RouteContext) {
   const user = await requireOrganizationRole("MEMBER");
+  const executionEnabled = await isAgentExecutionEnabled();
+  if (!executionEnabled) {
+    return NextResponse.json(
+      {
+        error: "Global kill switch is active. Agent execution is temporarily disabled.",
+      },
+      { status: 503 },
+    );
+  }
+
   const throttleResponse = enforceRateLimit(
     request,
     "executions:trigger",
