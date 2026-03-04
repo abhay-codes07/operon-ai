@@ -12,7 +12,10 @@ import {
 } from "@/server/services/agents/memory-service";
 import { recordExecutionUsage } from "@/server/services/billing/usage-service";
 import { analyzeExecutionFailure } from "@/server/services/executions/failure-analysis-service";
-import { ingestExecutionKnowledge } from "@/server/services/knowledge/knowledge-graph-service";
+import {
+  fetchKnowledgeContextForExecution,
+  ingestExecutionKnowledge,
+} from "@/server/services/knowledge/knowledge-graph-service";
 import { registerPageSnapshot } from "@/server/services/monitoring/change-radar-service";
 import { registerSelectorFailure } from "@/server/services/workflows/autonomy-engine";
 import {
@@ -124,6 +127,12 @@ export async function runExecutionWithTinyFish(
         organizationId: input.organizationId,
         agentId: input.agentId,
         workflowId: workflow.id,
+      }),
+      knowledgeContext: await fetchKnowledgeContextForExecution({
+        organizationId: input.organizationId,
+        stepTargets: ((definition as { steps?: WorkflowDefinitionStep[] }).steps ?? []).map(
+          (step) => step.target,
+        ),
       }),
     },
   });

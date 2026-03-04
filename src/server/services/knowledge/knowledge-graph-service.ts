@@ -70,3 +70,25 @@ export async function ingestExecutionKnowledge(input: {
 export async function fetchKnowledgeGraphSnapshot(organizationId: string) {
   return fetchKnowledgeGraph(organizationId);
 }
+
+export async function fetchKnowledgeContextForExecution(input: {
+  organizationId: string;
+  stepTargets: Array<string | null | undefined>;
+}) {
+  const graph = await fetchKnowledgeGraph(input.organizationId);
+  const targetDomains = new Set(
+    input.stepTargets
+      .map((target) => extractDomainFromTarget(target))
+      .filter(Boolean) as string[],
+  );
+
+  return {
+    domains: graph.domains.filter((domain) => targetDomains.has(domain.domain)).slice(0, 10),
+    signals: graph.signals
+      .filter((signal) => {
+        const [domainPrefix] = signal.signalKey.split(":");
+        return domainPrefix ? targetDomains.has(domainPrefix) : false;
+      })
+      .slice(0, 20),
+  };
+}
