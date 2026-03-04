@@ -339,6 +339,14 @@ export async function runExecutionWithTinyFish(
         : undefined,
   });
 
+  const analysis =
+    parsed.status === "FAILED"
+      ? await analyzeExecutionFailure({
+          organizationId: input.organizationId,
+          executionId: input.executionId,
+        })
+      : null;
+
   await recordExecutionReliabilityMetric({
     organizationId: input.organizationId,
     executionId: input.executionId,
@@ -347,16 +355,8 @@ export async function runExecutionWithTinyFish(
     finishedAt: finalizedExecution.finishedAt,
     isSuccess: parsed.status === "SUCCEEDED",
     retriesUsed: 0,
-    failureCategory: parsed.status === "FAILED" ? "UNKNOWN" : undefined,
+    failureCategory: analysis?.category,
   });
-
-  const analysis =
-    parsed.status === "FAILED"
-      ? await analyzeExecutionFailure({
-          organizationId: input.organizationId,
-          executionId: input.executionId,
-        })
-      : null;
 
   await ingestExecutionKnowledge({
     organizationId: input.organizationId,
