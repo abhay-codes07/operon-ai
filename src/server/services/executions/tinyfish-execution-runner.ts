@@ -5,6 +5,10 @@ import { executeTinyFishWorkflow, TinyFishApiError } from "@/server/integrations
 import { buildTinyFishExecutionRequest } from "@/server/integrations/tinyfish/request-builder";
 import { parseTinyFishExecutionResponse } from "@/server/integrations/tinyfish/response-parser";
 import { logInfo } from "@/server/observability/logger";
+import {
+  fetchAgentMemoryContext,
+  rememberExecutionPattern,
+} from "@/server/services/agents/memory-service";
 import { recordExecutionUsage } from "@/server/services/billing/usage-service";
 import {
   captureExecutionDomSnapshot,
@@ -111,6 +115,11 @@ export async function runExecutionWithTinyFish(
     metadata: {
       source: "webops-ai",
       traceId: input.traceId,
+      memoryContext: await fetchAgentMemoryContext({
+        organizationId: input.organizationId,
+        agentId: input.agentId,
+        workflowId: workflow.id,
+      }),
     },
   });
 
@@ -276,6 +285,21 @@ export async function runExecutionWithTinyFish(
   if (parsed.status === "SUCCEEDED") {
     await recordExecutionUsage(input.organizationId, 1);
   }
+
+  await rememberExecutionPattern({
+    organizationId: input.organizationId,
+    agentId: input.agentId,
+    workflowId: workflow.id,
+    executionId: input.executionId,
+    status: parsed.status === "FAILED" ? "FAILED" : "SUCCEEDED",
+    summary: parsed.summary,
+    resolvedFailures:
+      parsed.status === "FAILED"
+        ? replaySteps
+            .filter((item) => item.status === "FAILED")
+            .map((item) => item.target ?? item.stepKey)
+        : undefined,
+  });
 
   await appendExecutionEvent({
     organizationId: input.organizationId,
