@@ -5,6 +5,7 @@ import { createTraceId } from "@/server/observability/tracing";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer";
 import { enforceRateLimit } from "@/server/security/rate-limit";
+import { evaluateWorkflowAgainstPolicy } from "@/server/security/policy-engine";
 import { enforceExecutionQuotaOrThrow } from "@/server/services/billing/enforcement-service";
 import { appendExecutionEvent, queueExecution } from "@/server/services/executions/execution-service";
 import { fetchWorkflowById } from "@/server/services/workflows/workflow-service";
@@ -43,6 +44,21 @@ export async function POST(request: Request, context: RouteContext) {
 
   if (!workflow) {
     return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
+  }
+
+  const policyEvaluation = await evaluateWorkflowAgainstPolicy({
+    organizationId: user.organizationId!,
+    workflowId: workflow.id,
+    definition: workflow.definition as { steps?: Array<{ action?: string; target?: string }> } | null,
+  });
+  if (!policyEvaluation.allowed) {
+    return NextResponse.json(
+      {
+        error: "Workflow violates organization security policy",
+        reasons: policyEvaluation.reasons,
+      },
+      { status: 403 },
+    );
   }
 
   try {
