@@ -1,4 +1,5 @@
 import { fetchToolVersions, retrieveToolById } from "@/server/services/tools/tool-registry-service";
+import { updateToolVersionValidation } from "@/server/repositories/tools/tool-registry-repository";
 
 function scoreSelector(target?: string) {
   if (!target) {
@@ -44,7 +45,7 @@ export async function validateToolDefinition(input: {
   );
   const average = stepScores.length === 0 ? 0 : stepScores.reduce((a, b) => a + b, 0) / stepScores.length;
 
-  return {
+  const result = {
     toolId: tool.id,
     toolVersionId: version.id,
     simulationPassed: average >= 0.5,
@@ -52,4 +53,13 @@ export async function validateToolDefinition(input: {
     expectedOutputConfirmed: average >= 0.55,
     validationScore: Number((average * 100).toFixed(2)),
   };
+
+  await updateToolVersionValidation({
+    toolVersionId: version.id,
+    validationScore: result.validationScore,
+    validated: result.simulationPassed && result.selectorValidationPassed && result.expectedOutputConfirmed,
+    notes: `Validation score ${result.validationScore}`,
+  });
+
+  return result;
 }

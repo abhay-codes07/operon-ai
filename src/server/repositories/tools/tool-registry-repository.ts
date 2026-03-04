@@ -110,6 +110,24 @@ export async function listToolVersions(organizationId: string, toolId: string): 
   });
 }
 
+export async function updateToolVersionValidation(input: {
+  toolVersionId: string;
+  validationScore: number;
+  validated: boolean;
+  notes?: string;
+}) {
+  return prisma.toolVersion.update({
+    where: {
+      id: input.toolVersionId,
+    },
+    data: {
+      validationScore: input.validationScore,
+      validated: input.validated,
+      notes: input.notes,
+    },
+  });
+}
+
 export async function createToolExecution(input: unknown): Promise<ToolExecutionItem> {
   const parsed = executeToolSchema.parse(input);
 
