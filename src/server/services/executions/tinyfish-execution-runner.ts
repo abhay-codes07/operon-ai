@@ -30,6 +30,7 @@ import {
 } from "@/server/services/knowledge/knowledge-graph-service";
 import { registerPageSnapshot } from "@/server/services/monitoring/change-radar-service";
 import { registerSelectorFailure } from "@/server/services/workflows/autonomy-engine";
+import { generateToolFromExecutionFailure } from "@/server/services/tools/tool-generation-service";
 import {
   captureExecutionDomSnapshot,
   persistExecutionReplaySteps,
@@ -479,6 +480,14 @@ export async function runExecutionWithTinyFish(
     stepTargets: workflowSteps.map((step) => step.target),
     failureCategory: analysis?.category,
   });
+
+  if (parsed.status === "FAILED") {
+    await generateToolFromExecutionFailure({
+      organizationId: input.organizationId,
+      agentId: input.agentId,
+      executionId: input.executionId,
+    }).catch(() => null);
+  }
 
   await appendExecutionEvent({
     organizationId: input.organizationId,
