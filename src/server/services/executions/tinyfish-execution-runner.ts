@@ -5,6 +5,7 @@ import { executeTinyFishWorkflow, TinyFishApiError } from "@/server/integrations
 import { buildTinyFishExecutionRequest } from "@/server/integrations/tinyfish/request-builder";
 import { parseTinyFishExecutionResponse } from "@/server/integrations/tinyfish/response-parser";
 import { logInfo } from "@/server/observability/logger";
+import { recordExecutionReliabilityMetric } from "@/server/services/agents/reliability-service";
 import {
   fetchAgentMemoryContext,
   rememberExecutionPattern,
@@ -276,7 +277,7 @@ export async function runExecutionWithTinyFish(
     errorMessage: parsed.errorMessage,
   });
 
-  await setExecutionStatus({
+  const finalizedExecution = await setExecutionStatus({
     organizationId: input.organizationId,
     executionId: input.executionId,
     status: parsed.status,
@@ -299,6 +300,17 @@ export async function runExecutionWithTinyFish(
             .filter((item) => item.status === "FAILED")
             .map((item) => item.target ?? item.stepKey)
         : undefined,
+  });
+
+  await recordExecutionReliabilityMetric({
+    organizationId: input.organizationId,
+    executionId: input.executionId,
+    agentId: input.agentId,
+    startedAt: finalizedExecution.startedAt,
+    finishedAt: finalizedExecution.finishedAt,
+    isSuccess: parsed.status === "SUCCEEDED",
+    retriesUsed: 0,
+    failureCategory: parsed.status === "FAILED" ? "UNKNOWN" : undefined,
   });
 
   await appendExecutionEvent({
