@@ -68,6 +68,26 @@ enum SimulationStatus {
   FAILED
 }
 
+enum FailureCategory {
+  SELECTOR_DRIFT
+  NAVIGATION_FAILURE
+  AUTHENTICATION_ISSUE
+  PAGE_LOAD_TIMEOUT
+  UNKNOWN
+}
+
+enum ChangeType {
+  ADDED
+  REMOVED
+  MODIFIED
+}
+
+enum ChangeSeverity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -119,6 +139,16 @@ model Organization {
   agentMemories AgentMemory[]
   securityPolicy OrganizationSecurityPolicy?
   workflowSimulations WorkflowSimulation[]
+  agentReliability AgentReliability[]
+  executionMetrics ExecutionMetric[]
+  failureAnalyses FailureAnalysis[]
+  domainKnowledge DomainKnowledge[]
+  agentInsights AgentInsight[]
+  sharedSignals SharedSignal[]
+  pageSnapshots PageSnapshot[]
+  changeEvents ChangeEvent[]
+  selectorHistory SelectorHistory[]
+  adaptiveWorkflows AdaptiveWorkflow[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -193,6 +223,9 @@ model Agent {
   workflows      Workflow[]
   executions     Execution[]
   memories       AgentMemory[]
+  reliability    AgentReliability?
+  executionMetrics ExecutionMetric[]
+  insights       AgentInsight[]
 
   @@index([organizationId, status])
   @@index([organizationId, createdAt])
@@ -217,6 +250,10 @@ model Workflow {
   executions     Execution[]
   memories       AgentMemory[]
   simulations    WorkflowSimulation[]
+  pageSnapshots  PageSnapshot[]
+  changeEvents   ChangeEvent[]
+  selectorHistory SelectorHistory[]
+  adaptiveWorkflow AdaptiveWorkflow?
 
   @@index([organizationId, status])
   @@index([organizationId, agentId, createdAt])
@@ -247,6 +284,10 @@ model Execution {
   snapshots      DomSnapshot[]
   selfHealingRecords SelfHealingRecord[]
   memoryEntries  AgentMemory[]    @relation("MemorySourceExecution")
+  metric         ExecutionMetric?
+  failureAnalysis FailureAnalysis?
+  pageSnapshots  PageSnapshot[]
+  changeEvents   ChangeEvent[]
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, agentId, createdAt])
@@ -377,6 +418,184 @@ model WorkflowSimulation {
   requestedBy    User?            @relation(fields: [requestedById], references: [id], onDelete: SetNull)
 
   @@index([organizationId, workflowId, createdAt])
+}
+
+model AgentReliability {
+  id               String       @id @default(cuid())
+  organizationId   String
+  agentId          String       @unique
+  successRate      Float        @default(0)
+  retryRate        Float        @default(0)
+  failureFrequency Float        @default(0)
+  avgExecutionMs   Int          @default(0)
+  reliabilityScore Float        @default(0)
+  totalExecutions  Int          @default(0)
+  updatedAt        DateTime     @updatedAt
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agent            Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, reliabilityScore, updatedAt])
+}
+
+model ExecutionMetric {
+  id             String       @id @default(cuid())
+  organizationId String
+  executionId    String       @unique
+  agentId        String
+  durationMs     Int
+  retriesUsed    Int          @default(0)
+  isSuccess      Boolean      @default(false)
+  failureCategory FailureCategory?
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  execution      Execution    @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  agent          Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, agentId, createdAt])
+  @@index([organizationId, failureCategory, createdAt])
+}
+
+model FailureAnalysis {
+  id             String         @id @default(cuid())
+  organizationId String
+  executionId    String         @unique
+  category       FailureCategory @default(UNKNOWN)
+  summary        String
+  evidence       Json?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  execution      Execution      @relation(fields: [executionId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, category, updatedAt])
+}
+
+model DomainKnowledge {
+  id             String       @id @default(cuid())
+  organizationId String
+  domain         String
+  issueCount     Int          @default(0)
+  stabilityScore Float        @default(1)
+  lastSeenAt     DateTime     @default(now())
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  insights       AgentInsight[]
+  sharedSignals  SharedSignal[]
+
+  @@unique([organizationId, domain])
+  @@index([organizationId, stabilityScore, lastSeenAt])
+}
+
+model AgentInsight {
+  id                String         @id @default(cuid())
+  organizationId    String
+  agentId           String
+  domainKnowledgeId String?
+  insightType       String
+  insightKey        String
+  insightValue      Json
+  confidence        Float          @default(0.5)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  organization      Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agent             Agent          @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  domainKnowledge   DomainKnowledge? @relation(fields: [domainKnowledgeId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, agentId, updatedAt])
+}
+
+model SharedSignal {
+  id                String         @id @default(cuid())
+  organizationId    String
+  domainKnowledgeId String?
+  signalType        String
+  signalKey         String
+  signalValue       Json
+  count             Int            @default(1)
+  lastSeenAt        DateTime       @default(now())
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  organization      Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  domainKnowledge   DomainKnowledge? @relation(fields: [domainKnowledgeId], references: [id], onDelete: SetNull)
+
+  @@unique([organizationId, signalType, signalKey])
+  @@index([organizationId, lastSeenAt])
+}
+
+model PageSnapshot {
+  id             String       @id @default(cuid())
+  organizationId String
+  executionId    String
+  workflowId     String?
+  url            String
+  domHash        String
+  snapshotRef    String?
+  capturedAt     DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  execution      Execution    @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  workflow       Workflow?    @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+  changeEvents   ChangeEvent[]
+
+  @@index([organizationId, workflowId, capturedAt])
+  @@index([organizationId, url, capturedAt])
+}
+
+model ChangeEvent {
+  id             String         @id @default(cuid())
+  organizationId String
+  executionId    String
+  workflowId     String?
+  pageSnapshotId String
+  changeType     ChangeType
+  severity       ChangeSeverity @default(MEDIUM)
+  previousHash   String?
+  currentHash    String
+  details        Json?
+  detectedAt     DateTime       @default(now())
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  execution      Execution      @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  workflow       Workflow?      @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+  pageSnapshot   PageSnapshot   @relation(fields: [pageSnapshotId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, severity, detectedAt])
+  @@index([organizationId, workflowId, detectedAt])
+}
+
+model SelectorHistory {
+  id                 String       @id @default(cuid())
+  organizationId     String
+  workflowId         String
+  stepKey            String
+  originalSelector   String
+  alternativeSelector String
+  failCount          Int          @default(1)
+  confidence         Float        @default(0.5)
+  lastSeenAt         DateTime     @default(now())
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  workflow           Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, workflowId, stepKey, originalSelector, alternativeSelector])
+  @@index([organizationId, workflowId, lastSeenAt])
+}
+
+model AdaptiveWorkflow {
+  id                 String       @id @default(cuid())
+  organizationId     String
+  workflowId         String       @unique
+  adaptationVersion  Int          @default(1)
+  proposedDefinition Json
+  applied            Boolean      @default(false)
+  notes              String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  workflow           Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, applied, updatedAt])
 }
 
 model Subscription {
