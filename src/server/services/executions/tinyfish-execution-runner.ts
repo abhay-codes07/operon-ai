@@ -5,7 +5,18 @@ import { executeTinyFishWorkflow, TinyFishApiError } from "@/server/integrations
 import { buildTinyFishExecutionRequest } from "@/server/integrations/tinyfish/request-builder";
 import { parseTinyFishExecutionResponse } from "@/server/integrations/tinyfish/response-parser";
 import { logInfo } from "@/server/observability/logger";
+import { prisma } from "@/server/db/client";
 import { recordExecutionReliabilityMetric } from "@/server/services/agents/reliability-service";
+import {
+  applyPendingExecutionControlCommands,
+  enqueueExecutionControlCommand,
+} from "@/server/services/control-plane/execution-control-service";
+import {
+  isAgentExecutionEnabled,
+} from "@/server/services/control-plane/system-flag-service";
+import {
+  publishExecutionStreamEvent,
+} from "@/server/services/control-plane/streaming-service";
 import {
   fetchAgentMemoryContext,
   rememberExecutionPattern,
@@ -86,6 +97,10 @@ export async function runExecutionWithTinyFish(
     throw new Error("Workflow not found for organization");
   }
 
+  if (!(await isAgentExecutionEnabled())) {
+    throw new Error("Agent execution disabled by global kill switch");
+  }
+
   await setExecutionStatus({
     organizationId: input.organizationId,
     executionId: input.executionId,
@@ -99,6 +114,16 @@ export async function runExecutionWithTinyFish(
     message: "TinyFish execution started",
     metadata: {
       traceId: input.traceId,
+    },
+  });
+
+  await publishExecutionStreamEvent({
+    organizationId: input.organizationId,
+    executionId: input.executionId,
+    eventType: "execution.started",
+    payload: {
+      workflowId: workflow.id,
+      traceId: input.traceId ?? null,
     },
   });
 
@@ -209,6 +234,57 @@ export async function runExecutionWithTinyFish(
   });
 
   for (const replayStep of replaySteps) {
+    await applyPendingExecutionControlCommands({
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+    });
+
+    if (!(await isAgentExecutionEnabled())) {
+      await enqueueExecutionControlCommand({
+        organizationId: input.organizationId,
+        executionId: input.executionId,
+        action: "STOP",
+        reason: "Global kill switch activated during execution",
+      });
+      throw new Error("Execution stopped by global kill switch");
+    }
+
+    const executionState = await prisma.execution.findUnique({
+      where: {
+        id: input.executionId,
+      },
+      select: {
+        status: true,
+        isPaused: true,
+        stepCursor: true,
+      },
+    });
+
+    if (executionState?.status === "CANCELED") {
+      await publishExecutionStreamEvent({
+        organizationId: input.organizationId,
+        executionId: input.executionId,
+        eventType: "execution.stopped",
+        payload: {
+          stepKey: replayStep.stepKey,
+        },
+      });
+      throw new Error("Execution canceled by control command");
+    }
+
+    if (executionState?.isPaused && executionState.stepCursor < replayStep.stepIndex + 1) {
+      await publishExecutionStreamEvent({
+        organizationId: input.organizationId,
+        executionId: input.executionId,
+        eventType: "execution.paused",
+        payload: {
+          stepKey: replayStep.stepKey,
+          stepIndex: replayStep.stepIndex,
+        },
+      });
+      continue;
+    }
+
     const healing = (replayStep.metadata?.selfHealing as
       | {
           resolvedSelector?: string;
@@ -234,6 +310,17 @@ export async function runExecutionWithTinyFish(
       success: replayStep.status !== "FAILED",
       metadata: {
         attempts: healing.attempts ?? [],
+      },
+    });
+
+    await publishExecutionStreamEvent({
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+      eventType: "step.updated",
+      payload: {
+        stepKey: replayStep.stepKey,
+        stepIndex: replayStep.stepIndex,
+        status: replayStep.status,
       },
     });
 
@@ -378,6 +465,16 @@ export async function runExecutionWithTinyFish(
       providerExecutionId: parsed.providerExecutionId,
       status: parsed.status,
       traceId: input.traceId,
+    },
+  });
+
+  await publishExecutionStreamEvent({
+    organizationId: input.organizationId,
+    executionId: input.executionId,
+    eventType: parsed.status === "FAILED" ? "execution.failed" : "execution.completed",
+    payload: {
+      status: parsed.status,
+      providerExecutionId: parsed.providerExecutionId,
     },
   });
 
