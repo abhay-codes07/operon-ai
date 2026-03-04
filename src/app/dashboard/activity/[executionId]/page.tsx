@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ExecutionDetailLivePanel } from "@/components/dashboard/activity/execution-detail-live-panel";
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { requireOrganizationRole } from "@/server/auth/authorization";
+import { fetchAgentMemoryContext } from "@/server/services/agents/memory-service";
 import { fetchExecutionReplay } from "@/server/services/executions/replay-service";
 import { fetchExecutionById, fetchExecutionTimeline } from "@/server/services/executions/execution-service";
 import { fetchSelfHealingTimeline } from "@/server/services/executions/self-healing-service";
@@ -31,7 +32,7 @@ export default async function DashboardExecutionDetailPage({
     );
   }
 
-  const [timeline, replay, selfHealingRecords] = await Promise.all([
+  const [timeline, replay, selfHealingRecords, memoryEntries] = await Promise.all([
     fetchExecutionTimeline({
       organizationId: user.organizationId!,
       executionId: execution.id,
@@ -45,6 +46,11 @@ export default async function DashboardExecutionDetailPage({
     fetchSelfHealingTimeline({
       organizationId: user.organizationId!,
       executionId: execution.id,
+    }),
+    fetchAgentMemoryContext({
+      organizationId: user.organizationId!,
+      agentId: execution.agentId,
+      workflowId: execution.workflowId ?? undefined,
     }),
   ]);
 
@@ -71,6 +77,12 @@ export default async function DashboardExecutionDetailPage({
         initialSelfHealingRecords={selfHealingRecords.map((item) => ({
           ...item,
           createdAt: item.createdAt.toISOString(),
+        }))}
+        initialMemoryEntries={memoryEntries.map((item) => ({
+          ...item,
+          updatedAt: item.updatedAt.toISOString(),
+          confidence: item.confidence ?? null,
+          memoryValue: item.memoryValue as Record<string, unknown>,
         }))}
       />
     </div>

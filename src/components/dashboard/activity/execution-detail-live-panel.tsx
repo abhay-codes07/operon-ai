@@ -10,6 +10,7 @@ import { ExecutionReplayViewer } from "./execution-replay-viewer";
 import { ExecutionLogTimeline } from "./execution-log-timeline";
 import { RetryExecutionButton } from "./retry-execution-button";
 import { SelfHealingPanel } from "./self-healing-panel";
+import { AgentMemoryPanel } from "./agent-memory-panel";
 
 type ExecutionDetail = {
   id: string;
@@ -59,6 +60,14 @@ type ExecutionDetailLivePanelProps = {
     success: boolean;
     createdAt: string;
   }>;
+  initialMemoryEntries: Array<{
+    id: string;
+    kind: "RUN_METADATA" | "PATTERN" | "FAILURE_RESOLUTION";
+    memoryKey: string;
+    memoryValue: Record<string, unknown>;
+    confidence?: number | null;
+    updatedAt: string;
+  }>;
 };
 
 export function ExecutionDetailLivePanel({
@@ -66,11 +75,13 @@ export function ExecutionDetailLivePanel({
   initialLogs,
   initialReplay,
   initialSelfHealingRecords,
+  initialMemoryEntries,
 }: ExecutionDetailLivePanelProps): JSX.Element {
   const [execution, setExecution] = useState(initialExecution);
   const [logs, setLogs] = useState(initialLogs);
   const [replay, setReplay] = useState(initialReplay);
   const [selfHealingRecords, setSelfHealingRecords] = useState(initialSelfHealingRecords);
+  const [memoryEntries, setMemoryEntries] = useState(initialMemoryEntries);
 
   const refresh = useCallback(async () => {
     const executionResponse = await fetch(`/api/internal/executions/${initialExecution.id}`, {
@@ -109,6 +120,19 @@ export function ExecutionDetailLivePanel({
         records: typeof initialSelfHealingRecords;
       };
       setSelfHealingRecords(selfHealingPayload.records);
+    }
+
+    const memoryResponse = await fetch(
+      `/api/internal/agents/${initialExecution.agentId}/memory?workflowId=${initialExecution.workflowId ?? ""}`,
+      {
+        cache: "no-store",
+      },
+    );
+    if (memoryResponse.ok) {
+      const memoryPayload = (await memoryResponse.json()) as {
+        memory: typeof initialMemoryEntries;
+      };
+      setMemoryEntries(memoryPayload.memory);
     }
   }, [initialExecution.id]);
 
@@ -183,6 +207,10 @@ export function ExecutionDetailLivePanel({
 
       <DashboardCard title="Self-Healing Decisions" description="Selector fallback and semantic recovery actions">
         <SelfHealingPanel records={selfHealingRecords} />
+      </DashboardCard>
+
+      <DashboardCard title="Agent Memory Context" description="Learned patterns and failure resolutions reused by future runs">
+        <AgentMemoryPanel entries={memoryEntries} />
       </DashboardCard>
     </>
   );
