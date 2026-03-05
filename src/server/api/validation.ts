@@ -39,3 +39,21 @@ export function parsePositiveInt(
 
   return parsed;
 }
+
+export async function validateJson<T>(request: Request, schema: ZodSchema<T>) {
+  const payload = await request.json().catch(() => null);
+  const parsed = schema.safeParse(payload);
+
+  if (!parsed.success) {
+    return {
+      success: false as const,
+      error: "Invalid request payload",
+      issues: parsed.error.flatten(),
+    };
+  }
+
+  return {
+    success: true as const,
+    data: parsed.data,
+  };
+}
