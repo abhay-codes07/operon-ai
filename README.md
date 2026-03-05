@@ -84,6 +84,8 @@ Dynamic Tool Generation Engine allows agents to generate, validate, version, ins
 
 Operon Mission Control provides a real-time control plane for fleet status, incident detection, operational metrics, automated recovery runbooks, and controlled agent deployment.
 
+Secure Agent Gateway intercepts every agent action with policy-as-code enforcement, sandboxed execution, risk scoring, and immutable execution audit trails.
+
 ## Local Development
 
 ```bash
