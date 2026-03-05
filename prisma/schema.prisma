@@ -114,6 +114,39 @@ enum ToolExecutionStatus {
   FAILED
 }
 
+enum FleetStatus {
+  RUNNING
+  IDLE
+  FAILED
+  RETRYING
+}
+
+enum HealthStatus {
+  HEALTHY
+  DEGRADED
+  CRITICAL
+}
+
+enum IncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IncidentStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+enum RunbookExecutionStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -187,6 +220,13 @@ model Organization {
   toolVersions ToolVersion[]
   toolExecutions ToolExecution[]
   toolInstallations ToolInstallation[]
+  agentStatuses AgentStatusSnapshot[]
+  agentHealthRecords AgentHealth[]
+  incidents Incident[]
+  incidentEvents IncidentEvent[]
+  runbooks Runbook[]
+  runbookExecutions RunbookExecution[]
+  agentDeployments AgentDeployment[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -265,6 +305,11 @@ model Agent {
   executionMetrics ExecutionMetric[]
   insights       AgentInsight[]
   generatedTools Tool[]
+  statusHistory AgentStatusSnapshot[]
+  healthHistory AgentHealth[]
+  incidents Incident[]
+  runbookExecutions RunbookExecution[]
+  deployments AgentDeployment[]
 
   @@index([organizationId, status])
   @@index([organizationId, createdAt])
@@ -337,6 +382,8 @@ model Execution {
   stepCursor     Int              @default(0)
   debugMode      Boolean          @default(false)
   toolExecutions ToolExecution[]
+  incidents Incident[]
+  runbookExecutions RunbookExecution[]
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, agentId, createdAt])
@@ -811,6 +858,128 @@ model ToolInstallation {
 
   @@unique([workflowId, toolId])
   @@index([organizationId, workflowId, createdAt])
+}
+
+model AgentStatusSnapshot {
+  id             String       @id @default(cuid())
+  organizationId String
+  agentId        String
+  status         FleetStatus
+  reason         String?
+  occurredAt     DateTime     @default(now())
+  metadata       Json?
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agent          Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status, occurredAt])
+  @@index([agentId, occurredAt])
+}
+
+model AgentHealth {
+  id                String       @id @default(cuid())
+  organizationId    String
+  agentId           String
+  status            HealthStatus
+  cpuLoadPct        Float?
+  memoryUsageMb     Int?
+  queueBacklog      Int?
+  successRateWindow Float?
+  recordedAt        DateTime     @default(now())
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agent             Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status, recordedAt])
+  @@index([agentId, recordedAt])
+}
+
+model Incident {
+  id             String         @id @default(cuid())
+  organizationId String
+  agentId        String?
+  executionId    String?
+  title          String
+  description    String
+  severity       IncidentSeverity @default(MEDIUM)
+  status         IncidentStatus @default(OPEN)
+  detectedAt     DateTime       @default(now())
+  resolvedAt     DateTime?
+  metadata       Json?
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agent          Agent?         @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  execution      Execution?     @relation(fields: [executionId], references: [id], onDelete: SetNull)
+  events         IncidentEvent[]
+
+  @@index([organizationId, status, detectedAt])
+  @@index([organizationId, severity, detectedAt])
+}
+
+model IncidentEvent {
+  id             String       @id @default(cuid())
+  organizationId String
+  incidentId     String
+  eventType      String
+  message        String
+  metadata       Json?
+  occurredAt     DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  incident       Incident     @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, incidentId, occurredAt])
+}
+
+model Runbook {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  description    String
+  triggerType    String
+  steps          Json
+  enabled        Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  executions     RunbookExecution[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId, enabled, updatedAt])
+}
+
+model RunbookExecution {
+  id             String                 @id @default(cuid())
+  organizationId String
+  runbookId      String
+  agentId        String?
+  executionId    String?
+  status         RunbookExecutionStatus @default(QUEUED)
+  triggerSource  String
+  logs           Json?
+  startedAt      DateTime?
+  finishedAt     DateTime?
+  createdAt      DateTime               @default(now())
+  organization   Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  runbook        Runbook                @relation(fields: [runbookId], references: [id], onDelete: Cascade)
+  agent          Agent?                 @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  execution      Execution?             @relation(fields: [executionId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status, createdAt])
+  @@index([organizationId, runbookId, createdAt])
+}
+
+model AgentDeployment {
+  id             String       @id @default(cuid())
+  organizationId String
+  agentId        String
+  desiredRuns    Int          @default(1)
+  actualRuns     Int          @default(0)
+  status         FleetStatus  @default(IDLE)
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agent          Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status, updatedAt])
+  @@unique([organizationId, agentId])
 }
 
 model Subscription {
