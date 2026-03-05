@@ -36,6 +36,7 @@ import { learnFromToolExecution } from "@/server/services/tools/tool-learning-en
 import { recordAgentFleetStatus } from "@/server/services/mission-control/fleet-service";
 import { detectExecutionAnomalies, detectIncident } from "@/server/services/mission-control/incident-detection-service";
 import { executeRunbooksForIncident } from "@/server/services/mission-control/runbook-engine";
+import { processAgentActionThroughGateway } from "@/server/services/security/agent-gateway-service";
 import {
   captureExecutionDomSnapshot,
   persistExecutionReplaySteps,
@@ -225,6 +226,7 @@ export async function runExecutionWithTinyFish(
   );
 
   const parsed = parseTinyFishExecutionResponse(providerResponse);
+  let gatewayBlockedReason: string | null = null;
 
   const workflowSteps = (definition as { steps?: WorkflowDefinitionStep[] }).steps ?? [];
   const replaySteps = await persistExecutionReplaySteps({
@@ -365,6 +367,35 @@ export async function runExecutionWithTinyFish(
       continue;
     }
 
+    const gatewayAction = await processAgentActionThroughGateway({
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+      agentId: input.agentId,
+      action: replayStep.action,
+      target: healing.resolvedSelector ?? replayStep.target ?? undefined,
+      payload: {
+        stepKey: replayStep.stepKey,
+        stepIndex: replayStep.stepIndex,
+      },
+    });
+
+    if (!gatewayAction.allowed) {
+      gatewayBlockedReason = `Secure Agent Gateway blocked action ${replayStep.action}: ${gatewayAction.reasons.join(", ")}`;
+      await publishExecutionStreamEvent({
+        organizationId: input.organizationId,
+        executionId: input.executionId,
+        eventType: "gateway.blocked",
+        payload: {
+          stepKey: replayStep.stepKey,
+          action: replayStep.action,
+          reasons: gatewayAction.reasons,
+          riskScore: gatewayAction.risk.riskScore,
+          auditId: gatewayAction.auditId,
+        },
+      });
+      continue;
+    }
+
     await recordSelfHealingResolution({
       organizationId: input.organizationId,
       executionId: input.executionId,
@@ -454,6 +485,9 @@ export async function runExecutionWithTinyFish(
     storedScreenshots.push(stored);
   }
 
+  const finalStatus: ExecutionStatus = gatewayBlockedReason ? "FAILED" : parsed.status;
+  const finalErrorMessage = gatewayBlockedReason ?? parsed.errorMessage;
+
   await saveExecutionResult({
     organizationId: input.organizationId,
     executionId: input.executionId,
@@ -464,16 +498,16 @@ export async function runExecutionWithTinyFish(
       output: parsed.output,
       screenshots: storedScreenshots,
     },
-    errorMessage: parsed.errorMessage,
+    errorMessage: finalErrorMessage,
   });
 
   const finalizedExecution = await setExecutionStatus({
     organizationId: input.organizationId,
     executionId: input.executionId,
-    status: parsed.status,
+    status: finalStatus,
   });
 
-  if (parsed.status === "SUCCEEDED") {
+  if (finalStatus === "SUCCEEDED") {
     await recordExecutionUsage(input.organizationId, 1);
   }
 
@@ -482,10 +516,10 @@ export async function runExecutionWithTinyFish(
     agentId: input.agentId,
     workflowId: workflow.id,
     executionId: input.executionId,
-    status: parsed.status === "FAILED" ? "FAILED" : "SUCCEEDED",
+    status: finalStatus === "FAILED" ? "FAILED" : "SUCCEEDED",
     summary: parsed.summary,
     resolvedFailures:
-      parsed.status === "FAILED"
+      finalStatus === "FAILED"
         ? replaySteps
             .filter((item) => item.status === "FAILED")
             .map((item) => item.target ?? item.stepKey)
@@ -493,14 +527,14 @@ export async function runExecutionWithTinyFish(
   });
 
   const analysis =
-    parsed.status === "FAILED"
+    finalStatus === "FAILED"
       ? await analyzeExecutionFailure({
           organizationId: input.organizationId,
           executionId: input.executionId,
         })
       : null;
 
-  if (parsed.status === "FAILED") {
+  if (finalStatus === "FAILED") {
     const signalType =
       analysis?.category === "SELECTOR_DRIFT"
         ? "SELECTOR_ERROR_LOOP"
@@ -535,7 +569,7 @@ export async function runExecutionWithTinyFish(
     executionId: input.executionId,
     agentId: input.agentId,
     logs: parsed.logs.map((item) => ({ message: item.message })),
-    executionStatus: parsed.status,
+    executionStatus: finalStatus,
   });
   for (const anomalyIncident of anomalyIncidents) {
     await executeRunbooksForIncident({
@@ -553,7 +587,7 @@ export async function runExecutionWithTinyFish(
     agentId: input.agentId,
     startedAt: finalizedExecution.startedAt,
     finishedAt: finalizedExecution.finishedAt,
-    isSuccess: parsed.status === "SUCCEEDED",
+    isSuccess: finalStatus === "SUCCEEDED",
     retriesUsed: 0,
     failureCategory: analysis?.category,
   });
@@ -563,12 +597,12 @@ export async function runExecutionWithTinyFish(
     agentId: input.agentId,
     executionId: input.executionId,
     workflowId: workflow.id,
-    status: parsed.status === "FAILED" ? "FAILED" : "SUCCEEDED",
+    status: finalStatus === "FAILED" ? "FAILED" : "SUCCEEDED",
     stepTargets: workflowSteps.map((step) => step.target),
     failureCategory: analysis?.category,
   });
 
-  if (parsed.status === "FAILED") {
+  if (finalStatus === "FAILED") {
     await generateToolFromExecutionFailure({
       organizationId: input.organizationId,
       agentId: input.agentId,
@@ -580,7 +614,7 @@ export async function runExecutionWithTinyFish(
     await learnFromToolExecution({
       organizationId: input.organizationId,
       toolId: installation.toolId,
-      status: parsed.status === "FAILED" ? "FAILED" : "SUCCEEDED",
+      status: finalStatus === "FAILED" ? "FAILED" : "SUCCEEDED",
       durationMs:
         finalizedExecution.startedAt && finalizedExecution.finishedAt
           ? finalizedExecution.finishedAt.getTime() - finalizedExecution.startedAt.getTime()
@@ -593,12 +627,12 @@ export async function runExecutionWithTinyFish(
   await appendExecutionEvent({
     organizationId: input.organizationId,
     executionId: input.executionId,
-    level: parsed.status === "FAILED" ? "ERROR" : "INFO",
+    level: finalStatus === "FAILED" ? "ERROR" : "INFO",
     message:
-      parsed.status === "FAILED" ? "TinyFish execution failed" : "TinyFish execution completed",
+      finalStatus === "FAILED" ? "TinyFish execution failed" : "TinyFish execution completed",
     metadata: {
       providerExecutionId: parsed.providerExecutionId,
-      status: parsed.status,
+      status: finalStatus,
       traceId: input.traceId,
     },
   });
@@ -606,24 +640,24 @@ export async function runExecutionWithTinyFish(
   await recordAgentFleetStatus({
     organizationId: input.organizationId,
     agentId: input.agentId,
-    status: parsed.status === "FAILED" ? "FAILED" : "IDLE",
+    status: finalStatus === "FAILED" ? "FAILED" : "IDLE",
     reason:
-      parsed.status === "FAILED"
+      finalStatus === "FAILED"
         ? "Execution ended with failure"
         : "Execution completed successfully",
     metadata: {
       executionId: input.executionId,
       providerExecutionId: parsed.providerExecutionId,
-      status: parsed.status,
+      status: finalStatus,
     },
   });
 
   await publishExecutionStreamEvent({
     organizationId: input.organizationId,
     executionId: input.executionId,
-    eventType: parsed.status === "FAILED" ? "execution.failed" : "execution.completed",
+    eventType: finalStatus === "FAILED" ? "execution.failed" : "execution.completed",
     payload: {
-      status: parsed.status,
+      status: finalStatus,
       providerExecutionId: parsed.providerExecutionId,
     },
   });
@@ -635,13 +669,13 @@ export async function runExecutionWithTinyFish(
     workflowId: input.workflowId,
     traceId: input.traceId,
     metadata: {
-      status: parsed.status,
+      status: finalStatus,
       providerExecutionId: parsed.providerExecutionId,
     },
   });
 
   return {
-    status: parsed.status,
+    status: finalStatus,
     providerExecutionId: parsed.providerExecutionId,
   };
 }
