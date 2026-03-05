@@ -40,6 +40,11 @@ export const dashboardNav = [
     description: "Approvals and live controls",
   },
   {
+    href: "/dashboard/mission-control",
+    label: "Mission Control",
+    description: "Fleet ops and incidents",
+  },
+  {
     href: "/dashboard/billing",
     label: "Billing",
     description: "Plans and quota",
