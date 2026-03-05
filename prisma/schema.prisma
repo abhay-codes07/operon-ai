@@ -147,6 +147,29 @@ enum RunbookExecutionStatus {
   FAILED
 }
 
+enum PolicyRuleType {
+  DOMAIN_ALLOWLIST
+  ACTION_ALLOWLIST
+}
+
+enum PolicyDecision {
+  ALLOW
+  DENY
+}
+
+enum AuditResult {
+  APPROVED
+  BLOCKED
+  FAILED
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -227,6 +250,10 @@ model Organization {
   runbooks Runbook[]
   runbookExecutions RunbookExecution[]
   agentDeployments AgentDeployment[]
+  agentPolicies AgentPolicy[]
+  policyRules PolicyRule[]
+  executionAudits ExecutionAudit[]
+  auditEvents AuditEvent[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -310,6 +337,8 @@ model Agent {
   incidents Incident[]
   runbookExecutions RunbookExecution[]
   deployments AgentDeployment[]
+  agentPolicy AgentPolicy?
+  executionAudits ExecutionAudit[]
 
   @@index([organizationId, status])
   @@index([organizationId, createdAt])
@@ -384,6 +413,7 @@ model Execution {
   toolExecutions ToolExecution[]
   incidents Incident[]
   runbookExecutions RunbookExecution[]
+  executionAudits ExecutionAudit[]
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, agentId, createdAt])
@@ -498,6 +528,84 @@ model OrganizationSecurityPolicy {
   createdAt            DateTime     @default(now())
   updatedAt            DateTime     @updatedAt
   organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model AgentPolicy {
+  id                   String       @id @default(cuid())
+  organizationId       String
+  agentId              String
+  enabled              Boolean      @default(true)
+  maxRunsPerHour       Int          @default(120)
+  allowedWindowStartHr Int?
+  allowedWindowEndHr   Int?
+  timezone             String       @default("UTC")
+  metadata             Json?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agent                Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  rules                PolicyRule[]
+
+  @@unique([organizationId, agentId])
+  @@index([organizationId, enabled, updatedAt])
+}
+
+model PolicyRule {
+  id             String         @id @default(cuid())
+  organizationId String
+  agentPolicyId  String
+  ruleType       PolicyRuleType
+  value          String
+  enabled        Boolean        @default(true)
+  metadata       Json?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agentPolicy    AgentPolicy    @relation(fields: [agentPolicyId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, ruleType, enabled, updatedAt])
+  @@index([agentPolicyId, ruleType, enabled])
+  @@unique([agentPolicyId, ruleType, value])
+}
+
+model ExecutionAudit {
+  id             String         @id @default(cuid())
+  organizationId String
+  executionId    String?
+  agentId        String
+  action         String
+  targetDomain   String?
+  intentHash     String
+  policyDecision PolicyDecision
+  result         AuditResult
+  riskLevel      RiskLevel
+  riskScore      Int
+  riskReason     String?
+  metadata       Json?
+  occurredAt     DateTime       @default(now())
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  execution      Execution?     @relation(fields: [executionId], references: [id], onDelete: SetNull)
+  agent          Agent          @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  events         AuditEvent[]
+
+  @@index([organizationId, occurredAt])
+  @@index([organizationId, agentId, occurredAt])
+  @@index([organizationId, result, occurredAt])
+}
+
+model AuditEvent {
+  id               String         @id @default(cuid())
+  organizationId   String
+  executionAuditId String
+  eventType        String
+  message          String
+  metadata         Json?
+  occurredAt       DateTime       @default(now())
+  organization     Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  executionAudit   ExecutionAudit @relation(fields: [executionAuditId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, occurredAt])
+  @@index([executionAuditId, occurredAt])
 }
 
 model WorkflowSimulation {
