@@ -6,11 +6,12 @@ import { SecurityPolicyForm } from "@/components/dashboard/security/security-pol
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { fetchAgentCatalog } from "@/server/services/agents/agent-service";
 import { fetchAuditLogs } from "@/server/services/security/audit-log-service";
+import { fetchAgentPolicies } from "@/server/services/security/agent-policy-service";
 import { fetchOrganizationPolicy } from "@/server/security/policy-engine";
 
 export default async function DashboardSecurityPage(): Promise<JSX.Element> {
   const user = await requireOrganizationRole("ADMIN");
-  const [policy, agents, auditLogs] = await Promise.all([
+  const [policy, agents, auditLogs, agentPolicies] = await Promise.all([
     fetchOrganizationPolicy(user.organizationId!),
     fetchAgentCatalog({
       organizationId: user.organizationId!,
@@ -21,6 +22,7 @@ export default async function DashboardSecurityPage(): Promise<JSX.Element> {
       organizationId: user.organizationId!,
       limit: 40,
     }),
+    fetchAgentPolicies(user.organizationId!),
   ]);
 
   return (
@@ -50,6 +52,13 @@ export default async function DashboardSecurityPage(): Promise<JSX.Element> {
           agents={agents.items.map((item) => ({
             id: item.id,
             name: item.name,
+          }))}
+          initialPolicies={agentPolicies.map((item) => ({
+            id: item.id,
+            agentId: item.agentId,
+            enabled: item.enabled,
+            maxRunsPerHour: item.maxRunsPerHour,
+            updatedAt: item.updatedAt.toISOString(),
           }))}
         />
       </DashboardCard>

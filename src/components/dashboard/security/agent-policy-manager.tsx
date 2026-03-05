@@ -11,9 +11,16 @@ type AgentOption = {
 
 type AgentPolicyManagerProps = {
   agents: AgentOption[];
+  initialPolicies: Array<{
+    id: string;
+    agentId: string;
+    enabled: boolean;
+    maxRunsPerHour: number;
+    updatedAt: string;
+  }>;
 };
 
-export function AgentPolicyManager({ agents }: AgentPolicyManagerProps): JSX.Element {
+export function AgentPolicyManager({ agents, initialPolicies }: AgentPolicyManagerProps): JSX.Element {
   const [agentId, setAgentId] = useState(agents[0]?.id ?? "");
   const [enabled, setEnabled] = useState(true);
   const [maxRunsPerHour, setMaxRunsPerHour] = useState("120");
@@ -57,6 +64,22 @@ export function AgentPolicyManager({ agents }: AgentPolicyManagerProps): JSX.Ele
 
   return (
     <div className="space-y-4">
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Active Agent Policies</p>
+        {initialPolicies.length === 0 ? (
+          <p className="mt-2 text-xs text-slate-600">No agent-level policies configured.</p>
+        ) : (
+          <div className="mt-2 space-y-1">
+            {initialPolicies.map((item) => (
+              <p key={item.id} className="text-xs text-slate-700">
+                {agents.find((agent) => agent.id === item.agentId)?.name ?? item.agentId.slice(-8)} •{" "}
+                {item.enabled ? "Enabled" : "Disabled"} • Limit {item.maxRunsPerHour}/hr
+              </p>
+            ))}
+          </div>
+        )}
+      </div>
+
       <label className="block space-y-2">
         <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Agent</span>
         <select
