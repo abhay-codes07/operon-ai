@@ -6,6 +6,7 @@ import { requireOrganizationRole } from "@/server/auth/authorization";
 import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer";
 import { publishExecutionStreamEvent } from "@/server/services/control-plane/streaming-service";
 import { enforceRateLimit } from "@/server/security/rate-limit";
+import { recordAgentFleetStatus } from "@/server/services/mission-control/fleet-service";
 import {
   appendExecutionEvent,
   fetchExecutionById,
@@ -86,6 +87,18 @@ export async function POST(request: Request, context: RouteContext) {
     payload: {
       traceId,
       requestedByUserId: user.id,
+    },
+  });
+
+  await recordAgentFleetStatus({
+    organizationId: user.organizationId!,
+    agentId: retriedExecution.agentId,
+    status: "RETRYING",
+    reason: "Execution manually retried",
+    metadata: {
+      executionId: execution.id,
+      requestedByUserId: user.id,
+      traceId,
     },
   });
 

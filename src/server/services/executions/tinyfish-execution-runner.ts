@@ -33,6 +33,9 @@ import { registerSelectorFailure } from "@/server/services/workflows/autonomy-en
 import { generateToolFromExecutionFailure } from "@/server/services/tools/tool-generation-service";
 import { fetchInstalledTools } from "@/server/services/tools/tool-registry-service";
 import { learnFromToolExecution } from "@/server/services/tools/tool-learning-engine";
+import { recordAgentFleetStatus } from "@/server/services/mission-control/fleet-service";
+import { detectExecutionAnomalies, detectIncident } from "@/server/services/mission-control/incident-detection-service";
+import { executeRunbooksForIncident } from "@/server/services/mission-control/runbook-engine";
 import {
   captureExecutionDomSnapshot,
   persistExecutionReplaySteps,
@@ -113,6 +116,15 @@ export async function runExecutionWithTinyFish(
     organizationId: input.organizationId,
     executionId: input.executionId,
     status: "RUNNING",
+  });
+  await recordAgentFleetStatus({
+    organizationId: input.organizationId,
+    agentId: input.agentId,
+    status: "RUNNING",
+    reason: "Execution started",
+    metadata: {
+      executionId: input.executionId,
+    },
   });
 
   await appendExecutionEvent({
@@ -488,6 +500,53 @@ export async function runExecutionWithTinyFish(
         })
       : null;
 
+  if (parsed.status === "FAILED") {
+    const signalType =
+      analysis?.category === "SELECTOR_DRIFT"
+        ? "SELECTOR_ERROR_LOOP"
+        : analysis?.category === "PAGE_LOAD_TIMEOUT"
+          ? "RETRY_LOOP"
+          : "FAILURE_SPIKE";
+    const incident = await detectIncident({
+      organizationId: input.organizationId,
+      signalType,
+      title: `Execution failure detected for agent ${input.agentId.slice(-8)}`,
+      description: analysis?.summary ?? parsed.errorMessage ?? "Execution failed without explicit provider message",
+      severity: analysis?.category === "AUTHENTICATION_ISSUE" ? "CRITICAL" : "HIGH",
+      agentId: input.agentId,
+      executionId: input.executionId,
+      metadata: {
+        category: analysis?.category ?? "UNKNOWN",
+        providerExecutionId: parsed.providerExecutionId,
+      },
+    });
+
+    await executeRunbooksForIncident({
+      organizationId: input.organizationId,
+      triggerType: signalType,
+      incidentId: incident.id,
+      executionId: input.executionId,
+      agentId: input.agentId,
+    }).catch(() => []);
+  }
+
+  const anomalyIncidents = await detectExecutionAnomalies({
+    organizationId: input.organizationId,
+    executionId: input.executionId,
+    agentId: input.agentId,
+    logs: parsed.logs.map((item) => ({ message: item.message })),
+    executionStatus: parsed.status,
+  });
+  for (const anomalyIncident of anomalyIncidents) {
+    await executeRunbooksForIncident({
+      organizationId: input.organizationId,
+      triggerType: anomalyIncident.signalType,
+      incidentId: anomalyIncident.id,
+      executionId: input.executionId,
+      agentId: input.agentId,
+    }).catch(() => []);
+  }
+
   await recordExecutionReliabilityMetric({
     organizationId: input.organizationId,
     executionId: input.executionId,
@@ -541,6 +600,21 @@ export async function runExecutionWithTinyFish(
       providerExecutionId: parsed.providerExecutionId,
       status: parsed.status,
       traceId: input.traceId,
+    },
+  });
+
+  await recordAgentFleetStatus({
+    organizationId: input.organizationId,
+    agentId: input.agentId,
+    status: parsed.status === "FAILED" ? "FAILED" : "IDLE",
+    reason:
+      parsed.status === "FAILED"
+        ? "Execution ended with failure"
+        : "Execution completed successfully",
+    metadata: {
+      executionId: input.executionId,
+      providerExecutionId: parsed.providerExecutionId,
+      status: parsed.status,
     },
   });
 
