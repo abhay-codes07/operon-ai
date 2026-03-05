@@ -82,6 +82,8 @@ Real-Time Agent Control Plane enables live session streaming, approval gates, ru
 
 Dynamic Tool Generation Engine allows agents to generate, validate, version, install, and continuously optimize reusable automation tools from failed runs.
 
+Operon Mission Control provides a real-time control plane for fleet status, incident detection, operational metrics, automated recovery runbooks, and controlled agent deployment.
+
 ## Local Development
 
 ```bash
