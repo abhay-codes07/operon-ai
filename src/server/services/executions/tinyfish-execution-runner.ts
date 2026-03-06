@@ -47,6 +47,10 @@ import {
 } from "@/server/services/executions/self-healing-service";
 import { persistScreenshotArtifact } from "@/server/services/storage/screenshot-storage";
 import { fetchWorkflowById } from "@/server/services/workflows/workflow-service";
+import {
+  evaluateReleaseHealth,
+  recordReleaseExecutionOutcome,
+} from "@/server/services/workflows/release-manager-service";
 
 import {
   appendExecutionEvent,
@@ -673,6 +677,40 @@ export async function runExecutionWithTinyFish(
       providerExecutionId: parsed.providerExecutionId,
     },
   });
+
+  const releaseContext = await prisma.execution.findUnique({
+    where: {
+      id: input.executionId,
+    },
+    select: {
+      inputPayload: true,
+    },
+  });
+  const releaseId =
+    (releaseContext?.inputPayload as { releaseId?: string | null } | null)?.releaseId ?? null;
+  if (releaseId) {
+    await recordReleaseExecutionOutcome({
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+      status: finalStatus,
+    });
+
+    const evaluation = await evaluateReleaseHealth({
+      organizationId: input.organizationId,
+      releaseId,
+    });
+    if (evaluation.rolledBack) {
+      await appendExecutionEvent({
+        organizationId: input.organizationId,
+        executionId: input.executionId,
+        level: "WARN",
+        message: "Release automatically rolled back after canary failure threshold breach",
+        metadata: {
+          releaseId,
+        },
+      });
+    }
+  }
 
   return {
     status: finalStatus,
