@@ -10,6 +10,10 @@ import { enforceRateLimit } from "@/server/security/rate-limit";
 import { evaluateWorkflowAgainstPolicy } from "@/server/security/policy-engine";
 import { enforceExecutionQuotaOrThrow } from "@/server/services/billing/enforcement-service";
 import { appendExecutionEvent, queueExecution } from "@/server/services/executions/execution-service";
+import {
+  registerReleaseRouting,
+  resolveWorkflowForExecution,
+} from "@/server/services/workflows/release-manager-service";
 import { fetchWorkflowById } from "@/server/services/workflows/workflow-service";
 
 const paramsSchema = z.object({
@@ -58,10 +62,26 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
   }
 
-  const policyEvaluation = await evaluateWorkflowAgainstPolicy({
+  const routing = await resolveWorkflowForExecution({
     organizationId: user.organizationId!,
     workflowId: workflow.id,
-    definition: workflow.definition as { steps?: Array<{ action?: string; target?: string }> } | null,
+  });
+  const selectedWorkflow =
+    routing.workflowId === workflow.id
+      ? workflow
+      : await fetchWorkflowById({
+          organizationId: user.organizationId!,
+          workflowId: routing.workflowId,
+        });
+  if (!selectedWorkflow) {
+    return NextResponse.json({ error: "Routed workflow not found" }, { status: 404 });
+  }
+
+  const policyEvaluation = await evaluateWorkflowAgainstPolicy({
+    organizationId: user.organizationId!,
+    workflowId: selectedWorkflow.id,
+    definition:
+      selectedWorkflow.definition as { steps?: Array<{ action?: string; target?: string }> } | null,
   });
   if (!policyEvaluation.allowed) {
     return NextResponse.json(
@@ -85,13 +105,17 @@ export async function POST(request: Request, context: RouteContext) {
 
   const execution = await queueExecution({
     organizationId: user.organizationId!,
-    agentId: workflow.agentId,
-    workflowId: workflow.id,
+    agentId: selectedWorkflow.agentId,
+    workflowId: selectedWorkflow.id,
     requestedById: user.id,
     trigger: "MANUAL",
     inputPayload: {
       source: "dashboard",
       initiatedByUserId: user.id,
+      requestedWorkflowId: workflow.id,
+      routedWorkflowId: selectedWorkflow.id,
+      releaseId: routing.releaseId,
+      releaseLane: routing.lane,
     },
   });
   const traceId = createTraceId(execution.id);
@@ -99,12 +123,21 @@ export async function POST(request: Request, context: RouteContext) {
   await enqueueExecutionJob({
     organizationId: user.organizationId!,
     executionId: execution.id,
-    workflowId: workflow.id,
-    agentId: workflow.agentId,
+    workflowId: selectedWorkflow.id,
+    agentId: selectedWorkflow.agentId,
     requestedById: user.id,
     trigger: "MANUAL",
     traceId,
   });
+  if (routing.releaseId) {
+    await registerReleaseRouting({
+      organizationId: user.organizationId!,
+      releaseId: routing.releaseId,
+      executionId: execution.id,
+      workflowId: selectedWorkflow.id,
+      lane: routing.lane,
+    });
+  }
 
   await appendExecutionEvent({
     organizationId: user.organizationId!,
@@ -114,6 +147,9 @@ export async function POST(request: Request, context: RouteContext) {
     metadata: {
       queue: "execution",
       traceId,
+      releaseId: routing.releaseId,
+      releaseLane: routing.lane,
+      routedWorkflowId: selectedWorkflow.id,
     },
   });
 
@@ -122,7 +158,10 @@ export async function POST(request: Request, context: RouteContext) {
     executionId: execution.id,
     eventType: "execution.enqueued",
     payload: {
-      workflowId: workflow.id,
+      workflowId: selectedWorkflow.id,
+      requestedWorkflowId: workflow.id,
+      releaseId: routing.releaseId,
+      releaseLane: routing.lane,
       trigger: "MANUAL",
       traceId,
     },
