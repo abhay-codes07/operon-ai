@@ -86,6 +86,8 @@ Operon Mission Control provides a real-time control plane for fleet status, inci
 
 Secure Agent Gateway intercepts every agent action with policy-as-code enforcement, sandboxed execution, risk scoring, and immutable execution audit trails.
 
+Progressive Workflow Delivery adds canary traffic routing, release health snapshots, and automatic rollback when live failure thresholds are breached.
+
 ## Local Development
 
 ```bash
