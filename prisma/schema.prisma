@@ -170,6 +170,18 @@ enum RiskLevel {
   CRITICAL
 }
 
+enum WorkflowReleaseStatus {
+  ACTIVE
+  PAUSED
+  ROLLED_BACK
+  COMPLETED
+}
+
+enum ReleaseLane {
+  STABLE
+  CANARY
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -254,6 +266,9 @@ model Organization {
   policyRules PolicyRule[]
   executionAudits ExecutionAudit[]
   auditEvents AuditEvent[]
+  workflowReleases WorkflowRelease[]
+  releaseRoutingLogs ReleaseRoutingLog[]
+  releaseMetricSnapshots ReleaseMetricSnapshot[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -369,6 +384,9 @@ model Workflow {
   adaptiveWorkflow AdaptiveWorkflow?
   approvalRequests ApprovalRequest[]
   installedTools ToolInstallation[]
+  stableReleases WorkflowRelease[] @relation("StableWorkflow")
+  canaryReleases WorkflowRelease[] @relation("CanaryWorkflow")
+  releaseRoutings ReleaseRoutingLog[]
 
   @@index([organizationId, status])
   @@index([organizationId, agentId, createdAt])
@@ -414,6 +432,7 @@ model Execution {
   incidents Incident[]
   runbookExecutions RunbookExecution[]
   executionAudits ExecutionAudit[]
+  releaseRouting ReleaseRoutingLog?
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, agentId, createdAt])
@@ -606,6 +625,68 @@ model AuditEvent {
 
   @@index([organizationId, occurredAt])
   @@index([executionAuditId, occurredAt])
+}
+
+model WorkflowRelease {
+  id                    String                @id @default(cuid())
+  organizationId        String
+  agentId               String
+  stableWorkflowId      String
+  canaryWorkflowId      String
+  status                WorkflowReleaseStatus @default(ACTIVE)
+  canaryTrafficPercent  Int                   @default(10)
+  autoRollbackEnabled   Boolean               @default(true)
+  failureThresholdPct   Float                 @default(20)
+  minCanarySampleSize   Int                   @default(20)
+  totalRouted           Int                   @default(0)
+  stableRouted          Int                   @default(0)
+  canaryRouted          Int                   @default(0)
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  organization          Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agent                 Agent                 @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  stableWorkflow        Workflow              @relation("StableWorkflow", fields: [stableWorkflowId], references: [id], onDelete: Cascade)
+  canaryWorkflow        Workflow              @relation("CanaryWorkflow", fields: [canaryWorkflowId], references: [id], onDelete: Cascade)
+  routings              ReleaseRoutingLog[]
+  metricSnapshots       ReleaseMetricSnapshot[]
+
+  @@index([organizationId, status, updatedAt])
+  @@unique([organizationId, stableWorkflowId, canaryWorkflowId])
+}
+
+model ReleaseRoutingLog {
+  id             String       @id @default(cuid())
+  organizationId String
+  workflowReleaseId String
+  executionId    String       @unique
+  workflowId     String
+  lane           ReleaseLane
+  status         ExecutionStatus @default(QUEUED)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  workflowRelease WorkflowRelease @relation(fields: [workflowReleaseId], references: [id], onDelete: Cascade)
+  execution      Execution    @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  workflow       Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, workflowReleaseId, createdAt])
+  @@index([organizationId, lane, createdAt])
+}
+
+model ReleaseMetricSnapshot {
+  id              String       @id @default(cuid())
+  organizationId  String
+  workflowReleaseId String
+  canarySampleSize Int
+  canaryFailurePct Float
+  canarySuccessPct Float
+  stableSampleSize Int
+  stableFailurePct Float
+  capturedAt       DateTime     @default(now())
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  workflowRelease  WorkflowRelease @relation(fields: [workflowReleaseId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, workflowReleaseId, capturedAt])
 }
 
 model WorkflowSimulation {
