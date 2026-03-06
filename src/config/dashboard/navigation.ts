@@ -20,6 +20,11 @@ export const dashboardNav = [
     description: "Builder and schedules",
   },
   {
+    href: "/dashboard/releases",
+    label: "Releases",
+    description: "Canary rollout control",
+  },
+  {
     href: "/dashboard/tools",
     label: "Tools",
     description: "Marketplace and installs",
