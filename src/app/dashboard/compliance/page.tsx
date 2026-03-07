@@ -5,11 +5,13 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { ComplianceRiskBadge } from "@/components/workflows/compliance-risk-badge";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { prisma } from "@/server/db/client";
+import { getComplianceDashboardSummary } from "@/lib/compliance/dashboard.service";
 
 export default async function DashboardCompliancePage(): Promise<JSX.Element> {
   const user = await requireOrganizationRole("MEMBER");
 
-  const [workflows, violations, passports] = await Promise.all([
+  const [summary, workflows, violations, passports] = await Promise.all([
+    getComplianceDashboardSummary(user.organizationId!),
     prisma.workflow.findMany({
       where: { organizationId: user.organizationId! },
       select: {
@@ -33,11 +35,7 @@ export default async function DashboardCompliancePage(): Promise<JSX.Element> {
       take: 20,
     }),
     prisma.compliancePassport.findMany({
-      where: {
-        workflow: {
-          organizationId: user.organizationId!,
-        },
-      },
+      where: { workflow: { organizationId: user.organizationId! } },
       select: {
         id: true,
         workflowId: true,
@@ -72,19 +70,19 @@ export default async function DashboardCompliancePage(): Promise<JSX.Element> {
       <div className="grid gap-4 md:grid-cols-4">
         <DashboardCard>
           <p className="text-xs text-slate-500">Workflows</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{workflows.length}</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.totalWorkflows}</p>
         </DashboardCard>
         <DashboardCard>
           <p className="text-xs text-slate-500">Approved</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{approvedSet.size}</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.approvedWorkflows}</p>
         </DashboardCard>
         <DashboardCard>
           <p className="text-xs text-slate-500">Recent Violations</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{violations.length}</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.violations}</p>
         </DashboardCard>
         <DashboardCard>
           <p className="text-xs text-slate-500">Passports Generated</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{passports.length}</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.passportsGenerated}</p>
         </DashboardCard>
       </div>
 
