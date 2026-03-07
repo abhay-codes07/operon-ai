@@ -141,6 +141,18 @@ Compliance monitoring runs continuously:
 - Daily compliance worker refreshes workflow passport summaries automatically.
 - Audit trail entries are written for `WORKFLOW_APPROVED`, `WORKFLOW_REVOKED`, and `COMPLIANCE_VIOLATION`.
 
+Compliance API surface:
+
+- `GET /api/compliance/workflows/[id]`
+- `POST /api/compliance/workflows/[id]/request`
+- `POST /api/compliance/workflows/[id]/approve`
+- `POST /api/compliance/workflows/[id]/revoke`
+- `GET /api/compliance/workflows/[id]/events`
+- `GET /api/compliance/passport/[workflowId]`
+- `GET /api/compliance/passport/[workflowId]/pdf`
+- `GET /api/compliance/violations`
+- `GET /api/compliance/dashboard`
+
 ## Local Development
 
 ```bash
