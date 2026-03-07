@@ -182,6 +182,16 @@ enum ReleaseLane {
   CANARY
 }
 
+enum MarketplacePricingModel {
+  FREE
+  PAID
+}
+
+enum TemplateInstallationStatus {
+  ACTIVE
+  PAUSED
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -269,6 +279,9 @@ model Organization {
   workflowReleases WorkflowRelease[]
   releaseRoutingLogs ReleaseRoutingLog[]
   releaseMetricSnapshots ReleaseMetricSnapshot[]
+  authoredTemplates MarketplaceTemplate[] @relation("MarketplaceTemplateAuthor")
+  templateInstallations TemplateInstallation[]
+  templateReviews TemplateReview[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -687,6 +700,72 @@ model ReleaseMetricSnapshot {
   workflowRelease  WorkflowRelease @relation(fields: [workflowReleaseId], references: [id], onDelete: Cascade)
 
   @@index([organizationId, workflowReleaseId, capturedAt])
+}
+
+model MarketplaceTemplate {
+  id               String                @id @default(cuid())
+  slug             String                @unique
+  title            String
+  description      String
+  category         String
+  authorOrgId      String
+  pricingModel     MarketplacePricingModel @default(FREE)
+  priceUsd         Float                 @default(0)
+  reliabilityScore Float                 @default(0)
+  avgRating        Float                 @default(0)
+  reviewCount      Int                   @default(0)
+  installCount     Int                   @default(0)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  authorOrg        Organization          @relation("MarketplaceTemplateAuthor", fields: [authorOrgId], references: [id], onDelete: Cascade)
+  versions         TemplateVersion[]
+  installations    TemplateInstallation[]
+  reviews          TemplateReview[]
+
+  @@index([category, reliabilityScore, installCount])
+  @@index([authorOrgId, createdAt])
+}
+
+model TemplateVersion {
+  id                 String              @id @default(cuid())
+  templateId         String
+  version            String
+  workflowDefinition Json
+  changelog          String?
+  isLatest           Boolean             @default(false)
+  publishedAt        DateTime            @default(now())
+  template           MarketplaceTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, version])
+  @@index([templateId, isLatest, publishedAt])
+}
+
+model TemplateInstallation {
+  id               String                     @id @default(cuid())
+  templateId       String
+  orgId            String
+  installedVersion String
+  installedAt      DateTime                   @default(now())
+  status           TemplateInstallationStatus @default(ACTIVE)
+  template         MarketplaceTemplate        @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  organization     Organization               @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, orgId])
+  @@index([orgId, status, installedAt])
+}
+
+model TemplateReview {
+  id         String              @id @default(cuid())
+  templateId String
+  orgId      String
+  rating     Int
+  comment    String?
+  createdAt  DateTime            @default(now())
+  template   MarketplaceTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  organization Organization      @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, orgId])
+  @@index([templateId, createdAt])
 }
 
 model WorkflowSimulation {
