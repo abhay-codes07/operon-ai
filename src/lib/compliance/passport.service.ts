@@ -12,6 +12,20 @@ function computeRisk(actions: ComplianceActionType[]): ComplianceRiskLevel {
   return "LOW";
 }
 
+function buildSummaryText(input: {
+  domainsVisitedCount: number;
+  extractCount: number;
+  writeCount: number;
+  eventCount: number;
+}): string {
+  const reportDate = new Date().toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  return `On ${reportDate}, this workflow visited ${input.domainsVisitedCount} domain(s), recorded ${input.eventCount} tracked action(s), extracted data ${input.extractCount} time(s), and executed write/submit actions ${input.writeCount} time(s).`;
+}
+
 export async function generatePlainEnglishSummary(workflowId: string) {
   const workflow = await prisma.workflow.findUnique({
     where: { id: workflowId },
@@ -32,8 +46,12 @@ export async function generatePlainEnglishSummary(workflowId: string) {
   const extractCount = events.filter((event) => event.actionType === "EXTRACT").length;
   const writeCount = events.filter((event) => event.actionType === "WRITE" || event.actionType === "SUBMIT").length;
 
-  const referenceDate = new Date().toLocaleDateString();
-  const summary = `On ${referenceDate} this workflow visited ${domains.length} domain(s), extracted ${extractCount} data action(s), and performed ${writeCount} write/submit action(s).`;
+  const summary = buildSummaryText({
+    domainsVisitedCount: domains.length,
+    extractCount,
+    writeCount,
+    eventCount: events.length,
+  });
   const riskLevel = computeRisk(actions);
 
   const passport = await prisma.compliancePassport.upsert({
