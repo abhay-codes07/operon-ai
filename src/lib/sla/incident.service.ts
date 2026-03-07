@@ -66,6 +66,30 @@ export async function createSlaIncident(input: {
   breachType: SLABreachType;
   breachDetails: Record<string, unknown>;
 }) {
+  const recentBreachCount = await prisma.sLABreachIncident.count({
+    where: {
+      workflowId: input.workflowId,
+      resolvedAt: null,
+    },
+  });
+
+  const runLogs = input.runId
+    ? await prisma.executionLog.findMany({
+        where: {
+          executionId: input.runId,
+        },
+        select: {
+          level: true,
+          message: true,
+          occurredAt: true,
+        },
+        orderBy: {
+          occurredAt: "asc",
+        },
+        take: 20,
+      })
+    : [];
+
   const incident = await createIncident(input);
 
   const workflowSla = await prisma.workflowSLA.findUnique({
@@ -81,6 +105,21 @@ export async function createSlaIncident(input: {
     workflowId: input.workflowId,
     slackChannel: workflowSla?.notificationSlackChannel,
     email: workflowSla?.notificationEmail,
+  });
+
+  await prisma.sLABreachIncident.update({
+    where: { id: incident.id },
+    data: {
+      breachDetails: {
+        ...(input.breachDetails as Record<string, unknown>),
+        recentOpenBreaches: recentBreachCount,
+        attachedRunLogs: runLogs.map((log) => ({
+          level: log.level,
+          message: log.message,
+          occurredAt: log.occurredAt.toISOString(),
+        })),
+      },
+    },
   });
 
   return incident;
