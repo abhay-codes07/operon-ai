@@ -126,6 +126,21 @@ Business Impact profiles map workflows to value categories and estimated dollar 
 
 The Impact Dashboard aggregates monthly ROI, savings, and revenue-protection totals while ranking top-value workflows.
 
+## AI Agent Compliance Passport
+
+Every workflow carries a Compliance Passport that records approvals, execution actions, visited domains, extracted data categories, and policy violations.
+
+Production execution is blocked until the current workflow version has an active compliance approval. When a workflow definition changes, prior approval is no longer valid.
+
+Passports generate plain-English summaries for non-engineering stakeholders, assign risk levels (`LOW`, `MEDIUM`, `HIGH`), and expose downloadable PDF reports.
+
+Compliance monitoring runs continuously:
+
+- Runtime event capture logs `READ`, `WRITE`, `SUBMIT`, and `EXTRACT` actions per run.
+- Violation detection flags out-of-allowlist domains, excessive extraction, and policy breaches.
+- Daily compliance worker refreshes workflow passport summaries automatically.
+- Audit trail entries are written for `WORKFLOW_APPROVED`, `WORKFLOW_REVOKED`, and `COMPLIANCE_VIOLATION`.
+
 ## Local Development
 
 ```bash
