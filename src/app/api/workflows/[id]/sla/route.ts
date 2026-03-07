@@ -50,7 +50,20 @@ export async function GET(_request: Request, context: RouteContext) {
   const sla = await prisma.workflowSLA.findUnique({
     where: { workflowId: parsed.data.id },
   });
-  return NextResponse.json({ sla });
+  const openIncidents = await prisma.sLABreachIncident.count({
+    where: {
+      workflowId: parsed.data.id,
+      resolvedAt: null,
+    },
+  });
+  const health =
+    !sla ? "UNCONFIGURED" : openIncidents > 0 ? "BREACHED" : sla.maxFailureRate <= 0.1 ? "WARNING" : "HEALTHY";
+
+  return NextResponse.json({
+    sla,
+    health,
+    openIncidents,
+  });
 }
 
 export async function POST(request: Request, context: RouteContext) {
