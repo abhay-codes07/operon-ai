@@ -35,6 +35,11 @@ export const dashboardNav = [
     description: "Agent trust scorecards",
   },
   {
+    href: "/dashboard/impact",
+    label: "Impact",
+    description: "Business value metrics",
+  },
+  {
     href: "/dashboard/knowledge",
     label: "Knowledge",
     description: "Cross-agent learning graph",
@@ -63,5 +68,10 @@ export const dashboardNav = [
     href: "/dashboard/security",
     label: "Security",
     description: "Operational guardrails",
+  },
+  {
+    href: "/dashboard/incidents",
+    label: "Incidents",
+    description: "SLA breach response",
   },
 ] as const;
