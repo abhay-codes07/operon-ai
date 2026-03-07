@@ -96,6 +96,22 @@ Organizations can publish reusable templates, install them instantly, and run li
 
 Template reliability is continuously scored from execution outcomes, ratings, and recency. A background worker recomputes scores every 6 hours.
 
+### Publish
+
+Teams publish versioned templates with workflow definitions, changelogs, pricing metadata, and category tags.
+
+### Install
+
+Organizations install templates into their workspace with tracked version state and lifecycle status.
+
+### Reliability Scoring
+
+OperonHub computes reliability from execution outcomes, marketplace ratings, and release freshness, then updates leaderboard ranking.
+
+### Live Agents
+
+Template detail pages can trigger live demo runs through TinyFish, returning structured event traces and run output.
+
 ## Local Development
 
 ```bash
