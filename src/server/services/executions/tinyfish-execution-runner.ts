@@ -1,4 +1,4 @@
-import type { ExecutionStatus } from "@prisma/client";
+import type { ComplianceActionType, ExecutionStatus } from "@prisma/client";
 
 import { RetryableOperationError, withRetry } from "@/lib/utils/retry";
 import { executeTinyFishWorkflow, TinyFishApiError } from "@/server/integrations/tinyfish/client";
@@ -52,6 +52,13 @@ import {
   recordReleaseExecutionOutcome,
 } from "@/server/services/workflows/release-manager-service";
 import { evaluateRunAgainstSLA } from "@/lib/sla/sla.service";
+import {
+  recordAction,
+  recordDataExtraction,
+  recordDomainVisit,
+} from "@/lib/compliance/event.service";
+import { generatePlainEnglishSummary } from "@/lib/compliance/passport.service";
+import { detectComplianceViolationsForRun } from "@/lib/compliance/violation.service";
 
 import {
   appendExecutionEvent,
@@ -96,6 +103,41 @@ function shouldRetryTinyFishError(error: unknown): boolean {
   }
 
   return error instanceof RetryableOperationError;
+}
+
+function mapStepActionToComplianceAction(stepAction: string): ComplianceActionType {
+  const normalized = stepAction.trim().toLowerCase();
+  if (normalized.includes("submit")) {
+    return "SUBMIT";
+  }
+  if (
+    normalized.includes("type") ||
+    normalized.includes("write") ||
+    normalized.includes("fill") ||
+    normalized.includes("update")
+  ) {
+    return "WRITE";
+  }
+  if (
+    normalized.includes("extract") ||
+    normalized.includes("scrape") ||
+    normalized.includes("parse")
+  ) {
+    return "EXTRACT";
+  }
+  return "READ";
+}
+
+function deriveDomain(target: string | null | undefined): string | null {
+  if (!target) {
+    return null;
+  }
+  try {
+    const parsed = new URL(target);
+    return parsed.hostname.toLowerCase();
+  } catch {
+    return null;
+  }
 }
 
 export async function runExecutionWithTinyFish(
@@ -462,6 +504,16 @@ export async function runExecutionWithTinyFish(
       domContent: `${replayStep.stepKey}:${replayStep.action}:${replayStep.status}`,
       snapshotRef: replayStep.id,
     });
+
+    const complianceActionType = mapStepActionToComplianceAction(replayStep.action);
+    const domain = deriveDomain(replayStep.target);
+    if (domain) {
+      await recordDomainVisit(input.executionId, domain);
+    }
+    await recordAction(input.executionId, complianceActionType);
+    if (complianceActionType === "EXTRACT") {
+      await recordDataExtraction(input.executionId, "WORKFLOW_EXTRACTED_DATA");
+    }
   }
 
   for (const log of parsed.logs) {
@@ -719,6 +771,12 @@ export async function runExecutionWithTinyFish(
     startedAt: finalizedExecution.startedAt,
     finishedAt: finalizedExecution.finishedAt,
   }).catch(() => null);
+
+  await detectComplianceViolationsForRun({
+    runId: input.executionId,
+    workflowId: workflow.id,
+  }).catch(() => []);
+  await generatePlainEnglishSummary(workflow.id).catch(() => null);
 
   return {
     status: finalStatus,
