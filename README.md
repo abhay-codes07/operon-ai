@@ -112,6 +112,20 @@ OperonHub computes reliability from execution outcomes, marketplace ratings, and
 
 Template detail pages can trigger live demo runs through TinyFish, returning structured event traces and run output.
 
+## Workflow SLA Contracts
+
+Workflow SLA Contracts let each workflow define schedule expectations, maximum failure rate, runtime timeout, rolling windows, and escalation channels.
+
+SLA monitor workers evaluate execution timeout, missed schedules, and failure-rate thresholds every 5 minutes and create structured breach incidents automatically.
+
+Incidents can be reviewed and resolved from the Incident Center, with attached run-log context and operator retry actions.
+
+## Business Impact Dashboard
+
+Business Impact profiles map workflows to value categories and estimated dollar value per successful run.
+
+The Impact Dashboard aggregates monthly ROI, savings, and revenue-protection totals while ranking top-value workflows.
+
 ## Local Development
 
 ```bash
