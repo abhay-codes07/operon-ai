@@ -51,6 +51,7 @@ import {
   evaluateReleaseHealth,
   recordReleaseExecutionOutcome,
 } from "@/server/services/workflows/release-manager-service";
+import { evaluateRunAgainstSLA } from "@/lib/sla/sla.service";
 
 import {
   appendExecutionEvent,
@@ -711,6 +712,13 @@ export async function runExecutionWithTinyFish(
       });
     }
   }
+
+  await evaluateRunAgainstSLA({
+    id: input.executionId,
+    workflowId: workflow.id,
+    startedAt: finalizedExecution.startedAt,
+    finishedAt: finalizedExecution.finishedAt,
+  }).catch(() => null);
 
   return {
     status: finalStatus,
