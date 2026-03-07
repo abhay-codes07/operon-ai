@@ -88,6 +88,14 @@ Secure Agent Gateway intercepts every agent action with policy-as-code enforceme
 
 Progressive Workflow Delivery adds canary traffic routing, release health snapshots, and automatic rollback when live failure thresholds are breached.
 
+## OperonHub Marketplace
+
+OperonHub is the workflow marketplace for real-world TinyFish web agent automations.
+
+Organizations can publish reusable templates, install them instantly, and run live demos against production websites.
+
+Template reliability is continuously scored from execution outcomes, ratings, and recency. A background worker recomputes scores every 6 hours.
+
 ## Local Development
 
 ```bash
