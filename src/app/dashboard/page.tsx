@@ -6,6 +6,7 @@ import { listTemplates } from "@/lib/marketplace/marketplace.service";
 import { requireAuthenticatedUser } from "@/server/auth/authorization";
 import { fetchChangeRadarFeed } from "@/server/services/monitoring/change-radar-service";
 import { getExecutionQueueHealth } from "@/server/queue/monitoring/health";
+import { prisma } from "@/server/db/client";
 
 type DashboardPageProps = {
   searchParams?: {
@@ -24,6 +25,21 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     page: 1,
     pageSize: 5,
   }).catch(() => ({ items: [] as Array<{ id: string; title: string; reliabilityScore: number; installCount: number }> }));
+  const [approvalCount, violationCount] = user.organizationId
+    ? await Promise.all([
+        prisma.workflowComplianceApproval.count({
+          where: {
+            organizationId: user.organizationId,
+            revokedAt: null,
+          },
+        }),
+        prisma.complianceViolation.count({
+          where: {
+            organizationId: user.organizationId,
+          },
+        }),
+      ])
+    : [0, 0];
 
   return (
     <div className="space-y-5">
@@ -154,6 +170,27 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               Browse OperonHub
             </Link>
           </div>
+        </div>
+      </DashboardCard>
+
+      <DashboardCard title="Compliance Passport" description="Workflow approval posture and compliance violations.">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <article className="rounded-xl border border-slate-200 bg-white p-4">
+            <p className="text-xs text-slate-500">Approved Workflows</p>
+            <p className="mt-1 text-xl font-semibold tracking-tight text-slate-900">{approvalCount}</p>
+          </article>
+          <article className="rounded-xl border border-slate-200 bg-white p-4">
+            <p className="text-xs text-slate-500">Compliance Violations</p>
+            <p className="mt-1 text-xl font-semibold tracking-tight text-slate-900">{violationCount}</p>
+          </article>
+        </div>
+        <div className="pt-3">
+          <Link
+            href="/dashboard/compliance"
+            className="inline-flex h-9 items-center rounded-md bg-slate-900 px-3 text-sm font-medium text-white"
+          >
+            Open Compliance Dashboard
+          </Link>
         </div>
       </DashboardCard>
     </div>
