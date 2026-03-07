@@ -1,13 +1,19 @@
 import { closeQueueRedisConnection } from "@/server/queue/connection";
+import {
+  startMarketplaceReliabilityWorker,
+  stopMarketplaceReliabilityWorker,
+} from "@/server/queue/workers/marketplace-reliability.worker";
 import { startExecutionWorker, stopExecutionWorker } from "@/server/queue/workers/execution-worker";
 
 async function bootstrapWorker() {
   console.log("Starting WebOps AI execution worker...");
   startExecutionWorker();
+  startMarketplaceReliabilityWorker();
 
   const shutdown = async (signal: string) => {
     console.log(`Received ${signal}, shutting down worker...`);
     await stopExecutionWorker();
+    await stopMarketplaceReliabilityWorker();
     await closeQueueRedisConnection();
     process.exit(0);
   };
