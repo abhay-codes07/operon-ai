@@ -8,6 +8,7 @@ type IncidentRow = {
   workflowName: string;
   runId?: string | null;
   breachType: "FAILURE_RATE" | "EXECUTION_TIMEOUT" | "MISSED_SCHEDULE";
+  breachDetails: Record<string, unknown>;
   detectedAt: string;
   resolvedAt?: string | null;
 };
@@ -18,6 +19,7 @@ type IncidentCenterTableProps = {
 
 export function IncidentCenterTable({ items }: IncidentCenterTableProps): JSX.Element {
   const [rows, setRows] = useState(items);
+  const [openDetails, setOpenDetails] = useState<string | null>(null);
 
   async function resolve(id: string) {
     await fetch(`/api/incidents/${id}/resolve`, { method: "POST" });
@@ -76,7 +78,19 @@ export function IncidentCenterTable({ items }: IncidentCenterTableProps): JSX.El
                       Resolve
                     </button>
                   ) : null}
+                  <button
+                    type="button"
+                    className="rounded border border-slate-300 px-2 py-1 text-xs"
+                    onClick={() => setOpenDetails((current) => (current === row.id ? null : row.id))}
+                  >
+                    {openDetails === row.id ? "Hide Details" : "View Details"}
+                  </button>
                 </div>
+                {openDetails === row.id ? (
+                  <pre className="mt-2 overflow-auto rounded bg-slate-900 p-2 text-xs text-slate-100">
+                    {JSON.stringify(row.breachDetails, null, 2)}
+                  </pre>
+                ) : null}
               </td>
             </tr>
           ))}

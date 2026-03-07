@@ -23,6 +23,7 @@ export default async function DashboardIncidentsPage(): Promise<JSX.Element> {
             workflowName: item.workflow.name,
             runId: item.runId,
             breachType: item.breachType,
+            breachDetails: item.breachDetails as Record<string, unknown>,
             detectedAt: item.detectedAt.toISOString(),
             resolvedAt: item.resolvedAt?.toISOString(),
           }))}
