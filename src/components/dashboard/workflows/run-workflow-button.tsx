@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonPro
   const [isSimulating, setIsSimulating] = useState(false);
   const [isAutonomyLoading, setIsAutonomyLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [needsComplianceApproval, setNeedsComplianceApproval] = useState(false);
   const [simulation, setSimulation] = useState<{
     id: string;
     status: "READY" | "FAILED";
@@ -49,6 +51,7 @@ export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonPro
   async function onRunWorkflow() {
     setIsRunning(true);
     setError(null);
+    setNeedsComplianceApproval(false);
 
     const response = await fetch(`/api/internal/workflows/${workflowId}/execute`, {
       method: "POST",
@@ -57,7 +60,12 @@ export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonPro
     setIsRunning(false);
 
     if (!response.ok) {
-      const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; code?: string }
+        | null;
+      if (payload?.code === "WORKFLOW_NOT_COMPLIANCE_APPROVED") {
+        setNeedsComplianceApproval(true);
+      }
       setError(payload?.error ?? "Run failed");
       return;
     }
@@ -154,6 +162,11 @@ export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonPro
       {simulation ? <SimulationPreviewPanel simulation={simulation} /> : null}
       {autonomy ? <AutonomyModePanel payload={autonomy} /> : null}
       {error ? <p className="text-xs text-rose-700">{error}</p> : null}
+      {needsComplianceApproval ? (
+        <Link href={`/workflows/${workflowId}/compliance`} className="text-xs font-medium text-slate-700 underline">
+          Open Compliance Passport
+        </Link>
+      ) : null}
     </div>
   );
 }
