@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { SLAConfigForm } from "@/components/workflows/sla-config-form";
+import { SLAStatusIndicator } from "@/components/workflows/sla-status-indicator";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { prisma } from "@/server/db/client";
 
@@ -28,12 +29,30 @@ export default async function WorkflowSLAConfigPage({
     notFound();
   }
 
+  const openIncidents = await prisma.sLABreachIncident.count({
+    where: {
+      workflowId: workflow.id,
+      resolvedAt: null,
+    },
+  });
+  const slaState =
+    !workflow.workflowSLA
+      ? "UNCONFIGURED"
+      : openIncidents > 0
+        ? "BREACHED"
+        : workflow.workflowSLA.maxFailureRate <= 0.1
+          ? "WARNING"
+          : "HEALTHY";
+
   return (
     <div className="mx-auto max-w-3xl space-y-5 px-4 py-8">
       <header className="space-y-1">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Workflow SLA Contract</p>
         <h1 className="text-2xl font-semibold text-slate-900">{workflow.name}</h1>
         <p className="text-sm text-slate-600">Define failure, schedule, timeout, and escalation thresholds.</p>
+        <div className="pt-1">
+          <SLAStatusIndicator state={slaState} />
+        </div>
       </header>
       <section className="rounded-xl border border-slate-200 bg-white p-4">
         <SLAConfigForm
