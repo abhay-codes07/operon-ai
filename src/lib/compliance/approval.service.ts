@@ -8,7 +8,7 @@ async function logWorkflowApprovalAudit(input: {
   organizationId: string;
   agentId: string;
   workflowId: string;
-  action: "WORKFLOW_APPROVED" | "WORKFLOW_REVOKED";
+  action: "WORKFLOW_APPROVAL_REQUESTED" | "WORKFLOW_APPROVED" | "WORKFLOW_REVOKED";
   metadata?: Record<string, unknown>;
 }) {
   const audit = await prisma.executionAudit.create({
@@ -42,11 +42,18 @@ async function logWorkflowApprovalAudit(input: {
 export async function requestWorkflowApproval(workflowId: string) {
   const workflow = await prisma.workflow.findUnique({
     where: { id: workflowId },
-    select: { id: true, updatedAt: true },
+    select: { id: true, updatedAt: true, organizationId: true, agentId: true },
   });
   if (!workflow) {
     return null;
   }
+
+  await logWorkflowApprovalAudit({
+    organizationId: workflow.organizationId,
+    agentId: workflow.agentId,
+    workflowId: workflow.id,
+    action: "WORKFLOW_APPROVAL_REQUESTED",
+  });
 
   return {
     workflowId: workflow.id,
