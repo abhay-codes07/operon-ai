@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { WorkflowStatusBadge } from "@/components/dashboard/status/workflow-status-badge";
 import { WorkflowHealthBadge } from "@/components/dashboard/workflows/workflow-health-badge";
 import { RunWorkflowButton } from "@/components/dashboard/workflows/run-workflow-button";
@@ -58,6 +59,14 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
                 <p className="text-xs text-slate-500">
                   {workflow.description ?? workflow.definition.naturalLanguageTask}
                 </p>
+                <div className="mt-1 flex gap-2 text-xs">
+                  <Link href={`/workflows/${workflow.id}/sla`} className="text-slate-700 hover:underline">
+                    SLA
+                  </Link>
+                  <Link href={`/workflows/${workflow.id}/compliance`} className="text-slate-700 hover:underline">
+                    Compliance
+                  </Link>
+                </div>
               </td>
               <td className="px-4 py-3">
                 <WorkflowStatusBadge status={workflow.status} />

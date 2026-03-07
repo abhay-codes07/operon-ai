@@ -70,6 +70,11 @@ export const dashboardNav = [
     description: "Operational guardrails",
   },
   {
+    href: "/dashboard/compliance",
+    label: "Compliance",
+    description: "Approvals and passport audit",
+  },
+  {
     href: "/dashboard/incidents",
     label: "Incidents",
     description: "SLA breach response",
