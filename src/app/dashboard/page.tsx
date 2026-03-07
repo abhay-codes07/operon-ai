@@ -1,6 +1,8 @@
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { ErrorPanel } from "@/components/ui/feedback/error-panel";
 import { StatusBadge } from "@/components/ui/status-badge";
+import Link from "next/link";
+import { listTemplates } from "@/lib/marketplace/marketplace.service";
 import { requireAuthenticatedUser } from "@/server/auth/authorization";
 import { fetchChangeRadarFeed } from "@/server/services/monitoring/change-radar-service";
 import { getExecutionQueueHealth } from "@/server/queue/monitoring/health";
@@ -18,6 +20,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const changeEvents = user.organizationId
     ? await fetchChangeRadarFeed(user.organizationId).catch(() => [])
     : [];
+  const topTemplates = await listTemplates({
+    page: 1,
+    pageSize: 5,
+  }).catch(() => ({ items: [] as Array<{ id: string; title: string; reliabilityScore: number; installCount: number }> }));
 
   return (
     <div className="space-y-5">
@@ -124,6 +130,31 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             ))}
           </div>
         )}
+      </DashboardCard>
+
+      <DashboardCard title="OperonHub" description="Top templates by reliability score in the marketplace.">
+        <div className="space-y-2">
+          {topTemplates.items.length === 0 ? (
+            <p className="text-sm text-slate-600">No templates published yet.</p>
+          ) : (
+            topTemplates.items.map((template) => (
+              <article key={template.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <p className="text-sm font-semibold text-slate-900">{template.title}</p>
+                <p className="text-xs text-slate-600">
+                  Reliability {template.reliabilityScore.toFixed(1)} • Installs {template.installCount}
+                </p>
+              </article>
+            ))
+          )}
+          <div className="pt-2">
+            <Link
+              href="/marketplace"
+              className="inline-flex h-9 items-center rounded-md bg-slate-900 px-3 text-sm font-medium text-white"
+            >
+              Browse OperonHub
+            </Link>
+          </div>
+        </div>
       </DashboardCard>
     </div>
   );
