@@ -135,6 +135,7 @@ export default async function DashboardWorkflowsPage({
             return {
               ...item,
               hasSla,
+              complianceApproved: approvedWorkflowIds.has(item.id),
               slaState: breaches > 0 ? "BREACHED" : warning ? "WARNING" : "HEALTHY",
             };
           })}

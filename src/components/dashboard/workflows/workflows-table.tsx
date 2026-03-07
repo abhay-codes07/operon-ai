@@ -15,6 +15,7 @@ type WorkflowTableItem = {
   };
   slaState: "HEALTHY" | "WARNING" | "BREACHED";
   hasSla: boolean;
+  complianceApproved: boolean;
   createdAt: Date;
 };
 
@@ -40,6 +41,7 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Workflow</th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">SLA</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Compliance</th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
               Schedule
             </th>
@@ -73,6 +75,17 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
               </td>
               <td className="px-4 py-3">
                 {workflow.hasSla ? <WorkflowHealthBadge state={workflow.slaState} /> : <span className="text-xs text-slate-500">Not configured</span>}
+              </td>
+              <td className="px-4 py-3">
+                <span
+                  className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${
+                    workflow.complianceApproved
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                      : "border-amber-200 bg-amber-50 text-amber-700"
+                  }`}
+                >
+                  {workflow.complianceApproved ? "Approved" : "Pending"}
+                </span>
               </td>
               <td className="px-4 py-3 text-sm text-slate-600">{workflow.scheduleCron ?? "Manual trigger"}</td>
               <td className="px-4 py-3 text-sm text-slate-600">{workflow.definition.steps.length}</td>
