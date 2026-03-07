@@ -5,6 +5,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { WorkflowsTable } from "@/components/dashboard/workflows/workflows-table";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { fetchAgentCatalog } from "@/server/services/agents/agent-service";
+import { prisma } from "@/server/db/client";
 import { fetchWorkflowCatalog } from "@/server/services/workflows/workflow-service";
 
 type DashboardWorkflowsPageProps = {
@@ -39,6 +40,34 @@ export default async function DashboardWorkflowsPage({
     page: 1,
     pageSize: 25,
   });
+  const workflowIds = workflows.items.map((item) => item.id);
+  const [slaRows, incidentRows] = workflowIds.length
+    ? await Promise.all([
+        prisma.workflowSLA.findMany({
+          where: { workflowId: { in: workflowIds } },
+          select: {
+            workflowId: true,
+            maxFailureRate: true,
+          },
+        }),
+        prisma.sLABreachIncident.findMany({
+          where: {
+            workflowId: { in: workflowIds },
+            resolvedAt: null,
+          },
+          select: {
+            workflowId: true,
+            detectedAt: true,
+          },
+        }),
+      ])
+    : [[], []];
+  const slaMap = new Map(slaRows.map((row) => [row.workflowId, row]));
+  const incidentCountMap = new Map<string, number>();
+  for (const incident of incidentRows) {
+    incidentCountMap.set(incident.workflowId, (incidentCountMap.get(incident.workflowId) ?? 0) + 1);
+  }
+  const openBreachCount = incidentRows.length;
 
   return (
     <div className="space-y-5">
@@ -73,7 +102,24 @@ export default async function DashboardWorkflowsPage({
             ]}
           />
         </div>
-        <WorkflowsTable items={workflows.items} />
+        {openBreachCount > 0 ? (
+          <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">
+            {openBreachCount} active SLA breach incident{openBreachCount === 1 ? "" : "s"} detected.
+          </div>
+        ) : null}
+        <WorkflowsTable
+          items={workflows.items.map((item) => {
+            const hasSla = slaMap.has(item.id);
+            const breaches = incidentCountMap.get(item.id) ?? 0;
+            const sla = slaMap.get(item.id);
+            const warning = hasSla && breaches === 0 && (sla?.maxFailureRate ?? 0) <= 0.1;
+            return {
+              ...item,
+              hasSla,
+              slaState: breaches > 0 ? "BREACHED" : warning ? "WARNING" : "HEALTHY",
+            };
+          })}
+        />
       </DashboardCard>
     </div>
   );
