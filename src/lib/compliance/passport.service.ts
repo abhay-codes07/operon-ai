@@ -1,16 +1,7 @@
-import type { ComplianceActionType, ComplianceRiskLevel } from "@prisma/client";
+import type { ComplianceActionType } from "@prisma/client";
 
 import { prisma } from "@/server/db/client";
-
-function computeRisk(actions: ComplianceActionType[]): ComplianceRiskLevel {
-  if (actions.includes("WRITE") || actions.includes("SUBMIT")) {
-    return "HIGH";
-  }
-  if (actions.includes("EXTRACT")) {
-    return "MEDIUM";
-  }
-  return "LOW";
-}
+import { computeComplianceRisk } from "@/lib/compliance/risk";
 
 function buildSummaryText(input: {
   domainsVisitedCount: number;
@@ -52,7 +43,7 @@ export async function generatePlainEnglishSummary(workflowId: string) {
     writeCount,
     eventCount: events.length,
   });
-  const riskLevel = computeRisk(actions);
+  const riskLevel = computeComplianceRisk(actions);
 
   const passport = await prisma.compliancePassport.upsert({
     where: { workflowId },
