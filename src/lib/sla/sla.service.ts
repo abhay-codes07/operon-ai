@@ -167,7 +167,31 @@ export async function evaluateRunAgainstSLA(run: {
   finishedAt: Date | null;
 }) {
   const timeoutIncident = await detectExecutionTimeout(run);
+  let failureRateIncident: unknown = null;
+  if (run.workflowId) {
+    const sla = await prisma.workflowSLA.findUnique({
+      where: { workflowId: run.workflowId },
+      include: { workflow: { select: { organizationId: true } } },
+    });
+    if (sla) {
+      const rate = await calculateFailureRate(run.workflowId, sla.rollingWindowDays);
+      if (rate > sla.maxFailureRate) {
+        failureRateIncident = await createSlaIncident({
+          organizationId: sla.workflow.organizationId,
+          workflowId: run.workflowId,
+          runId: run.id,
+          breachType: "FAILURE_RATE",
+          breachDetails: {
+            observedFailureRate: rate,
+            maxFailureRate: sla.maxFailureRate,
+            rollingWindowDays: sla.rollingWindowDays,
+          },
+        });
+      }
+    }
+  }
   return {
     timeoutIncident,
+    failureRateIncident,
   };
 }
