@@ -50,6 +50,11 @@ export const dashboardNav = [
     description: "Fleet ops and incidents",
   },
   {
+    href: "/marketplace",
+    label: "OperonHub",
+    description: "Workflow marketplace",
+  },
+  {
     href: "/dashboard/billing",
     label: "Billing",
     description: "Plans and quota",
