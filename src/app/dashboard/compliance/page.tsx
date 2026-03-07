@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ComplianceDashboardLive } from "@/components/dashboard/compliance/compliance-dashboard-live";
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { ComplianceRiskBadge } from "@/components/workflows/compliance-risk-badge";
@@ -67,24 +68,7 @@ export default async function DashboardCompliancePage(): Promise<JSX.Element> {
         description="Approval coverage, risk distribution, and recent compliance violations."
       />
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <DashboardCard>
-          <p className="text-xs text-slate-500">Workflows</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.totalWorkflows}</p>
-        </DashboardCard>
-        <DashboardCard>
-          <p className="text-xs text-slate-500">Approved</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.approvedWorkflows}</p>
-        </DashboardCard>
-        <DashboardCard>
-          <p className="text-xs text-slate-500">Recent Violations</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.violations}</p>
-        </DashboardCard>
-        <DashboardCard>
-          <p className="text-xs text-slate-500">Passports Generated</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.passportsGenerated}</p>
-        </DashboardCard>
-      </div>
+      <ComplianceDashboardLive initial={summary} />
 
       <DashboardCard title="Workflow Compliance Status">
         <div className="overflow-hidden rounded-xl border border-slate-200">
