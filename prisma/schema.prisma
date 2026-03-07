@@ -205,6 +205,19 @@ enum SLABreachType {
   MISSED_SCHEDULE
 }
 
+enum ComplianceActionType {
+  READ
+  WRITE
+  SUBMIT
+  EXTRACT
+}
+
+enum ComplianceRiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -238,6 +251,7 @@ model User {
   reviewedApprovals ApprovalRequest[] @relation("ApprovalReviewedBy")
   debugSessions DebugSession[]
   installedTools ToolInstallation[]
+  complianceApprovals WorkflowComplianceApproval[] @relation("ComplianceApprovedBy")
 
   @@index([createdAt])
 }
@@ -296,6 +310,9 @@ model Organization {
   templateInstallations TemplateInstallation[]
   templateReviews TemplateReview[]
   slaBreachIncidents SLABreachIncident[]
+  complianceEvents ComplianceEvent[]
+  complianceViolations ComplianceViolation[]
+  workflowComplianceApprovals WorkflowComplianceApproval[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -417,6 +434,10 @@ model Workflow {
   workflowSLA WorkflowSLA?
   workflowBusinessImpact WorkflowBusinessImpact?
   slaBreachIncidents SLABreachIncident[]
+  complianceApprovals WorkflowComplianceApproval[]
+  complianceEvents ComplianceEvent[]
+  compliancePassport CompliancePassport?
+  complianceViolations ComplianceViolation[]
 
   @@index([organizationId, status])
   @@index([organizationId, agentId, createdAt])
@@ -464,6 +485,8 @@ model Execution {
   executionAudits ExecutionAudit[]
   releaseRouting ReleaseRoutingLog?
   slaBreachIncidents SLABreachIncident[] @relation("SLABreachRun")
+  complianceEvents ComplianceEvent[] @relation("ComplianceEventRun")
+  complianceViolations ComplianceViolation[] @relation("ComplianceViolationRun")
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, agentId, createdAt])
@@ -827,6 +850,67 @@ model SLABreachIncident {
 
   @@index([organizationId, detectedAt])
   @@index([workflowId, breachType, detectedAt])
+  @@index([runId])
+}
+
+model WorkflowComplianceApproval {
+  id               String       @id @default(cuid())
+  workflowId       String
+  version          String
+  approvedByUserId String
+  approvedAt       DateTime     @default(now())
+  approvalNotes    String?
+  revokedAt        DateTime?
+  organizationId   String
+  workflow         Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  approvedBy       User         @relation("ComplianceApprovedBy", fields: [approvedByUserId], references: [id], onDelete: Cascade)
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, workflowId, approvedAt])
+  @@index([workflowId, revokedAt])
+}
+
+model ComplianceEvent {
+  id             String               @id @default(cuid())
+  workflowId     String
+  runId          String?
+  domainVisited  String?
+  actionType     ComplianceActionType
+  dataCategory   String?
+  timestamp      DateTime             @default(now())
+  organizationId String
+  workflow       Workflow             @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  run            Execution?           @relation("ComplianceEventRun", fields: [runId], references: [id], onDelete: SetNull)
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, workflowId, timestamp])
+  @@index([runId, timestamp])
+}
+
+model CompliancePassport {
+  id              String              @id @default(cuid())
+  workflowId      String              @unique
+  lastGeneratedAt DateTime?
+  riskLevel       ComplianceRiskLevel @default(LOW)
+  summaryText     String?
+  reportUrl       String?
+  workflow        Workflow            @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+}
+
+model ComplianceViolation {
+  id             String       @id @default(cuid())
+  workflowId     String
+  runId          String?
+  violationType  String
+  description    String
+  detectedAt     DateTime     @default(now())
+  organizationId String
+  workflow       Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  run            Execution?   @relation("ComplianceViolationRun", fields: [runId], references: [id], onDelete: SetNull)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, detectedAt])
+  @@index([workflowId, detectedAt])
   @@index([runId])
 }
 
