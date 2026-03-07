@@ -20,6 +20,7 @@ const slaSchema = z.object({
   notificationEmail: z.string().trim().email().optional(),
   escalationAfterBreaches: z.number().int().min(1).max(100).optional(),
 });
+const slaPatchSchema = slaSchema.partial();
 
 type RouteContext = {
   params: {
@@ -80,5 +81,46 @@ export async function POST(request: Request, context: RouteContext) {
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
-  return POST(request, context);
+  const user = await requireOrganizationRole("ADMIN");
+  const parsedParams = paramsSchema.safeParse(context.params);
+  if (!parsedParams.success) {
+    return structuredApiError(400, "INVALID_WORKFLOW_ID", "Workflow identifier is invalid");
+  }
+
+  const workflow = await ensureWorkflowInOrg(user.organizationId!, parsedParams.data.id);
+  if (!workflow) {
+    return structuredApiError(404, "WORKFLOW_NOT_FOUND", "Workflow not found");
+  }
+
+  const existing = await prisma.workflowSLA.findUnique({
+    where: { workflowId: parsedParams.data.id },
+  });
+  if (!existing) {
+    return structuredApiError(404, "SLA_NOT_FOUND", "Workflow SLA not found");
+  }
+
+  const payload = await request.json().catch(() => null);
+  const parsedBody = slaPatchSchema.safeParse(payload);
+  if (!parsedBody.success) {
+    return structuredApiError(400, "INVALID_SLA_PAYLOAD", "Invalid SLA payload", {
+      issues: parsedBody.error.flatten(),
+    });
+  }
+
+  const merged = {
+    expectedSchedule: parsedBody.data.expectedSchedule ?? existing.expectedSchedule,
+    maxFailureRate: parsedBody.data.maxFailureRate ?? existing.maxFailureRate,
+    maxExecutionTimeSeconds: parsedBody.data.maxExecutionTimeSeconds ?? existing.maxExecutionTimeSeconds,
+    rollingWindowDays: parsedBody.data.rollingWindowDays ?? existing.rollingWindowDays,
+    notificationSlackChannel: parsedBody.data.notificationSlackChannel ?? existing.notificationSlackChannel ?? undefined,
+    notificationEmail: parsedBody.data.notificationEmail ?? existing.notificationEmail ?? undefined,
+    escalationAfterBreaches: parsedBody.data.escalationAfterBreaches ?? existing.escalationAfterBreaches,
+  };
+
+  if (!isCronExpressionValid(merged.expectedSchedule)) {
+    return structuredApiError(400, "INVALID_CRON", "SLA expectedSchedule must be a valid cron string");
+  }
+
+  const sla = await createWorkflowSLA(parsedParams.data.id, merged);
+  return NextResponse.json({ sla });
 }
