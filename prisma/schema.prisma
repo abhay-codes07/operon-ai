@@ -192,6 +192,19 @@ enum TemplateInstallationStatus {
   PAUSED
 }
 
+enum BusinessImpactCategory {
+  REVENUE_PROTECTION
+  COST_SAVINGS
+  COMPLIANCE
+  GROWTH
+}
+
+enum SLABreachType {
+  FAILURE_RATE
+  EXECUTION_TIMEOUT
+  MISSED_SCHEDULE
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -282,6 +295,7 @@ model Organization {
   authoredTemplates MarketplaceTemplate[] @relation("MarketplaceTemplateAuthor")
   templateInstallations TemplateInstallation[]
   templateReviews TemplateReview[]
+  slaBreachIncidents SLABreachIncident[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -400,6 +414,9 @@ model Workflow {
   stableReleases WorkflowRelease[] @relation("StableWorkflow")
   canaryReleases WorkflowRelease[] @relation("CanaryWorkflow")
   releaseRoutings ReleaseRoutingLog[]
+  workflowSLA WorkflowSLA?
+  workflowBusinessImpact WorkflowBusinessImpact?
+  slaBreachIncidents SLABreachIncident[]
 
   @@index([organizationId, status])
   @@index([organizationId, agentId, createdAt])
@@ -446,6 +463,7 @@ model Execution {
   runbookExecutions RunbookExecution[]
   executionAudits ExecutionAudit[]
   releaseRouting ReleaseRoutingLog?
+  slaBreachIncidents SLABreachIncident[] @relation("SLABreachRun")
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, agentId, createdAt])
@@ -766,6 +784,50 @@ model TemplateReview {
 
   @@unique([templateId, orgId])
   @@index([templateId, createdAt])
+}
+
+model WorkflowSLA {
+  id                       String   @id @default(cuid())
+  workflowId               String   @unique
+  expectedSchedule         String
+  maxFailureRate           Float
+  maxExecutionTimeSeconds  Int
+  rollingWindowDays        Int      @default(7)
+  notificationSlackChannel String?
+  notificationEmail        String?
+  escalationAfterBreaches  Int      @default(3)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  workflow                 Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+}
+
+model WorkflowBusinessImpact {
+  id                          String                 @id @default(cuid())
+  workflowId                  String                 @unique
+  category                    BusinessImpactCategory
+  estimatedDollarValuePerRun  Float
+  teamOwner                   String
+  businessObjective           String
+  createdAt                   DateTime               @default(now())
+  workflow                    Workflow               @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+}
+
+model SLABreachIncident {
+  id            String       @id @default(cuid())
+  workflowId    String
+  runId         String?
+  breachType    SLABreachType
+  breachDetails Json
+  detectedAt    DateTime     @default(now())
+  resolvedAt    DateTime?
+  workflow      Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  run           Execution?   @relation("SLABreachRun", fields: [runId], references: [id], onDelete: SetNull)
+  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+
+  @@index([organizationId, detectedAt])
+  @@index([workflowId, breachType, detectedAt])
+  @@index([runId])
 }
 
 model WorkflowSimulation {
