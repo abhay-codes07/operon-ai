@@ -1,4 +1,5 @@
 import { WorkflowStatusBadge } from "@/components/dashboard/status/workflow-status-badge";
+import { WorkflowHealthBadge } from "@/components/dashboard/workflows/workflow-health-badge";
 import { RunWorkflowButton } from "@/components/dashboard/workflows/run-workflow-button";
 
 type WorkflowTableItem = {
@@ -11,6 +12,8 @@ type WorkflowTableItem = {
     naturalLanguageTask: string;
     steps: Array<{ id: string }>;
   };
+  slaState: "HEALTHY" | "WARNING" | "BREACHED";
+  hasSla: boolean;
   createdAt: Date;
 };
 
@@ -35,6 +38,7 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
           <tr>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Workflow</th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">SLA</th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
               Schedule
             </th>
@@ -57,6 +61,9 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
               </td>
               <td className="px-4 py-3">
                 <WorkflowStatusBadge status={workflow.status} />
+              </td>
+              <td className="px-4 py-3">
+                {workflow.hasSla ? <WorkflowHealthBadge state={workflow.slaState} /> : <span className="text-xs text-slate-500">Not configured</span>}
               </td>
               <td className="px-4 py-3 text-sm text-slate-600">{workflow.scheduleCron ?? "Manual trigger"}</td>
               <td className="px-4 py-3 text-sm text-slate-600">{workflow.definition.steps.length}</td>
