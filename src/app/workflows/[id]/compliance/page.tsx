@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { ComplianceApprovalPanel } from "@/components/workflows/compliance-approval-panel";
+import { ComplianceEventsTable } from "@/components/workflows/compliance-events-table";
 import { ComplianceRiskBadge } from "@/components/workflows/compliance-risk-badge";
 import { ComplianceViolationsTable } from "@/components/workflows/compliance-violations-table";
 import { DownloadPassportButton } from "@/components/workflows/download-passport-button";
@@ -33,7 +34,7 @@ export default async function WorkflowCompliancePage({
     notFound();
   }
 
-  const [approved, approvals, summary, violations] = await Promise.all([
+  const [approved, approvals, summary, violations, events] = await Promise.all([
     hasActiveWorkflowApproval(workflow.id),
     listWorkflowApprovals(workflow.id),
     generatePlainEnglishSummary(workflow.id),
@@ -49,6 +50,14 @@ export default async function WorkflowCompliancePage({
         },
       },
       take: 50,
+    }),
+    prisma.complianceEvent.findMany({
+      where: {
+        workflowId: workflow.id,
+        organizationId: user.organizationId!,
+      },
+      orderBy: { timestamp: "desc" },
+      take: 100,
     }),
   ]);
 
@@ -111,6 +120,11 @@ export default async function WorkflowCompliancePage({
       <section className="space-y-2">
         <h2 className="text-sm font-semibold text-slate-900">Compliance Violations</h2>
         <ComplianceViolationsTable items={violations} />
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold text-slate-900">Compliance Event Timeline</h2>
+        <ComplianceEventsTable items={events} />
       </section>
     </div>
   );
