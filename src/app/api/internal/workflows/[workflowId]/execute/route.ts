@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { createTraceId } from "@/server/observability/tracing";
+import { hasActiveWorkflowApproval } from "@/lib/compliance/approval.service";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer";
 import { publishExecutionStreamEvent } from "@/server/services/control-plane/streaming-service";
@@ -75,6 +76,17 @@ export async function POST(request: Request, context: RouteContext) {
         });
   if (!selectedWorkflow) {
     return NextResponse.json({ error: "Routed workflow not found" }, { status: 404 });
+  }
+
+  const approvedForExecution = await hasActiveWorkflowApproval(selectedWorkflow.id);
+  if (!approvedForExecution) {
+    return NextResponse.json(
+      {
+        error: "Workflow compliance approval is required before production execution.",
+        code: "WORKFLOW_NOT_COMPLIANCE_APPROVED",
+      },
+      { status: 403 },
+    );
   }
 
   const policyEvaluation = await evaluateWorkflowAgainstPolicy({
