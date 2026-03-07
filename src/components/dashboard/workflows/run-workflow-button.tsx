@@ -61,12 +61,18 @@ export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonPro
 
     if (!response.ok) {
       const payload = (await response.json().catch(() => null)) as
-        | { error?: string; code?: string }
+        | { error?: string | { code?: string; message?: string } }
         | null;
-      if (payload?.code === "WORKFLOW_NOT_COMPLIANCE_APPROVED") {
+      const errorCode =
+        typeof payload?.error === "object" && payload?.error !== null ? payload.error.code : undefined;
+      const errorMessage =
+        typeof payload?.error === "object" && payload?.error !== null
+          ? payload.error.message
+          : payload?.error;
+      if (errorCode === "WORKFLOW_NOT_COMPLIANCE_APPROVED") {
         setNeedsComplianceApproval(true);
       }
-      setError(payload?.error ?? "Run failed");
+      setError(errorMessage ?? "Run failed");
       return;
     }
 

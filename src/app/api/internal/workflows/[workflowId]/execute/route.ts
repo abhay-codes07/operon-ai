@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { structuredApiError } from "@/app/api/_lib/structured-error";
 import { createTraceId } from "@/server/observability/tracing";
 import { hasActiveWorkflowApproval } from "@/lib/compliance/approval.service";
 import { requireOrganizationRole } from "@/server/auth/authorization";
@@ -80,12 +81,10 @@ export async function POST(request: Request, context: RouteContext) {
 
   const approvedForExecution = await hasActiveWorkflowApproval(selectedWorkflow.id);
   if (!approvedForExecution) {
-    return NextResponse.json(
-      {
-        error: "Workflow compliance approval is required before production execution.",
-        code: "WORKFLOW_NOT_COMPLIANCE_APPROVED",
-      },
-      { status: 403 },
+    return structuredApiError(
+      403,
+      "WORKFLOW_NOT_COMPLIANCE_APPROVED",
+      "Workflow compliance approval is required before production execution.",
     );
   }
 
