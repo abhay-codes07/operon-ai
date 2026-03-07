@@ -772,10 +772,34 @@ export async function runExecutionWithTinyFish(
     finishedAt: finalizedExecution.finishedAt,
   }).catch(() => null);
 
-  await detectComplianceViolationsForRun({
+  const complianceViolations = await detectComplianceViolationsForRun({
     runId: input.executionId,
     workflowId: workflow.id,
   }).catch(() => []);
+  if (complianceViolations.length > 0) {
+    await appendExecutionEvent({
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+      level: "WARN",
+      message: "Compliance violations detected during execution",
+      metadata: {
+        count: complianceViolations.length,
+        types: complianceViolations.map((item) => item?.violationType),
+      },
+    });
+    await publishExecutionStreamEvent({
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+      eventType: "compliance.violation",
+      payload: {
+        count: complianceViolations.length,
+        violations: complianceViolations.map((item) => ({
+          id: item?.id ?? null,
+          violationType: item?.violationType ?? null,
+        })),
+      },
+    });
+  }
   await generatePlainEnglishSummary(workflow.id).catch(() => null);
 
   return {
