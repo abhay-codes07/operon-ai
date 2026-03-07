@@ -62,6 +62,20 @@ export default async function DashboardWorkflowsPage({
         }),
       ])
     : [[], []];
+  const activeApprovals = workflowIds.length
+    ? await prisma.workflowComplianceApproval.findMany({
+        where: {
+          organizationId: user.organizationId!,
+          workflowId: { in: workflowIds },
+          revokedAt: null,
+        },
+        select: {
+          workflowId: true,
+        },
+      })
+    : [];
+  const approvedWorkflowIds = new Set(activeApprovals.map((item) => item.workflowId));
+  const unapprovedCount = workflowIds.filter((id) => !approvedWorkflowIds.has(id)).length;
   const slaMap = new Map(slaRows.map((row) => [row.workflowId, row]));
   const incidentCountMap = new Map<string, number>();
   for (const incident of incidentRows) {
@@ -105,6 +119,11 @@ export default async function DashboardWorkflowsPage({
         {openBreachCount > 0 ? (
           <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">
             {openBreachCount} active SLA breach incident{openBreachCount === 1 ? "" : "s"} detected.
+          </div>
+        ) : null}
+        {unapprovedCount > 0 ? (
+          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+            {unapprovedCount} workflow{unapprovedCount === 1 ? "" : "s"} missing active compliance approval.
           </div>
         ) : null}
         <WorkflowsTable
