@@ -59,6 +59,13 @@ import {
 } from "@/lib/compliance/event.service";
 import { generatePlainEnglishSummary } from "@/lib/compliance/passport.service";
 import { detectComplianceViolationsForRun } from "@/lib/compliance/violation.service";
+import {
+  recordBrowserRuntime,
+  recordLLMCost,
+  recordSelfHealingCost,
+} from "@/lib/finops/cost-tracker.service";
+import { updateWorkflowCostSummary } from "@/lib/finops/cost-aggregation.service";
+import { detectRunCostAnomaly } from "@/lib/finops/anomaly.service";
 
 import {
   appendExecutionEvent,
@@ -801,6 +808,34 @@ export async function runExecutionWithTinyFish(
     });
   }
   await generatePlainEnglishSummary(workflow.id).catch(() => null);
+
+  const executionDurationSeconds =
+    finalizedExecution.startedAt && finalizedExecution.finishedAt
+      ? Math.max(
+          0,
+          Math.round((finalizedExecution.finishedAt.getTime() - finalizedExecution.startedAt.getTime()) / 1000),
+        )
+      : 0;
+  await recordBrowserRuntime(input.executionId, executionDurationSeconds).catch(() => null);
+
+  const tokensEstimate = Math.max(
+    1,
+    Math.round(
+      (parsed.summary.length +
+        parsed.logs.reduce((sum, entry) => sum + entry.message.length, 0)) /
+        4,
+    ),
+  );
+  await recordLLMCost(input.executionId, tokensEstimate, "gpt-4o").catch(() => null);
+
+  const healedSelectorsCount = replaySteps.filter((step) => {
+    const selfHealing = step.metadata?.selfHealing as { strategy?: string } | undefined;
+    return typeof selfHealing?.strategy === "string" && selfHealing.strategy !== "selector-default";
+  }).length;
+  await recordSelfHealingCost(input.executionId, healedSelectorsCount).catch(() => null);
+
+  await updateWorkflowCostSummary(workflow.id).catch(() => null);
+  await detectRunCostAnomaly(input.executionId).catch(() => null);
 
   return {
     status: finalStatus,
