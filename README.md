@@ -126,6 +126,29 @@ Business Impact profiles map workflows to value categories and estimated dollar 
 
 The Impact Dashboard aggregates monthly ROI, savings, and revenue-protection totals while ranking top-value workflows.
 
+## Operon Pipelines
+
+Operon Pipelines orchestrate multiple agents as a single durable run.  
+Each step executes in sequence, passes structured output forward, and records full run state for recovery and audit.
+
+Execution model:
+
+- `Pipeline` defines ordered agent steps with input/output mappings.
+- `PipelineRun` tracks lifecycle (`RUNNING`, `PAUSED`, `FAILED`, `COMPLETED`).
+- `PipelineStepRun` binds each step to an underlying agent execution and captures payload handoff.
+
+Operational controls:
+
+- Start, pause, and resume pipeline runs through API and UI controls.
+- On step failure, the pipeline pauses and exposes manual retry/skip controls.
+- Background pipeline runner worker advances eligible steps and resolves completion.
+
+Observability and governance:
+
+- Live run monitor shows step state, execution links, and current pipeline status.
+- Audit trail events include `PIPELINE_CREATED`, `PIPELINE_STARTED`, `PIPELINE_STEP_COMPLETED`, `PIPELINE_FAILED`, and `PIPELINE_RESUMED`.
+- Pipeline stats endpoint supports operational dashboards (`/api/pipelines/stats`).
+
 ## AI Agent Compliance Passport
 
 Every workflow carries a Compliance Passport that records approvals, execution actions, visited domains, extracted data categories, and policy violations.
