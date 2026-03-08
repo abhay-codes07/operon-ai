@@ -54,6 +54,14 @@ export async function listPipelines(orgId: string) {
     include: {
       steps: {
         orderBy: { stepOrder: "asc" },
+        include: {
+          agent: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
       },
       runs: {
         orderBy: { startedAt: "desc" },
