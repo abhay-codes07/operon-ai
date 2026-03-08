@@ -3,6 +3,7 @@ import Link from "next/link";
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { FinOpsAnomalyAlerts } from "@/components/dashboard/finops/finops-anomaly-alerts";
+import { FinOpsLiveSummary } from "@/components/dashboard/finops/finops-live-summary";
 import { listCostAnomalies } from "@/lib/finops/anomaly.service";
 import { getMonthlyCost } from "@/lib/finops/cost-aggregation.service";
 import { getOrganizationROI } from "@/lib/finops/roi.service";
@@ -24,20 +25,13 @@ export default async function DashboardFinOpsPage(): Promise<JSX.Element> {
         description="Cost attribution, budget posture, anomaly detection, and ROI scoring."
       />
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <DashboardCard>
-          <p className="text-xs text-slate-500">Total AI Spend (Month)</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">${monthly.totalUsd.toFixed(2)}</p>
-        </DashboardCard>
-        <DashboardCard>
-          <p className="text-xs text-slate-500">Workflows Tracked</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{monthly.workflows.length}</p>
-        </DashboardCard>
-        <DashboardCard>
-          <p className="text-xs text-slate-500">Cost Anomalies</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{anomalies.length}</p>
-        </DashboardCard>
-      </div>
+      <FinOpsLiveSummary
+        initial={{
+          totalSpendUsd: monthly.totalUsd,
+          anomalyCount: anomalies.length,
+          workflowCount: monthly.workflows.length,
+        }}
+      />
 
       <DashboardCard title="Workflow Cost Ranking">
         <div className="space-y-2">
