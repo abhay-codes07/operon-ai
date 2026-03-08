@@ -13,3 +13,16 @@ export async function createCompetitor(input: {
     },
   });
 }
+
+export async function listCompetitors(orgId: string) {
+  return prisma.competitor.findMany({
+    where: { orgId },
+    include: {
+      signals: {
+        orderBy: { createdAt: "desc" },
+        take: 3,
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
