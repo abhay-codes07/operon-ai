@@ -233,6 +233,13 @@ enum PipelineStepRunStatus {
   SKIPPED
 }
 
+enum AgentCostEventType {
+  LLM_CALL
+  BROWSER_RUNTIME
+  RETRY
+  SELF_HEALING
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -1446,6 +1453,67 @@ model UsageRecord {
 
   @@unique([organizationId, metric, periodStart, periodEnd])
   @@index([organizationId, metric, periodStart])
+}
+
+model AgentCostEvent {
+  id            String             @id @default(cuid())
+  runId         String?
+  workflowId    String?
+  pipelineRunId String?
+  eventType     AgentCostEventType
+  costUsd       Decimal            @db.Decimal(12, 6)
+  metadata      Json?
+  createdAt     DateTime           @default(now())
+  run           Execution?         @relation(fields: [runId], references: [id], onDelete: SetNull)
+  workflow      Workflow?          @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+  pipelineRun   PipelineRun?       @relation(fields: [pipelineRunId], references: [id], onDelete: SetNull)
+
+  @@index([runId, createdAt])
+  @@index([workflowId, createdAt])
+  @@index([pipelineRunId, createdAt])
+  @@index([eventType, createdAt])
+}
+
+model WorkflowCostSummary {
+  id            String   @id @default(cuid())
+  workflowId    String   @unique
+  totalCost     Decimal  @default(0) @db.Decimal(12, 6)
+  totalRuns     Int      @default(0)
+  avgCostPerRun Decimal  @default(0) @db.Decimal(12, 6)
+  lastUpdated   DateTime @default(now())
+  workflow      Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([lastUpdated])
+}
+
+model CostBudget {
+  id                    String       @id @default(cuid())
+  orgId                 String
+  workflowId            String
+  monthlyBudgetUsd      Decimal      @db.Decimal(12, 2)
+  alertThresholdPercent Int          @default(80)
+  createdAt             DateTime     @default(now())
+  organization          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  workflow              Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, workflowId])
+  @@index([orgId, createdAt])
+}
+
+model CostAnomaly {
+  id            String    @id @default(cuid())
+  workflowId    String
+  runId         String?
+  expectedCost  Decimal   @db.Decimal(12, 6)
+  actualCost    Decimal   @db.Decimal(12, 6)
+  anomalyFactor Decimal   @db.Decimal(8, 3)
+  reason        String
+  createdAt     DateTime  @default(now())
+  workflow      Workflow  @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  run           Execution? @relation(fields: [runId], references: [id], onDelete: SetNull)
+
+  @@index([workflowId, createdAt])
+  @@index([runId])
 }
 
 model Pipeline {
