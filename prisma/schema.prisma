@@ -240,6 +240,14 @@ enum AgentCostEventType {
   SELF_HEALING
 }
 
+enum CompetitorSignalType {
+  PRICING_CHANGE
+  FEATURE_CHANGE
+  REVIEW_SENTIMENT
+  JOB_POSTING
+  HEADCOUNT_CHANGE
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -339,6 +347,8 @@ model Organization {
   pipelineRuns PipelineRun[]
   pipelineStepRuns PipelineStepRun[]
   costBudgets CostBudget[]
+  competitors Competitor[]
+  competitorSignals CompetitorSignal[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -1460,6 +1470,33 @@ model UsageRecord {
 
   @@unique([organizationId, metric, periodStart, periodEnd])
   @@index([organizationId, metric, periodStart])
+}
+
+model Competitor {
+  id        String       @id @default(cuid())
+  orgId     String
+  name      String
+  website   String
+  createdAt DateTime     @default(now())
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  signals   CompetitorSignal[]
+
+  @@unique([orgId, name])
+  @@index([orgId, createdAt])
+}
+
+model CompetitorSignal {
+  id           String               @id @default(cuid())
+  competitorId String
+  orgId        String
+  signalType   CompetitorSignalType
+  payload      Json
+  createdAt    DateTime             @default(now())
+  competitor   Competitor           @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+  organization Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([competitorId, createdAt])
+  @@index([orgId, signalType, createdAt])
 }
 
 model AgentCostEvent {
