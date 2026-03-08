@@ -17,7 +17,7 @@ export default async function PipelinesPage(): Promise<JSX.Element> {
       pageSize: 100,
       status: "ACTIVE",
     }),
-    listPipelines(user.organizationId!),
+    listPipelines({ orgId: user.organizationId! }),
     getPipelineStats(user.organizationId!),
   ]);
 

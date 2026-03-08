@@ -48,9 +48,32 @@ export async function addPipelineStep(pipelineId: string, step: PipelineStepInpu
   });
 }
 
-export async function listPipelines(orgId: string) {
+export async function listPipelines(input: {
+  orgId: string;
+  query?: string;
+  runStatus?: "RUNNING" | "PAUSED" | "FAILED" | "COMPLETED";
+}) {
   return prisma.pipeline.findMany({
-    where: { orgId },
+    where: {
+      orgId: input.orgId,
+      ...(input.query
+        ? {
+            OR: [
+              { name: { contains: input.query, mode: "insensitive" } },
+              { description: { contains: input.query, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+      ...(input.runStatus
+        ? {
+            runs: {
+              some: {
+                status: input.runStatus,
+              },
+            },
+          }
+        : {}),
+    },
     include: {
       steps: {
         orderBy: { stepOrder: "asc" },
