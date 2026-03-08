@@ -149,6 +149,28 @@ Observability and governance:
 - Audit trail events include `PIPELINE_CREATED`, `PIPELINE_STARTED`, `PIPELINE_STEP_COMPLETED`, `PIPELINE_FAILED`, and `PIPELINE_RESUMED`.
 - Pipeline stats endpoint supports operational dashboards (`/api/pipelines/stats`).
 
+## Operon FinOps
+
+Operon FinOps provides execution-level cost intelligence across agents, workflows, and pipelines.
+
+Core capabilities:
+
+- Cost attribution by event type (`LLM_CALL`, `BROWSER_RUNTIME`, `RETRY`, `SELF_HEALING`)
+- Workflow cost summaries (`total`, `avg per run`, `monthly spend`)
+- Budget controls with threshold alerts and automatic throttling strategies
+- ROI scoring using workflow business impact vs execution cost
+- Cost anomaly detection for runs that exceed baseline cost by >3x
+- Pipeline step-level and run-level cost breakdowns
+
+Operational endpoints:
+
+- `GET /api/finops/workflows/[id]`
+- `GET /api/finops/anomalies`
+- `POST /api/finops/budget`
+- `GET /api/finops/roi`
+- `GET /api/finops/summary`
+- `GET /api/finops/pipelines/[id]`
+
 ## AI Agent Compliance Passport
 
 Every workflow carries a Compliance Passport that records approvals, execution actions, visited domains, extracted data categories, and policy violations.
