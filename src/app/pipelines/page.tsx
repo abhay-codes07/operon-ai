@@ -2,13 +2,15 @@ import Link from "next/link";
 
 import { PipelineCreateForm } from "@/components/pipelines/pipeline-create-form";
 import { PipelineStatusBadge } from "@/components/pipelines/pipeline-status-badge";
+import { PipelineStatsPanel } from "@/components/pipelines/pipeline-stats-panel";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { fetchAgentCatalog } from "@/server/services/agents/agent-service";
 import { listPipelines } from "@/lib/pipeline/pipeline.service";
+import { getPipelineStats } from "@/lib/pipeline/metrics.service";
 
 export default async function PipelinesPage(): Promise<JSX.Element> {
   const user = await requireOrganizationRole("MEMBER");
-  const [agents, pipelines] = await Promise.all([
+  const [agents, pipelines, stats] = await Promise.all([
     fetchAgentCatalog({
       organizationId: user.organizationId!,
       page: 1,
@@ -16,6 +18,7 @@ export default async function PipelinesPage(): Promise<JSX.Element> {
       status: "ACTIVE",
     }),
     listPipelines(user.organizationId!),
+    getPipelineStats(user.organizationId!),
   ]);
 
   return (
@@ -25,6 +28,8 @@ export default async function PipelinesPage(): Promise<JSX.Element> {
         <h1 className="text-2xl font-semibold text-slate-900">Multi-Agent Orchestration</h1>
         <p className="text-sm text-slate-600">Coordinate autonomous web agents as durable step chains.</p>
       </header>
+
+      <PipelineStatsPanel initialStats={stats} />
 
       <div className="grid gap-4 lg:grid-cols-[1.1fr,1fr]">
         <section className="rounded-xl border border-slate-200 bg-white p-4">
