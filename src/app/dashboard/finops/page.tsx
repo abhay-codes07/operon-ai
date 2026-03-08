@@ -1,0 +1,80 @@
+import Link from "next/link";
+
+import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { listCostAnomalies } from "@/lib/finops/anomaly.service";
+import { getMonthlyCost } from "@/lib/finops/cost-aggregation.service";
+import { getOrganizationROI } from "@/lib/finops/roi.service";
+import { requireOrganizationRole } from "@/server/auth/authorization";
+
+export default async function DashboardFinOpsPage(): Promise<JSX.Element> {
+  const user = await requireOrganizationRole("MEMBER");
+  const [monthly, roiItems, anomalies] = await Promise.all([
+    getMonthlyCost(user.organizationId!),
+    getOrganizationROI(user.organizationId!),
+    listCostAnomalies(user.organizationId!),
+  ]);
+
+  return (
+    <div className="space-y-5">
+      <SectionHeading
+        eyebrow="Operon FinOps"
+        title="Agent Cost Intelligence"
+        description="Cost attribution, budget posture, anomaly detection, and ROI scoring."
+      />
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <DashboardCard>
+          <p className="text-xs text-slate-500">Total AI Spend (Month)</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900">${monthly.totalUsd.toFixed(2)}</p>
+        </DashboardCard>
+        <DashboardCard>
+          <p className="text-xs text-slate-500">Workflows Tracked</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900">{monthly.workflows.length}</p>
+        </DashboardCard>
+        <DashboardCard>
+          <p className="text-xs text-slate-500">Cost Anomalies</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900">{anomalies.length}</p>
+        </DashboardCard>
+      </div>
+
+      <DashboardCard title="Workflow Cost Ranking">
+        <div className="space-y-2">
+          {monthly.workflows.length === 0 ? (
+            <p className="text-sm text-slate-600">No workflow cost events yet.</p>
+          ) : (
+            monthly.workflows.map((item) => (
+              <article key={item.workflowId} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-slate-900">{item.workflowName}</p>
+                  <p className="text-xs font-semibold text-slate-700">${item.totalUsd.toFixed(2)}</p>
+                </div>
+                <Link href={`/workflows/${item.workflowId}/finops`} className="text-xs text-slate-600 underline">
+                  Open workflow cost view
+                </Link>
+              </article>
+            ))
+          )}
+        </div>
+      </DashboardCard>
+
+      <DashboardCard title="ROI Ranking">
+        <div className="space-y-2">
+          {roiItems.length === 0 ? (
+            <p className="text-sm text-slate-600">No ROI profiles available yet.</p>
+          ) : (
+            roiItems.slice(0, 20).map((item) => (
+              <article key={item.workflowId} className="rounded-lg border border-slate-200 bg-white p-3">
+                <p className="text-sm font-semibold text-slate-900">{item.workflowName}</p>
+                <p className="text-xs text-slate-600">
+                  Value/Run ${item.valuePerRun.toFixed(2)} • Cost/Run ${item.costPerRun.toFixed(4)} • ROI{" "}
+                  {item.roi ? item.roi.toFixed(2) : "N/A"}
+                </p>
+              </article>
+            ))
+          )}
+        </div>
+      </DashboardCard>
+    </div>
+  );
+}
