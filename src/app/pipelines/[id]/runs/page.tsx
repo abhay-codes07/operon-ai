@@ -6,6 +6,7 @@ import { PipelineRunsLivePanel } from "@/components/pipelines/pipeline-runs-live
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { getPipelineById } from "@/lib/pipeline/pipeline.service";
 import { PipelineStatusBadge } from "@/components/pipelines/pipeline-status-badge";
+import { getPipelineCostBreakdown } from "@/lib/finops/pipeline-cost.service";
 
 type PipelineRunsPageProps = {
   params: {
@@ -20,6 +21,21 @@ export default async function PipelineRunsPage({
   const pipeline = await getPipelineById(user.organizationId!, params.id);
   if (!pipeline) {
     notFound();
+  }
+  const costMap = new Map<
+    string,
+    {
+      totalCostUsd: number;
+      items: Array<{
+        stepRunId: string;
+        stepOrder: number;
+        status: string;
+        totalCostUsd: number;
+      }>;
+    }
+  >();
+  for (const run of pipeline.runs) {
+    costMap.set(run.id, await getPipelineCostBreakdown(run.id));
   }
 
   return (
@@ -63,6 +79,9 @@ export default async function PipelineRunsPage({
                 {run.completedAt ? ` • Completed ${new Date(run.completedAt).toLocaleString()}` : ""}
               </p>
               {run.errorMessage ? <p className="mt-1 text-xs text-rose-700">{run.errorMessage}</p> : null}
+              <p className="mt-1 text-xs text-slate-600">
+                Total Pipeline Cost: ${((costMap.get(run.id)?.totalCostUsd ?? 0) as number).toFixed(4)}
+              </p>
 
               <div className="mt-3 overflow-hidden rounded-lg border border-slate-200">
                 <table className="min-w-full divide-y divide-slate-200 bg-white">
@@ -72,6 +91,7 @@ export default async function PipelineRunsPage({
                       <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
                       <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Agent Run</th>
                       <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Timing</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Cost</th>
                       <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
                     </tr>
                   </thead>
@@ -95,6 +115,15 @@ export default async function PipelineRunsPage({
                         <td className="px-3 py-2 text-xs text-slate-500">
                           {stepRun.startedAt ? new Date(stepRun.startedAt).toLocaleTimeString() : "-"} →{" "}
                           {stepRun.completedAt ? new Date(stepRun.completedAt).toLocaleTimeString() : "-"}
+                        </td>
+                        <td className="px-3 py-2 text-xs text-slate-700">
+                          $
+                          {(
+                            costMap
+                              .get(run.id)
+                              ?.items.find((item) => item.stepRunId === stepRun.id)
+                              ?.totalCostUsd ?? 0
+                          ).toFixed(4)}
                         </td>
                         <td className="px-3 py-2">
                           <PipelineStepRunActions
