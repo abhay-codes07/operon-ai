@@ -117,3 +117,22 @@ export async function calculateRunCost(runId: string) {
 
   return Number(result._sum.costUsd ?? 0);
 }
+
+export async function recordPipelineRuntimeCost(
+  pipelineRunId: string,
+  workflowId: string | null,
+  seconds: number,
+) {
+  const costUsd = Math.max(0, seconds) * finopsRates.browserRuntimePerSecondUsd;
+  return createCostEvent({
+    pipelineRunId,
+    workflowId: workflowId ?? undefined,
+    eventType: "BROWSER_RUNTIME",
+    costUsd,
+    metadata: {
+      seconds,
+      source: "pipeline_orchestration_runtime",
+      ratePerSecondUsd: finopsRates.browserRuntimePerSecondUsd,
+    },
+  });
+}
