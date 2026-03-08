@@ -1,5 +1,6 @@
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { CompetitorManager } from "@/components/dashboard/intelligence/competitor-manager";
 import { listCompetitors } from "@/lib/competitor/competitor.service";
 import { generateInsights } from "@/lib/intelligence/insight.service";
 import { generateMorningReport } from "@/lib/intelligence/report.service";
@@ -25,7 +26,14 @@ export default async function DashboardIntelligencePage(): Promise<JSX.Element> 
       />
 
       <DashboardCard title="Competitor Coverage">
-        <p className="text-sm text-slate-700">{competitors.length} competitors monitored</p>
+        <p className="mb-3 text-sm text-slate-700">{competitors.length} competitors monitored</p>
+        <CompetitorManager
+          initialItems={competitors.map((item) => ({
+            id: item.id,
+            name: item.name,
+            website: item.website,
+          }))}
+        />
       </DashboardCard>
 
       <DashboardCard title="Signal Trends">
