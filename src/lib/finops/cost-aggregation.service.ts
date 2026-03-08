@@ -38,3 +38,55 @@ export async function updateWorkflowCostSummary(workflowId: string) {
     },
   });
 }
+
+export async function getMonthlyCost(orgId: string, monthDate = new Date()) {
+  const start = new Date(Date.UTC(monthDate.getUTCFullYear(), monthDate.getUTCMonth(), 1, 0, 0, 0));
+  const end = new Date(Date.UTC(monthDate.getUTCFullYear(), monthDate.getUTCMonth() + 1, 1, 0, 0, 0));
+
+  const events = await prisma.agentCostEvent.findMany({
+    where: {
+      createdAt: {
+        gte: start,
+        lt: end,
+      },
+      workflow: {
+        organizationId: orgId,
+      },
+    },
+    select: {
+      costUsd: true,
+      workflowId: true,
+      workflow: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  const totalUsd = events.reduce((sum, event) => sum + Number(event.costUsd), 0);
+  const byWorkflow = new Map<string, { workflowId: string; workflowName: string; totalUsd: number }>();
+
+  for (const event of events) {
+    const workflowId = event.workflowId ?? event.workflow?.id;
+    if (!workflowId || !event.workflow) {
+      continue;
+    }
+
+    const current = byWorkflow.get(workflowId) ?? {
+      workflowId,
+      workflowName: event.workflow.name,
+      totalUsd: 0,
+    };
+    current.totalUsd += Number(event.costUsd);
+    byWorkflow.set(workflowId, current);
+  }
+
+  return {
+    monthStart: start,
+    monthEnd: end,
+    totalUsd,
+    workflows: [...byWorkflow.values()].sort((a, b) => b.totalUsd - a.totalUsd),
+  };
+}
