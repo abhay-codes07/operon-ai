@@ -1,6 +1,7 @@
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { CompetitorManager } from "@/components/dashboard/intelligence/competitor-manager";
+import { IntelligenceTrendBars } from "@/components/dashboard/intelligence/intelligence-trend-bars";
 import { listCompetitors } from "@/lib/competitor/competitor.service";
 import { generateInsights } from "@/lib/intelligence/insight.service";
 import { generateMorningReport } from "@/lib/intelligence/report.service";
@@ -37,14 +38,7 @@ export default async function DashboardIntelligencePage(): Promise<JSX.Element> 
       </DashboardCard>
 
       <DashboardCard title="Signal Trends">
-        <div className="grid gap-2 md:grid-cols-3">
-          {trends.map((trend) => (
-            <article key={trend.signalType} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <p className="text-xs text-slate-500">{trend.signalType}</p>
-              <p className="text-xl font-semibold text-slate-900">{trend.count}</p>
-            </article>
-          ))}
-        </div>
+        <IntelligenceTrendBars items={trends} />
       </DashboardCard>
 
       <DashboardCard title="Latest Signals">
