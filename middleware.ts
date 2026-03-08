@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const protectedPrefixes = ["/dashboard", "/api/internal"];
+const protectedPrefixes = ["/dashboard", "/pipelines", "/api/internal", "/api/pipelines"];
 const authPrefixes = ["/auth/sign-in", "/auth/sign-up"];
 
 function startsWithPrefix(pathname: string, prefixes: string[]): boolean {
@@ -28,5 +28,12 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/api/internal/:path*", "/auth/sign-in", "/auth/sign-up"],
+  matcher: [
+    "/dashboard/:path*",
+    "/pipelines/:path*",
+    "/api/internal/:path*",
+    "/api/pipelines/:path*",
+    "/auth/sign-in",
+    "/auth/sign-up",
+  ],
 };
