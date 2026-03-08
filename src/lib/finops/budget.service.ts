@@ -62,3 +62,45 @@ export async function checkBudget(workflowId: string) {
     exceededBudget,
   };
 }
+
+export async function applyThrottlingStrategy(workflowId: string) {
+  const budgetState = await checkBudget(workflowId);
+  if (!budgetState) {
+    return null;
+  }
+
+  if (!budgetState.exceededBudget) {
+    return {
+      action: "NO_ACTION",
+      workflowId,
+    } as const;
+  }
+
+  const workflow = await prisma.workflow.findUnique({
+    where: { id: workflowId },
+    select: { id: true, status: true, scheduleCron: true, definition: true },
+  });
+  if (!workflow) {
+    return null;
+  }
+
+  await prisma.workflow.update({
+    where: { id: workflow.id },
+    data: {
+      status: "PAUSED",
+      scheduleCron: null,
+      definition: {
+        ...(workflow.definition as Record<string, unknown>),
+        runtimeHints: {
+          modelTier: "economy",
+          reason: "budget_exceeded",
+        },
+      },
+    },
+  });
+
+  return {
+    action: "PAUSED_WORKFLOW_AND_SWITCHED_TO_ECONOMY_MODEL_HINT",
+    workflowId: workflow.id,
+  } as const;
+}
