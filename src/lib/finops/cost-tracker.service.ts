@@ -1,6 +1,7 @@
 import type { AgentCostEventType } from "@prisma/client";
 
 import { getModelCostPerToken } from "@/lib/finops/cost-rates";
+import { finopsRates } from "@/lib/finops/cost-rates";
 import { prisma } from "@/server/db/client";
 
 async function resolveExecutionCostContext(runId: string) {
@@ -48,5 +49,24 @@ export async function recordLLMCost(runId: string, tokens: number, model: string
     eventType: "LLM_CALL",
     costUsd,
     metadata: { tokens, model, perToken },
+  });
+}
+
+export async function recordBrowserRuntime(runId: string, seconds: number) {
+  const context = await resolveExecutionCostContext(runId);
+  if (!context) {
+    return null;
+  }
+
+  const costUsd = Math.max(0, seconds) * finopsRates.browserRuntimePerSecondUsd;
+  return createCostEvent({
+    runId: context.id,
+    workflowId: context.workflowId ?? undefined,
+    eventType: "BROWSER_RUNTIME",
+    costUsd,
+    metadata: {
+      seconds,
+      ratePerSecondUsd: finopsRates.browserRuntimePerSecondUsd,
+    },
   });
 }
