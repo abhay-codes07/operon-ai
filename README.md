@@ -171,6 +171,29 @@ Operational endpoints:
 - `GET /api/finops/summary`
 - `GET /api/finops/pipelines/[id]`
 
+## Competitive Intelligence Nerve Center
+
+Operon runs autonomous competitor-monitoring agents in parallel and synthesizes change signals into actionable insights.
+
+Nerve Center capabilities:
+
+- Competitor registry with organization-scoped targets
+- Multi-signal monitoring (`PRICING_CHANGE`, `FEATURE_CHANGE`, `REVIEW_SENTIMENT`, `JOB_POSTING`, `HEADCOUNT_CHANGE`)
+- Parallel agent execution across pricing, feature, review, jobs, and headcount monitors
+- Signal aggregation and insight synthesis for high-impact competitor changes
+- Daily morning briefing generation and Slack alert delivery
+- Intelligence dashboard for signals, trend visualization, alerts, and competitor operations
+
+Primary intelligence endpoints:
+
+- `GET /api/intelligence/competitors`
+- `POST /api/intelligence/competitors`
+- `DELETE /api/intelligence/competitors/[id]`
+- `GET /api/intelligence/signals`
+- `GET /api/intelligence/insights`
+- `POST /api/intelligence/run`
+- `GET /api/intelligence/report`
+
 ## AI Agent Compliance Passport
 
 Every workflow carries a Compliance Passport that records approvals, execution actions, visited domains, extracted data categories, and policy violations.
