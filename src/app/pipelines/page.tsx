@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { PipelineCreateForm } from "@/components/pipelines/pipeline-create-form";
+import { PipelineFilters } from "@/components/pipelines/pipeline-filters";
 import { PipelineStatusBadge } from "@/components/pipelines/pipeline-status-badge";
 import { PipelineStatsPanel } from "@/components/pipelines/pipeline-stats-panel";
 import { requireOrganizationRole } from "@/server/auth/authorization";
@@ -8,8 +9,22 @@ import { fetchAgentCatalog } from "@/server/services/agents/agent-service";
 import { listPipelines } from "@/lib/pipeline/pipeline.service";
 import { getPipelineStats } from "@/lib/pipeline/metrics.service";
 
-export default async function PipelinesPage(): Promise<JSX.Element> {
+type PipelinesPageProps = {
+  searchParams?: {
+    query?: string;
+    status?: string;
+  };
+};
+
+export default async function PipelinesPage({ searchParams }: PipelinesPageProps): Promise<JSX.Element> {
   const user = await requireOrganizationRole("MEMBER");
+  const runStatus =
+    searchParams?.status === "RUNNING" ||
+    searchParams?.status === "PAUSED" ||
+    searchParams?.status === "FAILED" ||
+    searchParams?.status === "COMPLETED"
+      ? searchParams.status
+      : undefined;
   const [agents, pipelines, stats] = await Promise.all([
     fetchAgentCatalog({
       organizationId: user.organizationId!,
@@ -17,7 +32,7 @@ export default async function PipelinesPage(): Promise<JSX.Element> {
       pageSize: 100,
       status: "ACTIVE",
     }),
-    listPipelines({ orgId: user.organizationId! }),
+    listPipelines({ orgId: user.organizationId!, query: searchParams?.query?.trim(), runStatus }),
     getPipelineStats(user.organizationId!),
   ]);
 
@@ -30,6 +45,7 @@ export default async function PipelinesPage(): Promise<JSX.Element> {
       </header>
 
       <PipelineStatsPanel initialStats={stats} />
+      <PipelineFilters />
 
       <div className="grid gap-4 lg:grid-cols-[1.1fr,1fr]">
         <section className="rounded-xl border border-slate-200 bg-white p-4">
