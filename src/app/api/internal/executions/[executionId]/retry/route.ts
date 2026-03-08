@@ -7,6 +7,7 @@ import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer
 import { publishExecutionStreamEvent } from "@/server/services/control-plane/streaming-service";
 import { enforceRateLimit } from "@/server/security/rate-limit";
 import { recordAgentFleetStatus } from "@/server/services/mission-control/fleet-service";
+import { recordRetryCost } from "@/lib/finops/cost-tracker.service";
 import {
   appendExecutionEvent,
   fetchExecutionById,
@@ -101,6 +102,8 @@ export async function POST(request: Request, context: RouteContext) {
       traceId,
     },
   });
+
+  await recordRetryCost(execution.id).catch(() => null);
 
   return NextResponse.json(
     {
