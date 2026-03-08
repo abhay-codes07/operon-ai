@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { FinOpsAnomalyAlerts } from "@/components/dashboard/finops/finops-anomaly-alerts";
 import { listCostAnomalies } from "@/lib/finops/anomaly.service";
 import { getMonthlyCost } from "@/lib/finops/cost-aggregation.service";
 import { getOrganizationROI } from "@/lib/finops/roi.service";
@@ -74,6 +75,19 @@ export default async function DashboardFinOpsPage(): Promise<JSX.Element> {
             ))
           )}
         </div>
+      </DashboardCard>
+
+      <DashboardCard title="Cost Anomaly Alerts">
+        <FinOpsAnomalyAlerts
+          items={anomalies.map((item) => ({
+            id: item.id,
+            expectedCost: Number(item.expectedCost),
+            actualCost: Number(item.actualCost),
+            anomalyFactor: Number(item.anomalyFactor),
+            reason: item.reason,
+            workflow: item.workflow,
+          }))}
+        />
       </DashboardCard>
     </div>
   );
