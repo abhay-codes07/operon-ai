@@ -338,6 +338,7 @@ model Organization {
   pipelines Pipeline[]
   pipelineRuns PipelineRun[]
   pipelineStepRuns PipelineStepRun[]
+  costBudgets CostBudget[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -464,6 +465,10 @@ model Workflow {
   complianceEvents ComplianceEvent[]
   compliancePassport CompliancePassport?
   complianceViolations ComplianceViolation[]
+  costEvents AgentCostEvent[]
+  costSummary WorkflowCostSummary?
+  costBudgets CostBudget[]
+  costAnomalies CostAnomaly[]
 
   @@index([organizationId, status])
   @@index([organizationId, agentId, createdAt])
@@ -514,6 +519,8 @@ model Execution {
   complianceEvents ComplianceEvent[] @relation("ComplianceEventRun")
   complianceViolations ComplianceViolation[] @relation("ComplianceViolationRun")
   pipelineStepRuns PipelineStepRun[] @relation("PipelineStepRunExecution")
+  costEvents AgentCostEvent[]
+  costAnomalies CostAnomaly[]
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, agentId, createdAt])
@@ -1543,6 +1550,7 @@ model PipelineStep {
   pipeline      Pipeline     @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
   agent         Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
   stepRuns      PipelineStepRun[]
+  costEvents    AgentCostEvent[]
 
   @@unique([pipelineId, stepOrder])
   @@index([pipelineId, stepOrder])
