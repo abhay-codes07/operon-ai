@@ -42,3 +42,12 @@ Pipelines use a dedicated interval worker (`pipeline-runner.worker.ts`) to orche
 - Dispatches queued `PipelineStepRun` executions in order
 - Evaluates step completion and advances to next step
 - Pauses pipeline on failed step and preserves error state for manual retry/skip
+
+## FinOps Cost Monitor
+
+FinOps uses `cost-monitor.worker.ts` to enforce cost governance every 10 minutes.
+
+- Recomputes budget posture for workflows
+- Applies throttling strategy when budgets are exceeded
+- Detects recent cost anomalies against baseline run cost
+- Tracks monthly spend snapshots for dashboard visibility
