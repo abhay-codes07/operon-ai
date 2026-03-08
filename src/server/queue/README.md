@@ -33,3 +33,12 @@ npm run worker:dev
 ## Monitoring
 
 - Queue health endpoint: `GET /api/internal/queue/health`
+
+## Operon Pipelines Runner
+
+Pipelines use a dedicated interval worker (`pipeline-runner.worker.ts`) to orchestrate multi-agent step chains.
+
+- Scans `PipelineRun` records in `RUNNING` state
+- Dispatches queued `PipelineStepRun` executions in order
+- Evaluates step completion and advances to next step
+- Pauses pipeline on failed step and preserves error state for manual retry/skip
