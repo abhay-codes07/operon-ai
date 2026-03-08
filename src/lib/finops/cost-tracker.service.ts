@@ -70,3 +70,50 @@ export async function recordBrowserRuntime(runId: string, seconds: number) {
     },
   });
 }
+
+export async function recordRetryCost(runId: string) {
+  const context = await resolveExecutionCostContext(runId);
+  if (!context) {
+    return null;
+  }
+
+  return createCostEvent({
+    runId: context.id,
+    workflowId: context.workflowId ?? undefined,
+    eventType: "RETRY",
+    costUsd: finopsRates.retryFlatUsd,
+    metadata: {
+      retryFlatUsd: finopsRates.retryFlatUsd,
+    },
+  });
+}
+
+export async function recordSelfHealingCost(runId: string, healedSelectors: number) {
+  const context = await resolveExecutionCostContext(runId);
+  if (!context) {
+    return null;
+  }
+
+  const costUsd = Math.max(0, healedSelectors) * finopsRates.selfHealingFlatUsd;
+  return createCostEvent({
+    runId: context.id,
+    workflowId: context.workflowId ?? undefined,
+    eventType: "SELF_HEALING",
+    costUsd,
+    metadata: {
+      healedSelectors,
+      selfHealingFlatUsd: finopsRates.selfHealingFlatUsd,
+    },
+  });
+}
+
+export async function calculateRunCost(runId: string) {
+  const result = await prisma.agentCostEvent.aggregate({
+    where: { runId },
+    _sum: {
+      costUsd: true,
+    },
+  });
+
+  return Number(result._sum.costUsd ?? 0);
+}
