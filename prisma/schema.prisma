@@ -218,6 +218,21 @@ enum ComplianceRiskLevel {
   HIGH
 }
 
+enum PipelineRunStatus {
+  RUNNING
+  PAUSED
+  FAILED
+  COMPLETED
+}
+
+enum PipelineStepRunStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+  SKIPPED
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -313,6 +328,9 @@ model Organization {
   complianceEvents ComplianceEvent[]
   complianceViolations ComplianceViolation[]
   workflowComplianceApprovals WorkflowComplianceApproval[]
+  pipelines Pipeline[]
+  pipelineRuns PipelineRun[]
+  pipelineStepRuns PipelineStepRun[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -398,6 +416,7 @@ model Agent {
   deployments AgentDeployment[]
   agentPolicy AgentPolicy?
   executionAudits ExecutionAudit[]
+  pipelineSteps PipelineStep[]
 
   @@index([organizationId, status])
   @@index([organizationId, createdAt])
@@ -487,6 +506,7 @@ model Execution {
   slaBreachIncidents SLABreachIncident[] @relation("SLABreachRun")
   complianceEvents ComplianceEvent[] @relation("ComplianceEventRun")
   complianceViolations ComplianceViolation[] @relation("ComplianceViolationRun")
+  pipelineStepRuns PipelineStepRun[] @relation("PipelineStepRunExecution")
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, agentId, createdAt])
@@ -1426,4 +1446,82 @@ model UsageRecord {
 
   @@unique([organizationId, metric, periodStart, periodEnd])
   @@index([organizationId, metric, periodStart])
+}
+
+model Pipeline {
+  id          String       @id @default(cuid())
+  orgId       String
+  name        String
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  steps       PipelineStep[]
+  runs        PipelineRun[]
+
+  @@index([orgId, createdAt])
+  @@unique([orgId, name])
+}
+
+model PipelineStep {
+  id            String       @id @default(cuid())
+  pipelineId    String
+  agentId       String
+  stepOrder     Int
+  inputMapping  Json
+  outputMapping Json
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  pipeline      Pipeline     @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  agent         Agent        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  stepRuns      PipelineStepRun[]
+
+  @@unique([pipelineId, stepOrder])
+  @@index([pipelineId, stepOrder])
+  @@index([agentId, createdAt])
+}
+
+model PipelineRun {
+  id            String            @id @default(cuid())
+  pipelineId    String
+  orgId         String
+  status        PipelineRunStatus @default(RUNNING)
+  startedAt     DateTime          @default(now())
+  completedAt   DateTime?
+  inputPayload  Json?
+  contextPayload Json?
+  errorMessage  String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  pipeline      Pipeline          @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  organization  Organization      @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  stepRuns      PipelineStepRun[]
+
+  @@index([orgId, status, startedAt])
+  @@index([pipelineId, startedAt])
+}
+
+model PipelineStepRun {
+  id            String                @id @default(cuid())
+  pipelineRunId String
+  stepId        String
+  orgId         String
+  agentRunId    String?
+  status        PipelineStepRunStatus @default(QUEUED)
+  startedAt     DateTime?
+  completedAt   DateTime?
+  inputPayload  Json?
+  outputPayload Json?
+  errorMessage  String?
+  retryCount    Int                   @default(0)
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  pipelineRun   PipelineRun           @relation(fields: [pipelineRunId], references: [id], onDelete: Cascade)
+  step          PipelineStep          @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  organization  Organization          @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  agentRun      Execution?            @relation("PipelineStepRunExecution", fields: [agentRunId], references: [id], onDelete: SetNull)
+
+  @@index([pipelineRunId, status, createdAt])
+  @@index([orgId, status, createdAt])
+  @@index([agentRunId])
 }
