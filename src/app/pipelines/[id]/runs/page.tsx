@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { PipelineStepRunActions } from "@/components/pipelines/pipeline-step-run-actions";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { getPipelineById } from "@/lib/pipeline/pipeline.service";
 
@@ -59,6 +60,7 @@ export default async function PipelineRunsPage({
                       <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
                       <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Agent Run</th>
                       <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Timing</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -81,6 +83,13 @@ export default async function PipelineRunsPage({
                         <td className="px-3 py-2 text-xs text-slate-500">
                           {stepRun.startedAt ? new Date(stepRun.startedAt).toLocaleTimeString() : "-"} →{" "}
                           {stepRun.completedAt ? new Date(stepRun.completedAt).toLocaleTimeString() : "-"}
+                        </td>
+                        <td className="px-3 py-2">
+                          <PipelineStepRunActions
+                            pipelineRunId={run.id}
+                            stepRunId={stepRun.id}
+                            status={stepRun.status}
+                          />
                         </td>
                       </tr>
                     ))}
