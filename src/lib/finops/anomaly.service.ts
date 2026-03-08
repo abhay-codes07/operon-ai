@@ -58,3 +58,26 @@ export async function listCostAnomalies(orgId: string) {
     take: 200,
   });
 }
+
+export async function detectOrganizationCostAnomalies(orgId: string) {
+  const recentRuns = await prisma.execution.findMany({
+    where: {
+      organizationId: orgId,
+      workflowId: { not: null },
+      status: { in: ["SUCCEEDED", "FAILED", "CANCELED"] },
+      finishedAt: {
+        gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+      },
+    },
+    select: { id: true },
+    orderBy: { finishedAt: "desc" },
+    take: 200,
+  });
+
+  const anomalies = [] as Awaited<ReturnType<typeof detectRunCostAnomaly>>[];
+  for (const run of recentRuns) {
+    anomalies.push(await detectRunCostAnomaly(run.id));
+  }
+
+  return anomalies.filter(Boolean);
+}
