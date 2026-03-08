@@ -26,3 +26,12 @@ export async function listCompetitors(orgId: string) {
     orderBy: { createdAt: "desc" },
   });
 }
+
+export async function deleteCompetitor(orgId: string, competitorId: string) {
+  return prisma.competitor.deleteMany({
+    where: {
+      id: competitorId,
+      orgId,
+    },
+  });
+}
