@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PipelineStepRunActions } from "@/components/pipelines/pipeline-step-run-actions";
+import { PipelineRunsLivePanel } from "@/components/pipelines/pipeline-runs-live-panel";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { getPipelineById } from "@/lib/pipeline/pipeline.service";
 
@@ -33,6 +34,16 @@ export default async function PipelineRunsPage({
           ← Back to Pipeline
         </Link>
       </section>
+
+      <PipelineRunsLivePanel
+        pipelineId={pipeline.id}
+        initialRuns={pipeline.runs.map((run) => ({
+          id: run.id,
+          status: run.status,
+          startedAt: run.startedAt.toISOString(),
+          completedAt: run.completedAt?.toISOString() ?? null,
+        }))}
+      />
 
       {pipeline.runs.length === 0 ? (
         <section className="rounded-xl border border-slate-200 bg-white p-4">
