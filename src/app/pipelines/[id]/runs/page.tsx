@@ -5,6 +5,7 @@ import { PipelineStepRunActions } from "@/components/pipelines/pipeline-step-run
 import { PipelineRunsLivePanel } from "@/components/pipelines/pipeline-runs-live-panel";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { getPipelineById } from "@/lib/pipeline/pipeline.service";
+import { PipelineStatusBadge } from "@/components/pipelines/pipeline-status-badge";
 
 type PipelineRunsPageProps = {
   params: {
@@ -55,7 +56,7 @@ export default async function PipelineRunsPage({
             <section key={run.id} className="rounded-xl border border-slate-200 bg-white p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-slate-900">Run {run.id.slice(-8)}</p>
-                <span className="text-xs font-semibold text-slate-600">{run.status}</span>
+                <PipelineStatusBadge status={run.status} />
               </div>
               <p className="text-xs text-slate-500">
                 Started {new Date(run.startedAt).toLocaleString()}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { PipelineCreateForm } from "@/components/pipelines/pipeline-create-form";
+import { PipelineStatusBadge } from "@/components/pipelines/pipeline-status-badge";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { fetchAgentCatalog } from "@/server/services/agents/agent-service";
 import { listPipelines } from "@/lib/pipeline/pipeline.service";
@@ -40,9 +41,14 @@ export default async function PipelinesPage(): Promise<JSX.Element> {
                 >
                   <p className="text-sm font-semibold text-slate-900">{pipeline.name}</p>
                   <p className="text-xs text-slate-600">{pipeline.description ?? "No description"}</p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    {pipeline.steps.length} step(s) • {pipeline.runs[0]?.status ?? "Never run"}
-                  </p>
+                  <div className="mt-1 flex items-center gap-2">
+                    <p className="text-xs text-slate-500">{pipeline.steps.length} step(s)</p>
+                    {pipeline.runs[0]?.status ? (
+                      <PipelineStatusBadge status={pipeline.runs[0].status} />
+                    ) : (
+                      <span className="text-xs text-slate-500">Never run</span>
+                    )}
+                  </div>
                 </Link>
               ))}
             </div>

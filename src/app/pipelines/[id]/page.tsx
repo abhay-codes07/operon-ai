@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { PipelineCanvas } from "@/components/pipelines/pipeline-canvas";
 import { PipelineRunControls } from "@/components/pipelines/pipeline-run-controls";
 import { PipelineStepConfigForm } from "@/components/pipelines/pipeline-step-config-form";
+import { PipelineStatusBadge } from "@/components/pipelines/pipeline-status-badge";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { getPipelineById } from "@/lib/pipeline/pipeline.service";
 import { fetchAgentCatalog } from "@/server/services/agents/agent-service";
@@ -45,7 +46,10 @@ export default async function PipelineDetailPage({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="text-xs text-slate-600">
             <p>Steps: {pipeline.steps.length}</p>
-            <p>Latest Run: {latestRun?.status ?? "Never run"}</p>
+            <p className="flex items-center gap-2">
+              Latest Run:
+              {latestRun ? <PipelineStatusBadge status={latestRun.status} /> : <span>Never run</span>}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <PipelineRunControls
