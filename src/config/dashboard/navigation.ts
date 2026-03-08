@@ -60,6 +60,11 @@ export const dashboardNav = [
     description: "Workflow marketplace",
   },
   {
+    href: "/pipelines",
+    label: "Pipelines",
+    description: "Multi-agent orchestration",
+  },
+  {
     href: "/dashboard/billing",
     label: "Billing",
     description: "Plans and quota",
