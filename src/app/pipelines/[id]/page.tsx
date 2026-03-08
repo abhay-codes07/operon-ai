@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 
 import { PipelineCanvas } from "@/components/pipelines/pipeline-canvas";
 import { PipelineRunControls } from "@/components/pipelines/pipeline-run-controls";
+import { PipelineStepConfigForm } from "@/components/pipelines/pipeline-step-config-form";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { getPipelineById } from "@/lib/pipeline/pipeline.service";
+import { fetchAgentCatalog } from "@/server/services/agents/agent-service";
 
 type PipelineDetailPageProps = {
   params: {
@@ -16,7 +18,15 @@ export default async function PipelineDetailPage({
   params,
 }: PipelineDetailPageProps): Promise<JSX.Element> {
   const user = await requireOrganizationRole("MEMBER");
-  const pipeline = await getPipelineById(user.organizationId!, params.id);
+  const [pipeline, agents] = await Promise.all([
+    getPipelineById(user.organizationId!, params.id),
+    fetchAgentCatalog({
+      organizationId: user.organizationId!,
+      page: 1,
+      pageSize: 100,
+      status: "ACTIVE",
+    }),
+  ]);
   if (!pipeline) {
     notFound();
   }
@@ -53,16 +63,23 @@ export default async function PipelineDetailPage({
         </div>
       </section>
 
-      <PipelineCanvas
-        steps={pipeline.steps.map((step) => ({
-          id: step.id,
-          stepOrder: step.stepOrder,
-          agentId: step.agentId,
-          agentName: step.agent.name,
-          inputMapping: (step.inputMapping as Record<string, unknown> | null) ?? {},
-          outputMapping: (step.outputMapping as Record<string, unknown> | null) ?? {},
-        }))}
-      />
+      <div className="grid gap-4 lg:grid-cols-[1.35fr,1fr]">
+        <PipelineCanvas
+          steps={pipeline.steps.map((step) => ({
+            id: step.id,
+            stepOrder: step.stepOrder,
+            agentId: step.agentId,
+            agentName: step.agent.name,
+            inputMapping: (step.inputMapping as Record<string, unknown> | null) ?? {},
+            outputMapping: (step.outputMapping as Record<string, unknown> | null) ?? {},
+          }))}
+        />
+        <PipelineStepConfigForm
+          pipelineId={pipeline.id}
+          agents={agents.items.map((agent) => ({ id: agent.id, name: agent.name }))}
+          nextStepOrder={pipeline.steps.length + 1}
+        />
+      </div>
     </div>
   );
 }
