@@ -70,6 +70,11 @@ export const dashboardNav = [
     description: "Plans and quota",
   },
   {
+    href: "/dashboard/finops",
+    label: "FinOps",
+    description: "Agent cost intelligence",
+  },
+  {
     href: "/dashboard/security",
     label: "Security",
     description: "Operational guardrails",
