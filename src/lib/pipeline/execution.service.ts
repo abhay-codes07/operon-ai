@@ -3,6 +3,7 @@ import { enqueueExecutionJob } from "@/server/queue/producers/execution-producer
 import { createTraceId } from "@/server/observability/tracing";
 import { queueExecution } from "@/server/services/executions/execution-service";
 import { logPipelineAuditEvent } from "@/lib/pipeline/audit.service";
+import { recordPipelineRuntimeCost } from "@/lib/finops/cost-tracker.service";
 import {
   buildStepInputFromContext,
   mergeStepOutputIntoContext,
@@ -171,14 +172,18 @@ async function advanceAfterStepCompletion(run: PipelineRunWithSteps, stepRunId: 
   );
 
   if (!nextStep) {
+    const completedAt = new Date();
+    const startedAt = refreshed.startedAt;
+    const elapsedSeconds = Math.max(0, Math.round((completedAt.getTime() - startedAt.getTime()) / 1000));
     await prisma.pipelineRun.update({
       where: { id: refreshed.id },
       data: {
         status: "COMPLETED",
-        completedAt: new Date(),
+        completedAt,
         errorMessage: null,
       },
     });
+    await recordPipelineRuntimeCost(refreshed.id, null, elapsedSeconds).catch(() => null);
     return refreshed;
   }
 
