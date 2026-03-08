@@ -1,6 +1,7 @@
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { CompetitorManager } from "@/components/dashboard/intelligence/competitor-manager";
+import { IntelligenceAlerts } from "@/components/dashboard/intelligence/intelligence-alerts";
 import { IntelligenceTrendBars } from "@/components/dashboard/intelligence/intelligence-trend-bars";
 import { listCompetitors } from "@/lib/competitor/competitor.service";
 import { generateInsights } from "@/lib/intelligence/insight.service";
@@ -63,6 +64,18 @@ export default async function DashboardIntelligencePage(): Promise<JSX.Element> 
             </article>
           ))}
         </div>
+      </DashboardCard>
+
+      <DashboardCard title="Alerts">
+        <IntelligenceAlerts
+          items={insights.slice(0, 10).map((insight, index) => ({
+            id: `${insight.competitorId}-${index}`,
+            competitorName: insight.competitorName,
+            signalType: insight.signalType,
+            details: insight.details,
+            createdAt: insight.createdAt.toISOString(),
+          }))}
+        />
       </DashboardCard>
 
       <DashboardCard title="Morning Briefing">
