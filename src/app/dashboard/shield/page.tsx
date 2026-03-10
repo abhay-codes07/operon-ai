@@ -1,33 +1,23 @@
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { ShieldEventsTable } from "@/components/dashboard/shield/shield-events-table";
+import { ShieldLiveSummary } from "@/components/dashboard/shield/shield-live-summary";
 import { ShieldPolicyForm } from "@/components/dashboard/shield/shield-policy-form";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { listShieldEvents } from "@/lib/shield/event.service";
 import { latestShieldPolicy } from "@/lib/shield/policy.service";
+import { getShieldSummary } from "@/lib/shield/summary.service";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 
 export default async function DashboardShieldPage(): Promise<JSX.Element> {
   const user = await requireOrganizationRole("MEMBER");
-  const [events, policy] = await Promise.all([
+  const [events, policy, summary] = await Promise.all([
     listShieldEvents({
       organizationId: user.organizationId!,
       limit: 100,
     }),
     latestShieldPolicy(user.organizationId!),
+    getShieldSummary(user.organizationId!),
   ]);
-
-  const severityTotals = events.reduce(
-    (acc, event) => {
-      acc[event.severity] += 1;
-      return acc;
-    },
-    {
-      LOW: 0,
-      MEDIUM: 0,
-      HIGH: 0,
-      CRITICAL: 0,
-    },
-  );
 
   return (
     <div className="space-y-5">
@@ -38,14 +28,13 @@ export default async function DashboardShieldPage(): Promise<JSX.Element> {
       />
 
       <DashboardCard title="Threat Posture">
-        <div className="grid gap-3 md:grid-cols-4">
-          {Object.entries(severityTotals).map(([severity, count]) => (
-            <article key={severity} className="rounded-lg border border-slate-200 bg-white px-3 py-3">
-              <p className="text-xs font-semibold tracking-wide text-slate-500">{severity}</p>
-              <p className="mt-1 text-xl font-semibold text-slate-900">{count}</p>
-            </article>
-          ))}
-        </div>
+        <ShieldLiveSummary
+          initial={{
+            totalEvents: summary.totalEvents,
+            severity: summary.severity,
+            hotWorkflows: [],
+          }}
+        />
       </DashboardCard>
 
       <DashboardCard title="Shield Policy" description="Allowlist and action controls enforced before sensitive steps.">
