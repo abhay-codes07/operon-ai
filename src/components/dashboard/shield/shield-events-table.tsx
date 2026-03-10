@@ -1,5 +1,7 @@
 "use client";
 
+import { ShieldSeverityBadge } from "@/components/dashboard/shield/shield-severity-badge";
+
 type ShieldEventItem = {
   id: string;
   url: string;
@@ -19,13 +21,6 @@ type ShieldEventItem = {
 
 type ShieldEventsTableProps = {
   items: ShieldEventItem[];
-};
-
-const severityTone: Record<ShieldEventItem["severity"], string> = {
-  LOW: "border-slate-200 bg-slate-100 text-slate-700",
-  MEDIUM: "border-amber-200 bg-amber-50 text-amber-700",
-  HIGH: "border-orange-200 bg-orange-50 text-orange-700",
-  CRITICAL: "border-rose-200 bg-rose-50 text-rose-700",
 };
 
 export function ShieldEventsTable({ items }: ShieldEventsTableProps): JSX.Element {
@@ -48,18 +43,14 @@ export function ShieldEventsTable({ items }: ShieldEventsTableProps): JSX.Elemen
         <tbody className="divide-y divide-slate-100">
           {items.map((item) => (
             <tr key={item.id}>
-              <td className="px-3 py-3 text-xs text-slate-600">
-                {new Date(item.detectedAt).toLocaleString()}
-              </td>
+              <td className="px-3 py-3 text-xs text-slate-600">{new Date(item.detectedAt).toLocaleString()}</td>
               <td className="px-3 py-3 text-sm font-medium text-slate-900">{item.workflow.name}</td>
               <td className="px-3 py-3 text-xs text-slate-700">
                 <p>{item.url}</p>
                 {item.domLocation ? <p className="text-slate-500">{item.domLocation}</p> : null}
               </td>
               <td className="px-3 py-3">
-                <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-semibold ${severityTone[item.severity]}`}>
-                  {item.severity} ({item.riskScore})
-                </span>
+                <ShieldSeverityBadge severity={item.severity} riskScore={item.riskScore} />
               </td>
               <td className="px-3 py-3 text-xs text-slate-600">
                 {item.run.id.slice(-8)} ({item.run.status})
