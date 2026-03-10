@@ -55,6 +55,26 @@ export async function getShieldSummary(organizationId: string) {
     .slice(0, 5)
     .map(([workflowId, count]) => ({ workflowId, count }));
 
+  const workflowNameRows = hotWorkflowIds.length
+    ? await prisma.workflow.findMany({
+        where: {
+          id: {
+            in: hotWorkflowIds.map((item) => item.workflowId),
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      })
+    : [];
+  const workflowNameMap = new Map(workflowNameRows.map((item) => [item.id, item.name]));
+  const hotWorkflows = hotWorkflowIds.map((item) => ({
+    workflowId: item.workflowId,
+    workflowName: workflowNameMap.get(item.workflowId) ?? "Unknown workflow",
+    count: item.count,
+  }));
+
   return {
     totalEvents,
     severity: {
@@ -63,6 +83,6 @@ export async function getShieldSummary(organizationId: string) {
       MEDIUM: mediumEvents,
       LOW: lowEvents,
     },
-    hotWorkflowIds,
+    hotWorkflows,
   };
 }

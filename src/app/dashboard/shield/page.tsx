@@ -32,7 +32,7 @@ export default async function DashboardShieldPage(): Promise<JSX.Element> {
           initial={{
             totalEvents: summary.totalEvents,
             severity: summary.severity,
-            hotWorkflows: [],
+            hotWorkflows: summary.hotWorkflows,
           }}
         />
       </DashboardCard>
