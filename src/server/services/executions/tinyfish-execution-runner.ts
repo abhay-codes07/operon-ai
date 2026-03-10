@@ -73,6 +73,11 @@ import { logBehaviorAnomalyEvent, logPromptInjectionEvent, logShieldPolicyViolat
 import { guardExecutionAction } from "@/lib/shield/execution-guard.service";
 import { scanDomContent } from "@/lib/shield/injection-detector.service";
 import { sendShieldAlert } from "@/lib/shield/alert.service";
+import {
+  getBehaviorBaseline,
+  inferBehaviorBaselineFromWorkflowDefinition,
+  upsertBehaviorBaseline,
+} from "@/lib/shield/policy.service";
 
 import {
   appendExecutionEvent,
@@ -312,6 +317,15 @@ export async function runExecutionWithTinyFish(
   let gatewayBlockedReason: string | null = null;
 
   const workflowSteps = (definition as { steps?: WorkflowDefinitionStep[] }).steps ?? [];
+  const existingBaseline = await getBehaviorBaseline(workflow.id);
+  if (!existingBaseline) {
+    const inferredBaseline = inferBehaviorBaselineFromWorkflowDefinition(definition);
+    await upsertBehaviorBaseline({
+      workflowId: workflow.id,
+      allowedActions: inferredBaseline.allowedActions,
+      allowedDomains: inferredBaseline.allowedDomains,
+    }).catch(() => null);
+  }
   const replaySteps = await persistExecutionReplaySteps({
     organizationId: input.organizationId,
     executionId: input.executionId,
