@@ -18,7 +18,10 @@ function startsWithPrefix(pathname: string, prefixes: string[]): boolean {
 }
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  const nextAuthSecret = process.env.NEXTAUTH_SECRET;
+  const token = await getToken(
+    nextAuthSecret ? { req: request, secret: nextAuthSecret } : { req: request },
+  );
   const isAuthenticated = Boolean(token?.sub);
   const { pathname } = request.nextUrl;
 
