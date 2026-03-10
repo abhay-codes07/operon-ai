@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { ShieldEventsTable } from "@/components/dashboard/shield/shield-events-table";
+import { ShieldBaselineForm } from "@/components/workflows/shield-baseline-form";
 import { getBehaviorBaseline, latestShieldPolicy } from "@/lib/shield/policy.service";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { prisma } from "@/server/db/client";
@@ -126,6 +127,18 @@ export default async function WorkflowShieldPage({ params }: WorkflowShieldPageP
             Manage Shield policy
           </Link>
         </div>
+      </DashboardCard>
+
+      <DashboardCard title="Behavior Baseline">
+        <ShieldBaselineForm
+          workflowId={workflow.id}
+          initialAllowedActions={
+            Array.isArray(baseline?.allowedActions) ? (baseline?.allowedActions as string[]) : []
+          }
+          initialAllowedDomains={
+            Array.isArray(baseline?.allowedDomains) ? (baseline?.allowedDomains as string[]) : []
+          }
+        />
       </DashboardCard>
 
       <DashboardCard title="Recent Threats">
