@@ -19,6 +19,7 @@ export function ShieldBaselineForm({
   const [allowedDomains, setAllowedDomains] = useState(initialAllowedDomains.join("\n"));
   const [status, setStatus] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [inferring, setInferring] = useState(false);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -54,6 +55,29 @@ export function ShieldBaselineForm({
     }
   }
 
+  async function onInfer() {
+    setInferring(true);
+    setStatus(null);
+    try {
+      const response = await fetch(`/api/shield/workflows/${workflowId}/baseline/infer`, {
+        method: "POST",
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        setStatus(payload?.error?.message ?? "Failed to infer baseline");
+        return;
+      }
+      const inferred = payload?.inferred as { allowedActions?: string[]; allowedDomains?: string[] } | undefined;
+      setAllowedActions((inferred?.allowedActions ?? []).join("\n"));
+      setAllowedDomains((inferred?.allowedDomains ?? []).join("\n"));
+      setStatus("Baseline inferred from workflow definition.");
+    } catch {
+      setStatus("Network error while inferring baseline.");
+    } finally {
+      setInferring(false);
+    }
+  }
+
   return (
     <form onSubmit={onSubmit} className="space-y-3">
       <div className="grid gap-3 md:grid-cols-2">
@@ -79,6 +103,9 @@ export function ShieldBaselineForm({
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={saving}>
           {saving ? "Saving..." : "Save Baseline"}
+        </Button>
+        <Button type="button" variant="outline" onClick={onInfer} disabled={inferring || saving}>
+          {inferring ? "Inferring..." : "Infer from Workflow"}
         </Button>
         {status ? <p className="text-xs text-slate-600">{status}</p> : null}
       </div>
