@@ -1,15 +1,25 @@
 import { prisma } from "@/server/db/client";
 
+function normalizeDomains(domains: string[]) {
+  return [...new Set(domains.map((domain) => domain.trim().toLowerCase()).filter(Boolean))];
+}
+
+function normalizeActions(actions: string[]) {
+  return [...new Set(actions.map((action) => action.trim().toLowerCase()).filter(Boolean))];
+}
+
 export async function createShieldPolicy(input: {
   organizationId: string;
   allowedDomains: string[];
   blockedActions: string[];
 }) {
+  const allowedDomains = normalizeDomains(input.allowedDomains);
+  const blockedActions = normalizeActions(input.blockedActions);
   return prisma.shieldPolicy.create({
     data: {
       orgId: input.organizationId,
-      allowedDomains: input.allowedDomains,
-      blockedActions: input.blockedActions,
+      allowedDomains,
+      blockedActions,
     },
   });
 }
@@ -41,18 +51,20 @@ export async function upsertBehaviorBaseline(input: {
   allowedActions: string[];
   allowedDomains: string[];
 }) {
+  const allowedActions = normalizeActions(input.allowedActions);
+  const allowedDomains = normalizeDomains(input.allowedDomains);
   return prisma.agentBehaviorBaseline.upsert({
     where: {
       workflowId: input.workflowId,
     },
     update: {
-      allowedActions: input.allowedActions,
-      allowedDomains: input.allowedDomains,
+      allowedActions,
+      allowedDomains,
     },
     create: {
       workflowId: input.workflowId,
-      allowedActions: input.allowedActions,
-      allowedDomains: input.allowedDomains,
+      allowedActions,
+      allowedDomains,
     },
   });
 }
