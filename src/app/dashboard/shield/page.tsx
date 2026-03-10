@@ -2,6 +2,7 @@ import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { ShieldEventsTable } from "@/components/dashboard/shield/shield-events-table";
 import { ShieldLiveSummary } from "@/components/dashboard/shield/shield-live-summary";
 import { ShieldPolicyForm } from "@/components/dashboard/shield/shield-policy-form";
+import { ShieldTestAttackButton } from "@/components/dashboard/shield/shield-test-attack-button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { listShieldEvents } from "@/lib/shield/event.service";
 import { latestShieldPolicy } from "@/lib/shield/policy.service";
@@ -42,6 +43,9 @@ export default async function DashboardShieldPage(): Promise<JSX.Element> {
           initialAllowedDomains={Array.isArray(policy?.allowedDomains) ? (policy.allowedDomains as string[]) : []}
           initialBlockedActions={Array.isArray(policy?.blockedActions) ? (policy.blockedActions as string[]) : []}
         />
+        <div className="mt-3 border-t border-slate-100 pt-3">
+          <ShieldTestAttackButton />
+        </div>
       </DashboardCard>
 
       <DashboardCard title="Attack Timeline" description="Prompt injection attempts detected across active workflow runs.">
