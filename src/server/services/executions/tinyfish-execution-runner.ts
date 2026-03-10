@@ -66,6 +66,13 @@ import {
 } from "@/lib/finops/cost-tracker.service";
 import { updateWorkflowCostSummary } from "@/lib/finops/cost-aggregation.service";
 import { detectRunCostAnomaly } from "@/lib/finops/anomaly.service";
+import { detectBehaviorAnomalies, pauseExecutionForBehaviorAnomaly } from "@/lib/shield/behavior-monitor.service";
+import { classifyContext } from "@/lib/shield/context-classifier.service";
+import { sanitizeContextWindow } from "@/lib/shield/context-sanitizer";
+import { logBehaviorAnomalyEvent, logPromptInjectionEvent, logShieldPolicyViolation } from "@/lib/shield/event.service";
+import { guardExecutionAction } from "@/lib/shield/execution-guard.service";
+import { scanDomContent } from "@/lib/shield/injection-detector.service";
+import { sendShieldAlert } from "@/lib/shield/alert.service";
 
 import {
   appendExecutionEvent,
@@ -240,6 +247,28 @@ export async function runExecutionWithTinyFish(
     metadata: {
       source: "webops-ai",
       traceId: input.traceId,
+      shieldContext: (() => {
+        const workflowInstructions = (
+          definition as { naturalLanguageTask?: string; steps?: WorkflowDefinitionStep[] }
+        ).naturalLanguageTask ?? "";
+        const webContentPreview = ((definition as { steps?: WorkflowDefinitionStep[] }).steps ?? [])
+          .map((step) => `${step.action} ${step.target} ${step.expectedOutcome}`)
+          .join("\n");
+        const classified = classifyContext({
+          workflowInstructions,
+          webContent: webContentPreview,
+        });
+        return sanitizeContextWindow({
+          trustedInstructions: classified
+            .filter((chunk) => chunk.source === "trusted_workflow")
+            .map((chunk) => chunk.content)
+            .join("\n"),
+          untrustedWebContent: classified
+            .filter((chunk) => chunk.source === "untrusted_web")
+            .map((chunk) => chunk.content)
+            .join("\n"),
+        });
+      })(),
       memoryContext: await fetchAgentMemoryContext({
         organizationId: input.organizationId,
         agentId: input.agentId,
@@ -446,6 +475,83 @@ export async function runExecutionWithTinyFish(
           riskScore: gatewayAction.risk.riskScore,
           auditId: gatewayAction.auditId,
         },
+      });
+      continue;
+    }
+
+    const guardDecision = await guardExecutionAction({
+      organizationId: input.organizationId,
+      workflowId: workflow.id,
+      action: replayStep.action,
+      target: replayStep.target,
+    });
+    if (!guardDecision.allowed) {
+      await logShieldPolicyViolation({
+        organizationId: input.organizationId,
+        runId: input.executionId,
+        reasons: guardDecision.reasons,
+      });
+      await sendShieldAlert({
+        organizationId: input.organizationId,
+        executionId: input.executionId,
+        title: "Policy violation blocked execution step",
+        message: guardDecision.reasons.join("; "),
+        severity: "HIGH",
+      });
+      gatewayBlockedReason = `Operon Shield blocked action ${replayStep.action}: ${guardDecision.reasons.join(", ")}`;
+      continue;
+    }
+
+    const syntheticDom = `${replayStep.action} ${replayStep.target ?? ""} ${
+      (replayStep.metadata as { expectedOutcome?: string } | null)?.expectedOutcome ?? ""
+    }`;
+    const injectionScan = scanDomContent(syntheticDom);
+    if (injectionScan.detected) {
+      const strongestMatch = injectionScan.matches[0];
+      await logPromptInjectionEvent({
+        organizationId: input.organizationId,
+        workflowId: workflow.id,
+        runId: input.executionId,
+        url: replayStep.target ?? `https://workflow.operon.ai/${workflow.id}`,
+        domLocation: replayStep.stepKey,
+        injectedText: strongestMatch?.excerpt ?? syntheticDom.slice(0, 200),
+        riskScore: injectionScan.riskScore,
+      });
+      await sendShieldAlert({
+        organizationId: input.organizationId,
+        executionId: input.executionId,
+        title: "Prompt injection attempt detected",
+        message: `Step ${replayStep.stepKey} matched Shield detector patterns`,
+        severity: injectionScan.riskScore >= 60 ? "HIGH" : "MEDIUM",
+      });
+      if (injectionScan.riskScore >= 70) {
+        gatewayBlockedReason = "Operon Shield blocked high-risk prompt injection content";
+        continue;
+      }
+    }
+
+    const behaviorAnomalies = await detectBehaviorAnomalies({
+      workflowId: workflow.id,
+      action: replayStep.action,
+      target: replayStep.target,
+    });
+    if (behaviorAnomalies.length > 0) {
+      const reasons = behaviorAnomalies.map((item) => item.reason);
+      await pauseExecutionForBehaviorAnomaly({
+        executionId: input.executionId,
+        anomalyReasons: reasons,
+      });
+      await logBehaviorAnomalyEvent({
+        organizationId: input.organizationId,
+        runId: input.executionId,
+        reasons,
+      });
+      await sendShieldAlert({
+        organizationId: input.organizationId,
+        executionId: input.executionId,
+        title: "Behavior anomaly detected",
+        message: reasons.join("; "),
+        severity: "MEDIUM",
       });
       continue;
     }
