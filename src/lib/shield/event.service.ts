@@ -120,10 +120,16 @@ export async function logShieldPolicyViolation(input: {
 export async function listShieldEvents(input: {
   organizationId: string;
   limit?: number;
+  workflowId?: string;
+  runId?: string;
+  severity?: ShieldSeverity;
 }) {
   return prisma.promptInjectionEvent.findMany({
     where: {
       orgId: input.organizationId,
+      ...(input.workflowId ? { workflowId: input.workflowId } : {}),
+      ...(input.runId ? { runId: input.runId } : {}),
+      ...(input.severity ? { severity: input.severity } : {}),
     },
     take: input.limit ?? 100,
     orderBy: {
