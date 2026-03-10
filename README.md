@@ -88,6 +88,35 @@ Secure Agent Gateway intercepts every agent action with policy-as-code enforceme
 
 Progressive Workflow Delivery adds canary traffic routing, release health snapshots, and automatic rollback when live failure thresholds are breached.
 
+Operon Shield adds a dedicated prompt-injection defense layer that separates trusted workflow intent from untrusted web content at runtime, sanitizes context windows, and blocks unsafe execution paths before action dispatch.
+
+## Operon Shield
+
+Operon Shield is the runtime security layer for autonomous browser agents.
+
+It enforces three guarantees:
+
+- Instruction integrity: trusted workflow instructions remain isolated from untrusted page content.
+- Runtime containment: suspicious actions are blocked or paused through policy checks and behavior baselines.
+- Security observability: prompt injection attempts are logged, scored, alerted, and surfaced in a live threat timeline.
+
+Core Shield surfaces:
+
+- `GET /api/shield/events`
+- `POST /api/shield/policies`
+- `GET /api/shield/policies`
+- `GET /api/shield/summary`
+- `GET /api/shield/timeline`
+- `POST /api/shield/test-injection`
+- `GET /api/shield/workflows/[id]/status`
+- `GET|POST /api/shield/workflows/[id]/baseline`
+- `POST /api/shield/workflows/[id]/baseline/infer`
+
+UI surfaces:
+
+- `/dashboard/shield` for threat posture, policy controls, timeline, and demo-attack simulation.
+- `/workflows/[id]/shield` for workflow-level trusted/untrusted context review and baseline enforcement.
+
 ## OperonHub Marketplace
 
 OperonHub is the workflow marketplace for real-world TinyFish web agent automations.
