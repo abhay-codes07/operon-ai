@@ -248,6 +248,13 @@ enum CompetitorSignalType {
   HEADCOUNT_CHANGE
 }
 
+enum ShieldSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -349,6 +356,8 @@ model Organization {
   costBudgets CostBudget[]
   competitors Competitor[]
   competitorSignals CompetitorSignal[]
+  shieldPolicies ShieldPolicy[]
+  promptInjectionEvents PromptInjectionEvent[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -479,6 +488,8 @@ model Workflow {
   costSummary WorkflowCostSummary?
   costBudgets CostBudget[]
   costAnomalies CostAnomaly[]
+  promptInjectionEvents PromptInjectionEvent[]
+  behaviorBaseline AgentBehaviorBaseline?
 
   @@index([organizationId, status])
   @@index([organizationId, agentId, createdAt])
@@ -531,6 +542,7 @@ model Execution {
   pipelineStepRuns PipelineStepRun[] @relation("PipelineStepRunExecution")
   costEvents AgentCostEvent[]
   costAnomalies CostAnomaly[]
+  promptInjectionEvents PromptInjectionEvent[]
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, agentId, createdAt])
@@ -1637,4 +1649,49 @@ model PipelineStepRun {
   @@index([pipelineRunId, status, createdAt])
   @@index([orgId, status, createdAt])
   @@index([agentRunId])
+}
+
+model PromptInjectionEvent {
+  id           String         @id @default(cuid())
+  workflowId   String
+  runId        String
+  orgId        String
+  url          String
+  domLocation  String?
+  injectedText String         @db.Text
+  severity     ShieldSeverity @default(MEDIUM)
+  riskScore    Int            @default(0)
+  detectedAt   DateTime       @default(now())
+  workflow     Workflow       @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  run          Execution      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  organization Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, detectedAt])
+  @@index([workflowId, detectedAt])
+  @@index([runId, detectedAt])
+  @@index([orgId, severity, detectedAt])
+}
+
+model ShieldPolicy {
+  id             String       @id @default(cuid())
+  orgId          String
+  allowedDomains Json
+  blockedActions Json
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, createdAt])
+}
+
+model AgentBehaviorBaseline {
+  id             String       @id @default(cuid())
+  workflowId     String       @unique
+  allowedActions Json
+  allowedDomains Json
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  workflow       Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
 }
