@@ -3,21 +3,27 @@ import { ShieldEventsTable } from "@/components/dashboard/shield/shield-events-t
 import { ShieldLiveSummary } from "@/components/dashboard/shield/shield-live-summary";
 import { ShieldPolicyForm } from "@/components/dashboard/shield/shield-policy-form";
 import { ShieldTestAttackButton } from "@/components/dashboard/shield/shield-test-attack-button";
+import { ShieldTimeline } from "@/components/dashboard/shield/shield-timeline";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { listShieldEvents } from "@/lib/shield/event.service";
 import { latestShieldPolicy } from "@/lib/shield/policy.service";
 import { getShieldSummary } from "@/lib/shield/summary.service";
+import { getShieldTimeline } from "@/lib/shield/timeline.service";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 
 export default async function DashboardShieldPage(): Promise<JSX.Element> {
   const user = await requireOrganizationRole("MEMBER");
-  const [events, policy, summary] = await Promise.all([
+  const [events, policy, summary, timeline] = await Promise.all([
     listShieldEvents({
       organizationId: user.organizationId!,
       limit: 100,
     }),
     latestShieldPolicy(user.organizationId!),
     getShieldSummary(user.organizationId!),
+    getShieldTimeline({
+      organizationId: user.organizationId!,
+      days: 7,
+    }),
   ]);
 
   return (
@@ -49,6 +55,9 @@ export default async function DashboardShieldPage(): Promise<JSX.Element> {
       </DashboardCard>
 
       <DashboardCard title="Attack Timeline" description="Prompt injection attempts detected across active workflow runs.">
+        <div className="mb-4">
+          <ShieldTimeline initialItems={timeline} />
+        </div>
         <ShieldEventsTable
           items={events.map((event) => ({
             id: event.id,
