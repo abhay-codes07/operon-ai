@@ -64,3 +64,35 @@ export async function getBehaviorBaseline(workflowId: string) {
     },
   });
 }
+
+export function inferBehaviorBaselineFromWorkflowDefinition(definition: unknown): {
+  allowedActions: string[];
+  allowedDomains: string[];
+} {
+  const parsed = definition as {
+    steps?: Array<{
+      action?: string;
+      target?: string;
+    }>;
+  };
+  const actions = new Set<string>();
+  const domains = new Set<string>();
+
+  for (const step of parsed.steps ?? []) {
+    if (typeof step.action === "string" && step.action.trim().length > 0) {
+      actions.add(step.action.trim().toLowerCase());
+    }
+    if (typeof step.target === "string" && step.target.startsWith("http")) {
+      try {
+        domains.add(new URL(step.target).hostname.toLowerCase());
+      } catch {
+        // Ignore invalid targets while inferring baseline.
+      }
+    }
+  }
+
+  return {
+    allowedActions: [...actions],
+    allowedDomains: [...domains],
+  };
+}
