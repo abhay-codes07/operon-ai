@@ -2,6 +2,7 @@ import { hash } from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
+const prismaAny = prisma as unknown as Record<string, { upsert: (args: unknown) => Promise<unknown> }>;
 
 function buildWorkflowDefinition(targetUrl: string) {
   return {
@@ -270,7 +271,12 @@ async function main() {
   const periodEnd = new Date(periodStart);
   periodEnd.setUTCMonth(periodEnd.getUTCMonth() + 1);
 
-  await prisma.subscription.upsert({
+  const subscriptionDelegate = prismaAny.subscription;
+  if (!subscriptionDelegate) {
+    throw new Error("Prisma subscription delegate is unavailable. Run `npm run prisma:generate`.");
+  }
+
+  await subscriptionDelegate.upsert({
     where: {
       stripeCustomerId: `seed-customer-${organization.id}`,
     },
@@ -291,7 +297,12 @@ async function main() {
     },
   });
 
-  await prisma.usageRecord.upsert({
+  const usageRecordDelegate = prismaAny.usageRecord;
+  if (!usageRecordDelegate) {
+    throw new Error("Prisma usageRecord delegate is unavailable. Run `npm run prisma:generate`.");
+  }
+
+  await usageRecordDelegate.upsert({
     where: {
       organizationId_metric_periodStart_periodEnd: {
         organizationId: organization.id,

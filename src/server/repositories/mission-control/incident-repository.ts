@@ -1,6 +1,7 @@
-import type { IncidentSeverity, IncidentStatus } from "@prisma/client";
-
 import { prisma } from "@/server/db/client";
+
+type IncidentSeverity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+type IncidentStatus = "OPEN" | "ACKNOWLEDGED" | "RESOLVED";
 
 export async function createIncident(input: {
   organizationId: string;

@@ -1,4 +1,5 @@
-import type { BillingPlan, SubscriptionStatus } from "@prisma/client";
+type BillingPlan = "FREE" | "STARTER" | "GROWTH" | "ENTERPRISE";
+type SubscriptionStatus = "TRIALING" | "ACTIVE" | "PAST_DUE" | "CANCELED" | "INCOMPLETE";
 
 export type SubscriptionSnapshot = {
   id: string;

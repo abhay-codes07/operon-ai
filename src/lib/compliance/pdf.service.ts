@@ -72,7 +72,9 @@ export async function generateCompliancePassportPdf(workflowId: string) {
     return null;
   }
 
-  const domains = [...new Set(events.map((event) => event.domainVisited).filter(Boolean))] as string[];
+  const domains = Array.from(
+    new Set(events.map((event) => event.domainVisited).filter((value): value is string => Boolean(value))),
+  );
   const lines = [
     "Operon AI Compliance Passport",
     `Workflow: ${workflow.name}`,

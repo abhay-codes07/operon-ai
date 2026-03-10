@@ -1,6 +1,7 @@
-import type { ExecutionStatus, WorkflowReleaseStatus } from "@prisma/client";
-
 import { prisma } from "@/server/db/client";
+
+type ExecutionStatus = "QUEUED" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELED";
+type WorkflowReleaseStatus = "ACTIVE" | "PAUSED" | "ROLLED_BACK" | "COMPLETED";
 
 export async function createWorkflowRelease(input: {
   organizationId: string;

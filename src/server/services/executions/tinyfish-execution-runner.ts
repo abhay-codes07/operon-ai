@@ -1,4 +1,4 @@
-import type { ComplianceActionType, ExecutionStatus } from "@prisma/client";
+import type { ExecutionStatus } from "@prisma/client";
 
 import { RetryableOperationError, withRetry } from "@/lib/utils/retry";
 import { executeTinyFishWorkflow, TinyFishApiError } from "@/server/integrations/tinyfish/client";
@@ -99,6 +99,8 @@ type WorkflowDefinitionStep = {
   target: string;
   expectedOutcome: string;
 };
+
+type ComplianceActionType = "READ" | "WRITE" | "SUBMIT" | "EXTRACT";
 
 function toReplayStepStatus(
   overallStatus: ExecutionStatus,
@@ -895,8 +897,8 @@ export async function runExecutionWithTinyFish(
   await evaluateRunAgainstSLA({
     id: input.executionId,
     workflowId: workflow.id,
-    startedAt: finalizedExecution.startedAt,
-    finishedAt: finalizedExecution.finishedAt,
+    startedAt: finalizedExecution.startedAt ?? null,
+    finishedAt: finalizedExecution.finishedAt ?? null,
   }).catch(() => null);
 
   const complianceViolations = await detectComplianceViolationsForRun({
@@ -941,7 +943,7 @@ export async function runExecutionWithTinyFish(
   const tokensEstimate = Math.max(
     1,
     Math.round(
-      (parsed.summary.length +
+      ((parsed.summary ?? "").length +
         parsed.logs.reduce((sum, entry) => sum + entry.message.length, 0)) /
         4,
     ),

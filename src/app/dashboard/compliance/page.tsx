@@ -48,7 +48,21 @@ export default async function DashboardCompliancePage(): Promise<JSX.Element> {
     }),
   ]);
 
-  const passportMap = new Map(passports.map((passport) => [passport.workflowId, passport]));
+  type PassportRow = {
+    workflowId: string;
+    riskLevel: "LOW" | "MEDIUM" | "HIGH";
+    lastGeneratedAt: Date | null;
+  };
+  const passportMap = new Map<string, PassportRow>(
+    passports.map((passport) => [
+      passport.workflowId,
+      {
+        workflowId: passport.workflowId,
+        riskLevel: passport.riskLevel,
+        lastGeneratedAt: passport.lastGeneratedAt,
+      },
+    ]),
+  );
   const approvalRows = await prisma.workflowComplianceApproval.findMany({
     where: {
       organizationId: user.organizationId!,

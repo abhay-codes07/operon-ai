@@ -1,6 +1,6 @@
-import type { ComplianceActionType } from "@prisma/client";
-
 import { prisma } from "@/server/db/client";
+
+type ComplianceActionType = "READ" | "WRITE" | "SUBMIT" | "EXTRACT";
 
 async function resolveExecutionContext(runId: string) {
   return prisma.execution.findUnique({

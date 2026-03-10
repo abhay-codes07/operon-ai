@@ -114,6 +114,7 @@ export async function POST(request: Request, context: RouteContext) {
     throw error;
   }
 
+  const releaseLane = routing.lane === "CANARY" ? "CANARY" : "STABLE";
   const execution = await queueExecution({
     organizationId: user.organizationId!,
     agentId: selectedWorkflow.agentId,
@@ -126,7 +127,7 @@ export async function POST(request: Request, context: RouteContext) {
       requestedWorkflowId: workflow.id,
       routedWorkflowId: selectedWorkflow.id,
       releaseId: routing.releaseId,
-      releaseLane: routing.lane,
+      releaseLane,
     },
   });
   const traceId = createTraceId(execution.id);
@@ -146,7 +147,7 @@ export async function POST(request: Request, context: RouteContext) {
       releaseId: routing.releaseId,
       executionId: execution.id,
       workflowId: selectedWorkflow.id,
-      lane: routing.lane,
+      lane: releaseLane,
     });
   }
 
@@ -159,7 +160,7 @@ export async function POST(request: Request, context: RouteContext) {
       queue: "execution",
       traceId,
       releaseId: routing.releaseId,
-      releaseLane: routing.lane,
+      releaseLane,
       routedWorkflowId: selectedWorkflow.id,
     },
   });
@@ -172,7 +173,7 @@ export async function POST(request: Request, context: RouteContext) {
       workflowId: selectedWorkflow.id,
       requestedWorkflowId: workflow.id,
       releaseId: routing.releaseId,
-      releaseLane: routing.lane,
+      releaseLane,
       trigger: "MANUAL",
       traceId,
     },
@@ -186,3 +187,4 @@ export async function POST(request: Request, context: RouteContext) {
     { status: 202 },
   );
 }
+

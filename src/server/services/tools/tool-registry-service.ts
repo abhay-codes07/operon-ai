@@ -44,6 +44,10 @@ export async function retrieveToolVersions(input: { organizationId: string; tool
   return listToolVersions(input.organizationId, input.toolId);
 }
 
+export async function fetchToolVersions(input: { organizationId: string; toolId: string }) {
+  return retrieveToolVersions(input);
+}
+
 export async function recordToolExecution(input: {
   organizationId: string;
   toolId: string;

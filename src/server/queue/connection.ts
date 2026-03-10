@@ -4,7 +4,7 @@ import { getAppEnv } from "@/config/env";
 
 let redisConnection: IORedis | null = null;
 
-export function getQueueRedisConnection(): IORedis {
+export function getQueueRedisConnection(): any {
   if (redisConnection) {
     return redisConnection;
   }

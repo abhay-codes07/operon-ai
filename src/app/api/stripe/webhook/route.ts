@@ -79,6 +79,11 @@ export async function POST(request: Request) {
 
     if (event.type === "customer.subscription.updated") {
       const subscription = event.data.object as Stripe.Subscription;
+      const stripeSubscription = subscription as Stripe.Subscription & {
+        current_period_start?: number;
+        current_period_end?: number;
+        cancel_at_period_end?: boolean;
+      };
       const matched = await getSubscriptionByStripeCustomerId(String(subscription.customer));
 
       if (matched) {
@@ -88,9 +93,13 @@ export async function POST(request: Request) {
           stripeSubscriptionId: subscription.id,
           plan: matched.plan,
           status: mapStripeStatusToInternal(subscription.status),
-          currentPeriodStart: new Date(subscription.current_period_start * 1000),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-          cancelAtPeriodEnd: subscription.cancel_at_period_end,
+          currentPeriodStart: stripeSubscription.current_period_start
+            ? new Date(stripeSubscription.current_period_start * 1000)
+            : null,
+          currentPeriodEnd: stripeSubscription.current_period_end
+            ? new Date(stripeSubscription.current_period_end * 1000)
+            : null,
+          cancelAtPeriodEnd: Boolean(stripeSubscription.cancel_at_period_end),
         });
       }
     }

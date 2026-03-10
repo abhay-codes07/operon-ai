@@ -1,8 +1,8 @@
-import type { AgentCostEventType } from "@prisma/client";
-
 import { getModelCostPerToken } from "@/lib/finops/cost-rates";
 import { finopsRates } from "@/lib/finops/cost-rates";
 import { prisma } from "@/server/db/client";
+
+type AgentCostEventType = "LLM_CALL" | "BROWSER_RUNTIME" | "RETRY" | "SELF_HEALING";
 
 async function resolveExecutionCostContext(runId: string) {
   return prisma.execution.findUnique({

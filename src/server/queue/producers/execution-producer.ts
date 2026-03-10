@@ -6,15 +6,15 @@ import { getQueueRedisConnection } from "../connection";
 import { executionJobName, type ExecutionJobData } from "../jobs/execution-job";
 import { getQueueName } from "../names";
 
-let executionQueue: Queue<ExecutionJobData> | null = null;
+let executionQueue: Queue<any> | null = null;
 
-export function getExecutionQueue(): Queue<ExecutionJobData> {
+export function getExecutionQueue(): Queue<any> {
   if (executionQueue) {
     return executionQueue;
   }
 
-  executionQueue = new Queue<ExecutionJobData>(getQueueName("execution"), {
-    connection: getQueueRedisConnection(),
+  executionQueue = new Queue(getQueueName("execution"), {
+    connection: getQueueRedisConnection() as any,
   });
 
   return executionQueue;

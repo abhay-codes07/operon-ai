@@ -104,7 +104,7 @@ export function ShieldBaselineForm({
         <Button type="submit" disabled={saving}>
           {saving ? "Saving..." : "Save Baseline"}
         </Button>
-        <Button type="button" variant="outline" onClick={onInfer} disabled={inferring || saving}>
+        <Button type="button" variant="secondary" onClick={onInfer} disabled={inferring || saving}>
           {inferring ? "Inferring..." : "Infer from Workflow"}
         </Button>
         {status ? <p className="text-xs text-slate-600">{status}</p> : null}

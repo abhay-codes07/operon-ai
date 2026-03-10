@@ -26,7 +26,7 @@ export async function GET(request: Request) {
 
     const items = await listComplianceViolations(user.organizationId!);
     const filtered = parsed.data.workflowId
-      ? items.filter((item) => item.workflowId === parsed.data.workflowId)
+      ? items.filter((item: { workflowId: string }) => item.workflowId === parsed.data.workflowId)
       : items;
     const sliced = typeof parsed.data.limit === "number" ? filtered.slice(0, parsed.data.limit) : filtered;
 

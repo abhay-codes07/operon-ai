@@ -28,7 +28,7 @@ const createTemplateSchema = z.object({
   pricingModel: z.enum(["FREE", "PAID"]).default("FREE"),
   priceUsd: z.number().min(0).optional(),
   version: z.string().trim().min(1),
-  workflowDefinition: z.record(z.unknown()),
+  workflowDefinition: z.record(z.string(), z.unknown()),
   changelog: z.string().trim().optional(),
 });
 

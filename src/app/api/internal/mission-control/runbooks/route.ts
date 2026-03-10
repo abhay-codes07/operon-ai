@@ -13,7 +13,7 @@ const createRunbookBodySchema = z.object({
     .array(
       z.object({
         action: z.enum(["retry_login", "refresh_session", "fallback_selector", "notify_user"]),
-        config: z.record(z.any()).optional(),
+        config: z.record(z.string(), z.any()).optional(),
       }),
     )
     .min(1),

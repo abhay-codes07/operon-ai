@@ -35,7 +35,8 @@ export function CompetitorManager({ initialItems }: CompetitorManagerProps): JSX
       return;
     }
 
-    setItems((current) => [payload.competitor, ...current]);
+    const competitor = payload.competitor;
+    setItems((current) => [competitor, ...current]);
     setName("");
     setWebsite("");
     setState({ loading: false });

@@ -42,7 +42,7 @@ export async function GET(_request: Request, context: RouteContext) {
     return structuredApiError(404, "PASSPORT_REPORT_NOT_FOUND", "Compliance passport report could not be generated");
   }
 
-  return new NextResponse(buffer, {
+  return new NextResponse(new Uint8Array(buffer), {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",

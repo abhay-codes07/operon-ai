@@ -1,4 +1,5 @@
-import type { FleetStatus, HealthStatus } from "@prisma/client";
+type FleetStatus = "RUNNING" | "IDLE" | "FAILED" | "RETRYING";
+type HealthStatus = "HEALTHY" | "DEGRADED" | "CRITICAL";
 
 const fleetStyle: Record<FleetStatus, string> = {
   RUNNING: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",

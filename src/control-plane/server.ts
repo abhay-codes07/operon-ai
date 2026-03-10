@@ -65,18 +65,18 @@ async function run() {
       occurredAt: string;
     };
 
-    for (const subscription of subscriptions) {
+    subscriptions.forEach((subscription) => {
       if (subscription.organizationId !== parsed.organizationId) {
-        continue;
+        return;
       }
       if (subscription.executionId && subscription.executionId !== parsed.executionId) {
-        continue;
+        return;
       }
 
       if (subscription.socket.readyState === subscription.socket.OPEN) {
         subscription.socket.send(JSON.stringify(parsed));
       }
-    }
+    });
   });
 
   server.listen(port, () => {

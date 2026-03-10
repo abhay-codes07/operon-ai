@@ -1,7 +1,7 @@
-import type { SLABreachType } from "@prisma/client";
-
 import { prisma } from "@/server/db/client";
 import { logInfo } from "@/server/observability/logger";
+
+type SLABreachType = "FAILURE_RATE" | "EXECUTION_TIMEOUT" | "MISSED_SCHEDULE";
 
 export async function createIncident(input: {
   organizationId: string;

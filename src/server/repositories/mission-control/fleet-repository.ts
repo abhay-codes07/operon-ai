@@ -1,6 +1,7 @@
-import type { FleetStatus, HealthStatus } from "@prisma/client";
-
 import { prisma } from "@/server/db/client";
+
+type FleetStatus = "RUNNING" | "IDLE" | "FAILED" | "RETRYING";
+type HealthStatus = "HEALTHY" | "DEGRADED" | "CRITICAL";
 
 export async function appendAgentStatusSnapshot(input: {
   organizationId: string;

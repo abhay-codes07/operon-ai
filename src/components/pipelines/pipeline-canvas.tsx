@@ -37,6 +37,9 @@ export function PipelineCanvas({ steps }: PipelineCanvasProps): JSX.Element {
 
     const next = [...ordered];
     const [moved] = next.splice(sourceIndex, 1);
+    if (!moved) {
+      return;
+    }
     next.splice(targetIndex, 0, moved);
     setOrdered(
       next.map((step, index) => ({
@@ -72,7 +75,8 @@ export function PipelineCanvas({ steps }: PipelineCanvasProps): JSX.Element {
             <p className="text-sm font-semibold text-slate-900">{step.agentName}</p>
             <p className="text-xs text-slate-600">Agent ID: {step.agentId}</p>
             <p className="mt-1 text-xs text-slate-600">
-              Input keys: {Object.keys(step.inputMapping ?? {}).length} • Output keys: {Object.keys(step.outputMapping ?? {}).length}
+              Input keys: {Object.keys(step.inputMapping ?? {}).length} | Output keys:{" "}
+              {Object.keys(step.outputMapping ?? {}).length}
             </p>
           </article>
         ))}
@@ -85,7 +89,9 @@ export function PipelineCanvas({ steps }: PipelineCanvasProps): JSX.Element {
         ) : (
           <div className="mt-1 space-y-1 text-xs text-slate-700">
             {connections.map((connection) => (
-              <p key={`${connection.from}-${connection.to}`}>{connection.from.slice(-6)} → {connection.to.slice(-6)}</p>
+              <p key={`${connection.from}-${connection.to ?? "none"}`}>
+                {connection.from.slice(-6)} to {(connection.to ?? "none").slice(-6)}
+              </p>
             ))}
           </div>
         )}

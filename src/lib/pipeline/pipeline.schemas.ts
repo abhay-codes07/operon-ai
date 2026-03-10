@@ -3,8 +3,8 @@ import { z } from "zod";
 export const pipelineStepSchema = z.object({
   agentId: z.string().trim().min(1),
   stepOrder: z.number().int().min(1),
-  inputMapping: z.record(z.unknown()).default({}),
-  outputMapping: z.record(z.unknown()).default({}),
+  inputMapping: z.record(z.string(), z.unknown()).default({}),
+  outputMapping: z.record(z.string(), z.unknown()).default({}),
 });
 
 export const createPipelineSchema = z.object({
@@ -14,7 +14,7 @@ export const createPipelineSchema = z.object({
 });
 
 export const startPipelineSchema = z.object({
-  input: z.record(z.unknown()).optional().default({}),
+  input: z.record(z.string(), z.unknown()).optional().default({}),
 });
 
 export type PipelineStepInput = z.infer<typeof pipelineStepSchema>;

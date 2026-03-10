@@ -1,5 +1,20 @@
 import { prisma } from "@/server/db/client";
 
+export type ShieldSummary = {
+  totalEvents: number;
+  severity: {
+    CRITICAL: number;
+    HIGH: number;
+    MEDIUM: number;
+    LOW: number;
+  };
+  hotWorkflows: Array<{
+    workflowId: string;
+    workflowName: string;
+    count: number;
+  }>;
+};
+
 export async function getShieldSummary(organizationId: string) {
   const [totalEvents, criticalEvents, highEvents, mediumEvents, lowEvents, latestEvents] = await Promise.all([
     prisma.promptInjectionEvent.count({
@@ -70,9 +85,9 @@ export async function getShieldSummary(organizationId: string) {
     : [];
   const workflowNameMap = new Map(workflowNameRows.map((item) => [item.id, item.name]));
   const hotWorkflows = hotWorkflowIds.map((item) => ({
-    workflowId: item.workflowId,
-    workflowName: workflowNameMap.get(item.workflowId) ?? "Unknown workflow",
-    count: item.count,
+    workflowId: String(item.workflowId),
+    workflowName: String(workflowNameMap.get(item.workflowId) ?? "Unknown workflow"),
+    count: Number(item.count),
   }));
 
   return {
@@ -84,5 +99,5 @@ export async function getShieldSummary(organizationId: string) {
       LOW: lowEvents,
     },
     hotWorkflows,
-  };
+  } satisfies ShieldSummary;
 }

@@ -23,9 +23,9 @@ export async function GET(request: Request) {
 
   const agents = await fetchAgentCatalog({
     organizationId: user.organizationId!,
-    status,
     page,
     pageSize,
+    ...(status ? { status } : {}),
   });
 
   return NextResponse.json(agents);
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     organizationId: user.organizationId!,
     createdById: user.id,
     name: data.name,
-    description: data.description,
+    ...(data.description ? { description: data.description } : {}),
   });
 
   return NextResponse.json(agent, { status: 201 });

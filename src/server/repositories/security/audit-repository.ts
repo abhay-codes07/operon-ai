@@ -1,6 +1,8 @@
-import type { AuditResult, PolicyDecision, RiskLevel } from "@prisma/client";
-
 import { prisma } from "@/server/db/client";
+
+type AuditResult = "APPROVED" | "BLOCKED" | "FAILED";
+type PolicyDecision = "ALLOW" | "DENY";
+type RiskLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 export async function createExecutionAudit(input: {
   organizationId: string;

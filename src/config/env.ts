@@ -8,6 +8,7 @@ export type AppEnv = {
   STRIPE_WEBHOOK_SECRET: string;
   STRIPE_PRICE_STARTER: string;
   STRIPE_PRICE_GROWTH: string;
+  SLACK_WEBHOOK_URL?: string;
   TINYFISH_API_KEY: string;
   TINYFISH_BASE_URL: string;
   TINYFISH_EXECUTE_PATH: string;
@@ -111,6 +112,7 @@ export function getAppEnv(): AppEnv {
     STRIPE_WEBHOOK_SECRET: readRequiredEnv("STRIPE_WEBHOOK_SECRET"),
     STRIPE_PRICE_STARTER: readRequiredEnv("STRIPE_PRICE_STARTER"),
     STRIPE_PRICE_GROWTH: readRequiredEnv("STRIPE_PRICE_GROWTH"),
+    SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL?.trim() || undefined,
     TINYFISH_API_KEY: readRequiredEnv("TINYFISH_API_KEY"),
     TINYFISH_BASE_URL: readRequiredEnv("TINYFISH_BASE_URL"),
     TINYFISH_EXECUTE_PATH: readRequiredEnv("TINYFISH_EXECUTE_PATH"),

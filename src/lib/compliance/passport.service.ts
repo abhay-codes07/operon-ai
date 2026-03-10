@@ -1,5 +1,3 @@
-import type { ComplianceActionType } from "@prisma/client";
-
 import { prisma } from "@/server/db/client";
 import { computeComplianceRisk } from "@/lib/compliance/risk";
 
@@ -31,9 +29,13 @@ export async function generatePlainEnglishSummary(workflowId: string) {
     orderBy: { timestamp: "asc" },
   });
 
-  const domains = [...new Set(events.map((event) => event.domainVisited).filter(Boolean))] as string[];
+  const domains = Array.from(
+    new Set(events.map((event) => event.domainVisited).filter((value): value is string => Boolean(value))),
+  );
   const actions = events.map((event) => event.actionType);
-  const dataCategories = [...new Set(events.map((event) => event.dataCategory).filter(Boolean))] as string[];
+  const dataCategories = Array.from(
+    new Set(events.map((event) => event.dataCategory).filter((value): value is string => Boolean(value))),
+  );
   const extractCount = events.filter((event) => event.actionType === "EXTRACT").length;
   const writeCount = events.filter((event) => event.actionType === "WRITE" || event.actionType === "SUBMIT").length;
 

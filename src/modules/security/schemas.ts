@@ -7,7 +7,7 @@ export const organizationPolicySchema = z.object({
   allowedWindowEndHr: z.number().int().min(0).max(23).optional(),
   timezone: z.string().min(2).max(80).default("UTC"),
   requireHttps: z.boolean().default(true),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type OrganizationPolicy = z.infer<typeof organizationPolicySchema>;
@@ -20,7 +20,7 @@ export const secureAgentPolicySchema = z.object({
   timezone: z.string().min(2).max(80).default("UTC"),
   domainAllowlist: z.array(z.string().min(1)).max(200).default([]),
   actionAllowlist: z.array(z.string().min(1)).max(200).default([]),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type SecureAgentPolicy = z.infer<typeof secureAgentPolicySchema>;

@@ -3,11 +3,17 @@ import { prisma } from "@/server/db/client";
 import type { MonitoringTask } from "@/lib/competitor/agent-launcher.service";
 
 function estimateHeadcountFromPage(html: string): number {
-  const numberMatches = [...html.matchAll(/\b([1-9][0-9]{1,5})\b/g)].map((match) => Number(match[1]));
+  const numberMatches: number[] = [];
+  const pattern = /\b([1-9][0-9]{1,5})\b/g;
+  let match: RegExpExecArray | null = pattern.exec(html);
+  while (match) {
+    numberMatches.push(Number(match[1]));
+    match = pattern.exec(html);
+  }
   if (numberMatches.length === 0) {
     return 0;
   }
-  return numberMatches.sort((a, b) => b - a)[0];
+  return numberMatches.sort((a, b) => b - a)[0] ?? 0;
 }
 
 export async function runHeadcountMonitorAgent(task: MonitoringTask) {

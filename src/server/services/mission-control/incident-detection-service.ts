@@ -1,5 +1,3 @@
-import type { IncidentSeverity } from "@prisma/client";
-
 import {
   appendIncidentEvent,
   countIncidentsInWindow,
@@ -7,6 +5,8 @@ import {
   listRecentIncidents,
   markIncidentResolved,
 } from "@/server/repositories/mission-control/incident-repository";
+
+type IncidentSeverity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 type IncidentSignal = {
   organizationId: string;

@@ -14,7 +14,7 @@ const upsertPolicyBodySchema = z.object({
   timezone: z.string().trim().min(2).max(80).default("UTC"),
   domainAllowlist: z.array(z.string().trim().min(1)).default([]),
   actionAllowlist: z.array(z.string().trim().min(1)).default([]),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export async function GET() {

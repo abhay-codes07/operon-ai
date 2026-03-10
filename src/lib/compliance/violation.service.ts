@@ -104,7 +104,10 @@ export async function detectComplianceViolationsForRun(input: {
   const allowlist = (policy?.domainAllowlist as string[] | undefined) ?? [];
   const violations = [] as Array<{ violationType: string; description: string }>;
 
-  for (const domain of [...new Set(events.map((event) => event.domainVisited).filter(Boolean))] as string[]) {
+  const visitedDomains = Array.from(
+    new Set(events.map((event) => event.domainVisited).filter((value): value is string => Boolean(value))),
+  ) as string[];
+  for (const domain of visitedDomains) {
     if (allowlist.length > 0 && !allowlist.includes(domain.toLowerCase())) {
       violations.push({
         violationType: "DOMAIN_OUTSIDE_ALLOWLIST",

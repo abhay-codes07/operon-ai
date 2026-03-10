@@ -20,7 +20,7 @@ export async function GET(request: Request) {
   }
 
   const incidents = await listIncidentsByOrganization(user.organizationId!);
-  const filtered = incidents.filter((item) => {
+  const filtered = incidents.filter((item: { workflowId: string | null; resolvedAt: Date | null }) => {
     if (parsed.data.workflowId && item.workflowId !== parsed.data.workflowId) {
       return false;
     }

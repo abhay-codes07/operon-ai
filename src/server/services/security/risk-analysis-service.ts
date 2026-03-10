@@ -1,6 +1,6 @@
-import type { RiskLevel } from "@prisma/client";
-
 import { countRecentAgentAudits } from "@/server/repositories/security/audit-repository";
+
+type RiskLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 function toRiskLevel(score: number): RiskLevel {
   if (score >= 80) {

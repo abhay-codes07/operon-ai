@@ -1,5 +1,3 @@
-import type { ShieldSeverity } from "@prisma/client";
-
 import { prisma } from "@/server/db/client";
 import { appendExecutionEvent } from "@/server/services/executions/execution-service";
 import { publishExecutionStreamEvent } from "@/server/services/control-plane/streaming-service";
@@ -16,6 +14,8 @@ function toSeverity(riskScore: number): ShieldSeverity {
   }
   return "LOW";
 }
+
+type ShieldSeverity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 export async function logPromptInjectionEvent(input: {
   organizationId: string;

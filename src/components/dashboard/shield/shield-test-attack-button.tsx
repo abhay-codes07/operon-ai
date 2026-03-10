@@ -30,7 +30,7 @@ export function ShieldTestAttackButton(): JSX.Element {
 
   return (
     <div className="flex items-center gap-3">
-      <Button type="button" variant="outline" onClick={runTest} disabled={running}>
+      <Button type="button" variant="secondary" onClick={runTest} disabled={running}>
         {running ? "Running..." : "Run Demo Attack"}
       </Button>
       {message ? <p className="text-xs text-slate-600">{message}</p> : null}

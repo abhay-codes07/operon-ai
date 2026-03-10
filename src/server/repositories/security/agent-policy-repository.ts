@@ -1,6 +1,6 @@
-import type { PolicyRuleType } from "@prisma/client";
-
 import { prisma } from "@/server/db/client";
+
+type PolicyRuleType = "DOMAIN_ALLOWLIST" | "ACTION_ALLOWLIST";
 
 export async function getAgentPolicy(input: { organizationId: string; agentId: string }) {
   return prisma.agentPolicy.findUnique({

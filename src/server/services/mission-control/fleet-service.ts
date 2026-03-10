@@ -1,10 +1,11 @@
-import type { FleetStatus, HealthStatus } from "@prisma/client";
-
 import {
   appendAgentHealthRecord,
   appendAgentStatusSnapshot,
   listFleetSnapshot,
 } from "@/server/repositories/mission-control/fleet-repository";
+
+type FleetStatus = "RUNNING" | "IDLE" | "FAILED" | "RETRYING";
+type HealthStatus = "HEALTHY" | "DEGRADED" | "CRITICAL";
 
 function toHealthStatusFromFleetStatus(status: FleetStatus): HealthStatus {
   if (status === "FAILED") {

@@ -1,6 +1,7 @@
-import type { MarketplacePricingModel, Prisma, TemplateInstallationStatus } from "@prisma/client";
-
 import { prisma } from "@/server/db/client";
+
+type MarketplacePricingModel = "FREE" | "PAID";
+type TemplateInstallationStatus = "ACTIVE" | "PAUSED";
 
 export type MarketplaceTemplateFilters = {
   query?: string;
@@ -15,7 +16,7 @@ export async function listTemplates(filters: MarketplaceTemplateFilters = {}) {
   const page = Math.max(1, filters.page ?? 1);
   const pageSize = Math.min(100, Math.max(1, filters.pageSize ?? 20));
 
-  const where: Prisma.MarketplaceTemplateWhereInput = {
+  const where: Record<string, unknown> = {
     category: filters.category,
     pricingModel: filters.pricingModel,
     reliabilityScore:

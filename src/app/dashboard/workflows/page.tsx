@@ -76,7 +76,15 @@ export default async function DashboardWorkflowsPage({
     : [];
   const approvedWorkflowIds = new Set(activeApprovals.map((item) => item.workflowId));
   const unapprovedCount = workflowIds.filter((id) => !approvedWorkflowIds.has(id)).length;
-  const slaMap = new Map(slaRows.map((row) => [row.workflowId, row]));
+  const slaMap = new Map<string, { workflowId: string; maxFailureRate: number }>(
+    slaRows.map((row) => [
+      row.workflowId,
+      {
+        workflowId: row.workflowId,
+        maxFailureRate: Number(row.maxFailureRate),
+      },
+    ]),
+  );
   const incidentCountMap = new Map<string, number>();
   for (const incident of incidentRows) {
     incidentCountMap.set(incident.workflowId, (incidentCountMap.get(incident.workflowId) ?? 0) + 1);
@@ -131,7 +139,7 @@ export default async function DashboardWorkflowsPage({
             const hasSla = slaMap.has(item.id);
             const breaches = incidentCountMap.get(item.id) ?? 0;
             const sla = slaMap.get(item.id);
-            const warning = hasSla && breaches === 0 && (sla?.maxFailureRate ?? 0) <= 0.1;
+            const warning = hasSla && breaches === 0 && Number(sla?.maxFailureRate ?? 0) <= 0.1;
             return {
               ...item,
               hasSla,

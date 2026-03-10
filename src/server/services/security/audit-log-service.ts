@@ -1,6 +1,6 @@
-import type { AuditResult } from "@prisma/client";
-
 import { listExecutionAudits } from "@/server/repositories/security/audit-repository";
+
+type AuditResult = "APPROVED" | "BLOCKED" | "FAILED";
 
 export async function fetchAuditLogs(input: {
   organizationId: string;

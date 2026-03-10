@@ -1,6 +1,11 @@
-import type { CompetitorSignalType } from "@prisma/client";
-
 import { detectMeaningfulSignals } from "@/lib/intelligence/signal.service";
+
+type CompetitorSignalType =
+  | "PRICING_CHANGE"
+  | "FEATURE_CHANGE"
+  | "REVIEW_SENTIMENT"
+  | "JOB_POSTING"
+  | "HEADCOUNT_CHANGE";
 
 type Insight = {
   title: string;

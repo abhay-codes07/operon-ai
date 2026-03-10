@@ -1,6 +1,6 @@
-import type { FleetStatus } from "@prisma/client";
-
 import { prisma } from "@/server/db/client";
+
+type FleetStatus = "RUNNING" | "IDLE" | "FAILED" | "RETRYING";
 
 export async function upsertAgentDeployment(input: {
   organizationId: string;

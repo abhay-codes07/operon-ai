@@ -6,7 +6,7 @@ export const createExecutionInputSchema = z.object({
   workflowId: z.string().cuid().optional(),
   requestedById: z.string().cuid().optional(),
   trigger: z.enum(["MANUAL", "SCHEDULED", "API", "RETRY"]).default("MANUAL"),
-  inputPayload: z.record(z.unknown()).optional(),
+  inputPayload: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const appendExecutionLogInputSchema = z.object({
@@ -14,7 +14,7 @@ export const appendExecutionLogInputSchema = z.object({
   executionId: z.string().cuid(),
   level: z.enum(["DEBUG", "INFO", "WARN", "ERROR"]).default("INFO"),
   message: z.string().min(1).max(5000),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const upsertExecutionStepsInputSchema = z.object({
@@ -27,7 +27,7 @@ export const upsertExecutionStepsInputSchema = z.object({
       action: z.string().min(1).max(120),
       target: z.string().min(1).max(240).optional(),
       status: z.enum(["PENDING", "RUNNING", "SUCCEEDED", "FAILED", "SKIPPED"]).default("PENDING"),
-      metadata: z.record(z.unknown()).optional(),
+      metadata: z.record(z.string(), z.unknown()).optional(),
       startedAt: z.date().optional(),
       finishedAt: z.date().optional(),
     }),
@@ -40,7 +40,7 @@ export const createDomSnapshotInputSchema = z.object({
   executionStepId: z.string().cuid().optional(),
   pageUrl: z.string().url().optional(),
   domHtml: z.string().min(1),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type CreateExecutionInput = z.infer<typeof createExecutionInputSchema>;

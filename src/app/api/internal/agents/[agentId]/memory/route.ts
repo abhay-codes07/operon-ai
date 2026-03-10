@@ -27,7 +27,7 @@ export async function GET(request: Request, context: RouteContext) {
   const memory = await fetchAgentMemoryContext({
     organizationId: user.organizationId!,
     agentId: parsedParams.data.agentId,
-    workflowId,
+    ...(workflowId ? { workflowId } : {}),
   });
 
   return NextResponse.json({

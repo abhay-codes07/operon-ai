@@ -21,15 +21,16 @@ function cronLikelyMissed(lastRunAt: Date | null, cron: string): boolean {
   if (parts.length !== 5) {
     return false;
   }
+  const minutePart = parts[0] ?? "";
 
-  if (parts[0].startsWith("*/")) {
-    const intervalMinutes = Number(parts[0].slice(2));
+  if (minutePart.startsWith("*/")) {
+    const intervalMinutes = Number(minutePart.slice(2));
     if (!Number.isNaN(intervalMinutes) && intervalMinutes > 0) {
       return elapsedMs > intervalMinutes * 60 * 1000 * 2;
     }
   }
 
-  if (parts[0] === "0") {
+  if (minutePart === "0") {
     return elapsedMs > 2 * 60 * 60 * 1000;
   }
 

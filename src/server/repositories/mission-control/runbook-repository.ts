@@ -1,6 +1,6 @@
-import type { RunbookExecutionStatus } from "@prisma/client";
-
 import { prisma } from "@/server/db/client";
+
+type RunbookExecutionStatus = "QUEUED" | "RUNNING" | "SUCCEEDED" | "FAILED";
 
 export async function listRunbooks(input: { organizationId: string; enabledOnly?: boolean }) {
   return prisma.runbook.findMany({

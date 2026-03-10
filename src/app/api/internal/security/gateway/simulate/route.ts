@@ -9,7 +9,7 @@ const bodySchema = z.object({
   agentId: z.string().trim().min(1),
   action: z.string().trim().min(1),
   target: z.string().trim().optional(),
-  payload: z.record(z.unknown()).optional(),
+  payload: z.record(z.string(), z.unknown()).optional(),
 });
 
 export async function POST(request: Request) {

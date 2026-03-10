@@ -5,7 +5,7 @@ export const createAgentInputSchema = z.object({
   createdById: z.string().cuid(),
   name: z.string().min(2).max(120),
   description: z.string().max(1000).optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const updateAgentStatusInputSchema = z.object({
