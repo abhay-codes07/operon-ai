@@ -1,18 +1,15 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
-
 import { structuredApiError } from "@/app/api/_lib/structured-error";
 import { listShieldEvents } from "@/lib/shield/event.service";
+import { shieldEventsQuerySchema } from "@/lib/shield/schemas";
 import { requireOrganizationRole } from "@/server/auth/authorization";
-
-const querySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(200).optional(),
-});
 
 export async function GET(request: Request) {
   try {
     const user = await requireOrganizationRole("MEMBER");
-    const parsed = querySchema.safeParse(Object.fromEntries(new URL(request.url).searchParams.entries()));
+    const parsed = shieldEventsQuerySchema.safeParse(
+      Object.fromEntries(new URL(request.url).searchParams.entries()),
+    );
     if (!parsed.success) {
       return structuredApiError(400, "INVALID_QUERY", "Invalid shield events query", {
         issues: parsed.error.flatten(),
@@ -22,6 +19,9 @@ export async function GET(request: Request) {
     const items = await listShieldEvents({
       organizationId: user.organizationId!,
       limit: parsed.data.limit,
+      workflowId: parsed.data.workflowId,
+      runId: parsed.data.runId,
+      severity: parsed.data.severity,
     });
 
     return NextResponse.json({ items });

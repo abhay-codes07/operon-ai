@@ -1,14 +1,8 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
-
 import { structuredApiError } from "@/app/api/_lib/structured-error";
 import { createShieldPolicy, listShieldPolicies } from "@/lib/shield/policy.service";
+import { shieldPolicyPayloadSchema } from "@/lib/shield/schemas";
 import { requireOrganizationRole } from "@/server/auth/authorization";
-
-const policySchema = z.object({
-  allowedDomains: z.array(z.string().trim().min(1)).default([]),
-  blockedActions: z.array(z.string().trim().min(1)).default([]),
-});
 
 export async function GET() {
   try {
@@ -26,7 +20,7 @@ export async function POST(request: Request) {
   try {
     const user = await requireOrganizationRole("ADMIN");
     const payload = await request.json();
-    const parsed = policySchema.safeParse(payload);
+    const parsed = shieldPolicyPayloadSchema.safeParse(payload);
     if (!parsed.success) {
       return structuredApiError(400, "INVALID_SHIELD_POLICY_PAYLOAD", "Invalid shield policy payload", {
         issues: parsed.error.flatten(),
