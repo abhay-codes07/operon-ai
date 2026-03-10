@@ -21,6 +21,10 @@ import {
   startIntelligenceMonitorWorker,
   stopIntelligenceMonitorWorker,
 } from "@/server/queue/workers/intelligence-monitor.worker";
+import {
+  startShieldMonitorWorker,
+  stopShieldMonitorWorker,
+} from "@/server/queue/workers/shield-monitor.worker";
 
 async function bootstrapWorker() {
   console.log("Starting WebOps AI execution worker...");
@@ -31,6 +35,7 @@ async function bootstrapWorker() {
   startPipelineRunnerWorker();
   startCostMonitorWorker();
   startIntelligenceMonitorWorker();
+  startShieldMonitorWorker();
 
   const shutdown = async (signal: string) => {
     console.log(`Received ${signal}, shutting down worker...`);
@@ -41,6 +46,7 @@ async function bootstrapWorker() {
     await stopPipelineRunnerWorker();
     await stopCostMonitorWorker();
     await stopIntelligenceMonitorWorker();
+    await stopShieldMonitorWorker();
     await closeQueueRedisConnection();
     process.exit(0);
   };
