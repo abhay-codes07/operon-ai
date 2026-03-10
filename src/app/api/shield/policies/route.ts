@@ -1,0 +1,48 @@
+import { NextResponse } from "next/server";
+import { z } from "zod";
+
+import { structuredApiError } from "@/app/api/_lib/structured-error";
+import { createShieldPolicy, listShieldPolicies } from "@/lib/shield/policy.service";
+import { requireOrganizationRole } from "@/server/auth/authorization";
+
+const policySchema = z.object({
+  allowedDomains: z.array(z.string().trim().min(1)).default([]),
+  blockedActions: z.array(z.string().trim().min(1)).default([]),
+});
+
+export async function GET() {
+  try {
+    const user = await requireOrganizationRole("MEMBER");
+    const items = await listShieldPolicies(user.organizationId!);
+    return NextResponse.json({ items });
+  } catch (error) {
+    return structuredApiError(500, "SHIELD_POLICIES_FETCH_FAILED", "Failed to fetch shield policies", {
+      reason: error instanceof Error ? error.message : "unknown_error",
+    });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const user = await requireOrganizationRole("ADMIN");
+    const payload = await request.json();
+    const parsed = policySchema.safeParse(payload);
+    if (!parsed.success) {
+      return structuredApiError(400, "INVALID_SHIELD_POLICY_PAYLOAD", "Invalid shield policy payload", {
+        issues: parsed.error.flatten(),
+      });
+    }
+
+    const item = await createShieldPolicy({
+      organizationId: user.organizationId!,
+      allowedDomains: parsed.data.allowedDomains,
+      blockedActions: parsed.data.blockedActions,
+    });
+
+    return NextResponse.json({ item }, { status: 201 });
+  } catch (error) {
+    return structuredApiError(500, "SHIELD_POLICY_CREATE_FAILED", "Failed to create shield policy", {
+      reason: error instanceof Error ? error.message : "unknown_error",
+    });
+  }
+}
