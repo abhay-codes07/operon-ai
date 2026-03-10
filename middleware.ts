@@ -2,7 +2,15 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const protectedPrefixes = ["/dashboard", "/pipelines", "/api/internal", "/api/pipelines", "/api/finops", "/api/intelligence"];
+const protectedPrefixes = [
+  "/dashboard",
+  "/pipelines",
+  "/api/internal",
+  "/api/pipelines",
+  "/api/finops",
+  "/api/intelligence",
+  "/api/shield",
+];
 const authPrefixes = ["/auth/sign-in", "/auth/sign-up"];
 
 function startsWithPrefix(pathname: string, prefixes: string[]): boolean {
@@ -35,6 +43,7 @@ export const config = {
     "/api/pipelines/:path*",
     "/api/finops/:path*",
     "/api/intelligence/:path*",
+    "/api/shield/:path*",
     "/auth/sign-in",
     "/auth/sign-up",
   ],

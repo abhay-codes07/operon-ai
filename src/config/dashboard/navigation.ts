@@ -85,6 +85,11 @@ export const dashboardNav = [
     description: "Operational guardrails",
   },
   {
+    href: "/dashboard/shield",
+    label: "Shield",
+    description: "Prompt injection defense",
+  },
+  {
     href: "/dashboard/compliance",
     label: "Compliance",
     description: "Approvals and passport audit",

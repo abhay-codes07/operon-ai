@@ -71,6 +71,9 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
                   <Link href={`/workflows/${workflow.id}/finops`} className="text-slate-700 hover:underline">
                     FinOps
                   </Link>
+                  <Link href={`/workflows/${workflow.id}/shield`} className="text-slate-700 hover:underline">
+                    Shield
+                  </Link>
                 </div>
               </td>
               <td className="px-4 py-3">
