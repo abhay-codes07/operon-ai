@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { ShieldEventsTable } from "@/components/dashboard/shield/shield-events-table";
 import { ShieldBaselineForm } from "@/components/workflows/shield-baseline-form";
+import { WorkflowShieldStatus } from "@/components/workflows/workflow-shield-status";
 import { getBehaviorBaseline, latestShieldPolicy } from "@/lib/shield/policy.service";
+import { getWorkflowShieldStatus } from "@/lib/shield/workflow-status.service";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { prisma } from "@/server/db/client";
 
@@ -33,7 +35,7 @@ export default async function WorkflowShieldPage({ params }: WorkflowShieldPageP
     notFound();
   }
 
-  const [events, policy, baseline] = await Promise.all([
+  const [events, policy, baseline, shieldStatus] = await Promise.all([
     prisma.promptInjectionEvent.findMany({
       where: {
         workflowId: workflow.id,
@@ -59,6 +61,9 @@ export default async function WorkflowShieldPage({ params }: WorkflowShieldPageP
     }),
     latestShieldPolicy(user.organizationId!),
     getBehaviorBaseline(workflow.id),
+    getWorkflowShieldStatus({
+      workflowId: workflow.id,
+    }),
   ]);
 
   const definition = workflow.definition as {
@@ -80,6 +85,19 @@ export default async function WorkflowShieldPage({ params }: WorkflowShieldPageP
         <p className="text-sm text-slate-600">
           Trusted instruction boundaries, threat history, and enforcement posture.
         </p>
+        <WorkflowShieldStatus
+          workflowId={workflow.id}
+          initial={{
+            baselineConfigured: shieldStatus.baselineConfigured,
+            lastThreat: shieldStatus.lastThreat
+              ? {
+                  id: shieldStatus.lastThreat.id,
+                  severity: shieldStatus.lastThreat.severity,
+                  detectedAt: shieldStatus.lastThreat.detectedAt.toISOString(),
+                }
+              : null,
+          }}
+        />
       </div>
 
       <DashboardCard title="Trusted vs Untrusted Context">
