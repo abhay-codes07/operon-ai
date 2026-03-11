@@ -73,6 +73,8 @@ import { logBehaviorAnomalyEvent, logPromptInjectionEvent, logShieldPolicyViolat
 import { guardExecutionAction } from "@/lib/shield/execution-guard.service";
 import { scanDomContent } from "@/lib/shield/injection-detector.service";
 import { sendShieldAlert } from "@/lib/shield/alert.service";
+import { attemptSelfRepair } from "@/lib/autopilot/self-repair.service";
+import { updateMemoryFromRun } from "@/lib/autopilot/domain-memory.service";
 import {
   getBehaviorBaseline,
   inferBehaviorBaselineFromWorkflowDefinition,
@@ -598,12 +600,25 @@ export async function runExecutionWithTinyFish(
     });
 
     if (replayStep.status === "FAILED" && replayStep.target) {
+      const repairAttempt = await attemptSelfRepair({
+        orgId: input.organizationId,
+        runId: input.executionId,
+        workflowId: workflow.id,
+        domain: deriveDomain(replayStep.target) ?? workflow.id,
+        failedSelector: replayStep.target,
+        candidateSelectors: [replayStep.target, `[data-testid='${replayStep.stepKey}']`, `[aria-label*='${replayStep.action}']`],
+      }).catch(() => ({ repaired: false, reason: "repair_exception" }));
+      const repairedSelector =
+        repairAttempt.repaired && "selector" in repairAttempt && typeof repairAttempt.selector === "string"
+          ? repairAttempt.selector
+          : null;
+
       await registerSelectorFailure({
         organizationId: input.organizationId,
         workflowId: workflow.id,
         stepKey: replayStep.stepKey,
         originalSelector: replayStep.target,
-        alternativeSelector: healing.resolvedSelector ?? replayStep.target,
+        alternativeSelector: repairedSelector ?? healing.resolvedSelector ?? replayStep.target,
         confidence: healing.similarityScore ?? 0,
       });
     }
@@ -958,6 +973,17 @@ export async function runExecutionWithTinyFish(
 
   await updateWorkflowCostSummary(workflow.id).catch(() => null);
   await detectRunCostAnomaly(input.executionId).catch(() => null);
+  await updateMemoryFromRun({
+    orgId: input.organizationId,
+    domain: workflow.name.toLowerCase().replace(/\s+/g, "-"),
+    successfulSelectors: replaySteps
+      .map((step) => step.target)
+      .filter((value): value is string => typeof value === "string"),
+    visitedUrls: replaySteps
+      .map((step) => step.target)
+      .filter((value): value is string => typeof value === "string" && value.startsWith("http")),
+    repaired: healedSelectorsCount > 0,
+  }).catch(() => null);
 
   return {
     status: finalStatus,
