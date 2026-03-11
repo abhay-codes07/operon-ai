@@ -90,6 +90,28 @@ Progressive Workflow Delivery adds canary traffic routing, release health snapsh
 
 Operon Shield adds a dedicated prompt-injection defense layer that separates trusted workflow intent from untrusted web content at runtime, sanitizes context windows, and blocks unsafe execution paths before action dispatch.
 
+Operon Autopilot introduces learn-mode recording, workflow compilation, domain memory, and self-repair so operators can teach a flow once and keep it running as websites change.
+
+## Operon Autopilot
+
+Operon Autopilot converts live operator behavior into reusable workflow infrastructure.
+
+Operators record actions in Learn Mode, review the generated workflow, parameterize dynamic inputs, and approve it into the standard workflow runtime.
+
+Domain Memory stores working selectors and navigation patterns per domain. Self-repair logic uses that memory to recover from selector drift and logs repair events for review in the Autopilot dashboard.
+
+Autopilot API surface:
+
+- `POST /api/autopilot/start`
+- `POST /api/autopilot/action`
+- `POST /api/autopilot/finish`
+- `GET /api/autopilot/session/[id]`
+
+Autopilot UI surface:
+
+- `/autopilot/learn` for recording, compiling, reviewing, and approving workflows.
+- `/dashboard/autopilot` for learned session history, domain memory quality, and repair telemetry.
+
 ## Operon Shield
 
 Operon Shield is the runtime security layer for autonomous browser agents.
