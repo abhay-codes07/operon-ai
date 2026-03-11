@@ -170,7 +170,7 @@ export async function getAutopilotSession(orgId: string, sessionId: string) {
 export async function patchAutopilotSession(input: {
   orgId: string;
   sessionId: string;
-  status?: "REVIEW" | "APPROVED";
+  status?: "REVIEW" | "APPROVED" | "FAILED";
   compiledDefinition?: Record<string, unknown>;
   parameterSchema?: Record<string, unknown>;
 }) {

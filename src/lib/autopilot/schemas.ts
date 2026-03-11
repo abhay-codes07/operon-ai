@@ -71,7 +71,7 @@ export const autopilotListRepairEventsQuerySchema = z.object({
 });
 
 export const autopilotSessionPatchSchema = z.object({
-  status: z.enum(["REVIEW", "APPROVED"]).optional(),
+  status: z.enum(["REVIEW", "APPROVED", "FAILED"]).optional(),
   compiledDefinition: z.record(z.string(), z.unknown()).optional(),
   parameterSchema: z.record(z.string(), z.unknown()).optional(),
 });

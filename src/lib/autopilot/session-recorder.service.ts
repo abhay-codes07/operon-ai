@@ -146,7 +146,7 @@ export async function completeSession(input: {
 export async function updateSessionForReview(input: {
   sessionId: string;
   orgId: string;
-  status?: "REVIEW" | "APPROVED";
+  status?: "REVIEW" | "APPROVED" | "FAILED";
   compiledDefinition?: Record<string, unknown>;
   parameterSchema?: Record<string, unknown>;
   workflowFingerprint?: string;
