@@ -1,9 +1,11 @@
 import Link from "next/link";
 
 import { AutopilotDashboardPanel } from "@/components/dashboard/autopilot/autopilot-dashboard-panel";
+import { AutopilotLiveSummary } from "@/components/dashboard/autopilot/autopilot-live-summary";
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import {
+  getAutopilotSummary,
   listAutopilotRepairEvents,
   listDomainMemories,
   listRecentAutopilotSessions,
@@ -16,11 +18,19 @@ function toStringArray(value: unknown): string[] {
 
 export default async function DashboardAutopilotPage(): Promise<JSX.Element> {
   const user = await requireOrganizationRole("MEMBER");
-  const [sessions, memories, repairs] = await Promise.all([
+  const [sessions, memories, repairs, summary] = await Promise.all([
     listRecentAutopilotSessions(user.organizationId!, 30),
     listDomainMemories(user.organizationId!, 30),
     listAutopilotRepairEvents(user.organizationId!, 60),
+    getAutopilotSummary(user.organizationId!),
   ]);
+  const totalSessions = summary.sessionsByStatus.reduce((sum, item) => sum + item.count, 0);
+  const activeSessions = summary.sessionsByStatus
+    .filter((item) => item.status === "RECORDING")
+    .reduce((sum, item) => sum + item.count, 0);
+  const reviewSessions = summary.sessionsByStatus
+    .filter((item) => item.status === "REVIEW")
+    .reduce((sum, item) => sum + item.count, 0);
 
   return (
     <div className="space-y-5">
@@ -39,6 +49,17 @@ export default async function DashboardAutopilotPage(): Promise<JSX.Element> {
           </Link>
         }
       >
+        <div className="mb-4">
+          <AutopilotLiveSummary
+            initial={{
+              totalSessions,
+              activeSessions,
+              reviewSessions,
+              repairEvents: summary.repairEventCount,
+              averageRepairConfidence: summary.repairConfidenceAvg,
+            }}
+          />
+        </div>
         <AutopilotDashboardPanel
           sessions={sessions.map((session) => ({
             id: session.id,
