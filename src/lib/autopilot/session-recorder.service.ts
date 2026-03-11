@@ -140,3 +140,23 @@ export async function completeSession(input: {
     },
   });
 }
+
+export async function updateSessionForReview(input: {
+  sessionId: string;
+  orgId: string;
+  status?: "REVIEW" | "APPROVED";
+  compiledDefinition?: Record<string, unknown>;
+  parameterSchema?: Record<string, unknown>;
+}) {
+  return prisma.autopilotSession.updateMany({
+    where: {
+      id: input.sessionId,
+      orgId: input.orgId,
+    },
+    data: {
+      ...(input.status ? { status: input.status } : {}),
+      ...(input.compiledDefinition ? { compiledDefinition: input.compiledDefinition } : {}),
+      ...(input.parameterSchema ? { parameterSchema: input.parameterSchema } : {}),
+    },
+  });
+}

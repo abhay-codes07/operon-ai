@@ -6,6 +6,7 @@ import {
   setSessionReviewPayload,
   startRecording,
   storeAction,
+  updateSessionForReview,
 } from "@/lib/autopilot/session-recorder.service";
 import { updateMemoryFromRun } from "@/lib/autopilot/domain-memory.service";
 import { prisma } from "@/server/db/client";
@@ -145,4 +146,15 @@ export async function finishAutopilotSession(input: {
 
 export async function getAutopilotSession(orgId: string, sessionId: string) {
   return getSessionWithActions(sessionId, orgId);
+}
+
+export async function patchAutopilotSession(input: {
+  orgId: string;
+  sessionId: string;
+  status?: "REVIEW" | "APPROVED";
+  compiledDefinition?: Record<string, unknown>;
+  parameterSchema?: Record<string, unknown>;
+}) {
+  const updated = await updateSessionForReview(input);
+  return updated.count > 0;
 }

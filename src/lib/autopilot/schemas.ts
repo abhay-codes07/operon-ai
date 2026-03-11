@@ -69,3 +69,9 @@ export const autopilotListRepairEventsQuerySchema = z.object({
   workflowId: z.string().trim().min(1).optional(),
   runId: z.string().trim().min(1).optional(),
 });
+
+export const autopilotSessionPatchSchema = z.object({
+  status: z.enum(["REVIEW", "APPROVED"]).optional(),
+  compiledDefinition: z.record(z.string(), z.unknown()).optional(),
+  parameterSchema: z.record(z.string(), z.unknown()).optional(),
+});
