@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { structuredApiError } from "@/app/api/_lib/structured-error";
 import { getAutopilotSession, patchAutopilotSession } from "@/lib/autopilot/autopilot.service";
 import { autopilotSessionPatchSchema } from "@/lib/autopilot/schemas";
+import { canTransitionSessionStatus } from "@/lib/autopilot/session-state.service";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 
 type RouteContext = {
@@ -35,6 +36,17 @@ export async function PATCH(request: Request, context: RouteContext) {
     if (!parsed.success) {
       return structuredApiError(400, "INVALID_AUTOPILOT_SESSION_PATCH", "Invalid autopilot session patch payload", {
         issues: parsed.error.flatten(),
+      });
+    }
+
+    const existing = await getAutopilotSession(user.organizationId!, context.params.id);
+    if (!existing) {
+      return structuredApiError(404, "AUTOPILOT_SESSION_NOT_FOUND", "Autopilot session not found");
+    }
+    if (parsed.data.status && !canTransitionSessionStatus(existing.status, parsed.data.status)) {
+      return structuredApiError(409, "AUTOPILOT_INVALID_STATUS_TRANSITION", "Invalid autopilot session status transition", {
+        from: existing.status,
+        to: parsed.data.status,
       });
     }
 
