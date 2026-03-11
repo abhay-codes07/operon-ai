@@ -26,6 +26,19 @@ export async function attemptSelfRepair(input: {
   });
 
   if (validateRepair(similarityRepair, mergedCandidates)) {
+    await prisma.autopilotRepairEvent.create({
+      data: {
+        orgId: input.orgId,
+        workflowId: input.workflowId,
+        runId: input.runId,
+        domain: input.domain,
+        failedSelector: input.failedSelector,
+        repairedSelector: similarityRepair.selector,
+        strategy: "SELECTOR_SIMILARITY",
+        confidence: similarityRepair.confidence ?? 0,
+        success: true,
+      },
+    });
     await prisma.executionLog.create({
       data: {
         executionId: input.runId,
@@ -68,6 +81,19 @@ export async function attemptSelfRepair(input: {
       strategy: "text_match",
       confidence: 0.5,
     };
+    await prisma.autopilotRepairEvent.create({
+      data: {
+        orgId: input.orgId,
+        workflowId: input.workflowId,
+        runId: input.runId,
+        domain: input.domain,
+        failedSelector: input.failedSelector,
+        repairedSelector: repaired.selector,
+        strategy: "TEXT_MATCH",
+        confidence: repaired.confidence ?? 0,
+        success: true,
+      },
+    });
 
     await prisma.executionLog.create({
       data: {
