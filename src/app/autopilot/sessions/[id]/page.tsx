@@ -43,6 +43,7 @@ export default async function AutopilotSessionDetailPage({ params }: PageProps):
       <SessionDetailPanel
         domain={session.domain}
         status={session.status}
+        workflowFingerprint={session.workflowFingerprint}
         startedAt={session.startedAt.toISOString()}
         completedAt={session.completedAt ? session.completedAt.toISOString() : null}
         actions={session.actions.map((action) => ({

@@ -19,6 +19,7 @@ type RepairItem = {
 type SessionDetailPanelProps = {
   domain: string;
   status: string;
+  workflowFingerprint: string | null;
   startedAt: string;
   completedAt: string | null;
   actions: ActionItem[];
@@ -33,6 +34,7 @@ export function SessionDetailPanel(props: SessionDetailPanelProps) {
         <p className="mt-1 text-sm text-slate-600">
           {props.domain} • {props.status}
         </p>
+        <p className="text-xs text-slate-500">Fingerprint {props.workflowFingerprint ?? "n/a"}</p>
         <p className="text-xs text-slate-500">
           Started {new Date(props.startedAt).toLocaleString()}
           {props.completedAt ? ` • Completed ${new Date(props.completedAt).toLocaleString()}` : ""}
