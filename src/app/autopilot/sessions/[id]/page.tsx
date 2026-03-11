@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { SessionDetailPanel } from "@/components/autopilot/session/session-detail-panel";
+import { SessionControls } from "@/components/autopilot/session/session-controls";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { getAutopilotSessionById } from "@/lib/autopilot/dashboard.service";
 import { requireOrganizationRole } from "@/server/auth/authorization";
@@ -63,6 +64,7 @@ export default async function AutopilotSessionDetailPage({ params }: PageProps):
           createdAt: repair.createdAt.toISOString(),
         }))}
       />
+      <SessionControls sessionId={session.id} />
     </div>
   );
 }
