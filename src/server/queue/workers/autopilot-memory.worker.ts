@@ -11,6 +11,20 @@ function extractStringArray(value: unknown) {
 
 async function runAutopilotMemoryCycle() {
   try {
+    const staleCutoff = new Date(Date.now() - 2 * 60 * 60 * 1000);
+    const staleUpdate = await prisma.autopilotSession.updateMany({
+      where: {
+        status: "RECORDING",
+        startedAt: {
+          lt: staleCutoff,
+        },
+      },
+      data: {
+        status: "FAILED",
+        completedAt: new Date(),
+      },
+    });
+
     const sessions = await prisma.autopilotSession.findMany({
       where: {
         status: {
@@ -92,6 +106,7 @@ async function runAutopilotMemoryCycle() {
         component: "autopilot-memory-worker",
         metadata: {
           sessions: sessions.length,
+          staleSessionsFailed: staleUpdate.count,
         },
       });
     }
