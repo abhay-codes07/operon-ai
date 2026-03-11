@@ -45,6 +45,17 @@ export function WorkflowReviewPanel({ sessionId, initialDefinition, onApproved }
       return;
     }
 
+    await fetch(`/api/autopilot/session/${sessionId}`, {
+      method: "PATCH",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        status: "APPROVED",
+        compiledDefinition: editedDefinition,
+      }),
+    }).catch(() => null);
+
     const response = await fetch("/api/autopilot/finish", {
       method: "POST",
       headers: {
