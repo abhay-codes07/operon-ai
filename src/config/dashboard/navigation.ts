@@ -70,6 +70,11 @@ export const dashboardNav = [
     description: "Multi-agent orchestration",
   },
   {
+    href: "/dashboard/autopilot",
+    label: "Autopilot",
+    description: "Learn and self-repair workflows",
+  },
+  {
     href: "/dashboard/billing",
     label: "Billing",
     description: "Plans and quota",

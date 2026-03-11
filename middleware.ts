@@ -4,12 +4,14 @@ import { getToken } from "next-auth/jwt";
 
 const protectedPrefixes = [
   "/dashboard",
+  "/autopilot",
   "/pipelines",
   "/api/internal",
   "/api/pipelines",
   "/api/finops",
   "/api/intelligence",
   "/api/shield",
+  "/api/autopilot",
 ];
 const authPrefixes = ["/auth/sign-in", "/auth/sign-up"];
 
@@ -47,6 +49,8 @@ export const config = {
     "/api/finops/:path*",
     "/api/intelligence/:path*",
     "/api/shield/:path*",
+    "/api/autopilot/:path*",
+    "/autopilot/:path*",
     "/auth/sign-in",
     "/auth/sign-up",
   ],
