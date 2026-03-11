@@ -92,43 +92,56 @@ export async function finishAutopilotSession(input: {
   });
 
   let workflowId: string | undefined;
-  if (input.approve) {
-    const firstAgent = await prisma.agent.findFirst({
-      where: {
-        organizationId: input.orgId,
-      },
-      orderBy: { createdAt: "asc" },
-      select: {
-        id: true,
-      },
-    });
-
-    if (!firstAgent) {
-      return {
-        ok: false as const,
-        reason: "no_agent_available",
-        compiled: parameterized.definition,
-        parameterSchema: parameterized.schema,
-      };
-    }
-
-    const workflow = await prisma.workflow.create({
-      data: {
-        organizationId: input.orgId,
-        agentId: firstAgent.id,
-        createdById: session.userId,
-        name: input.name?.trim() || `Autopilot ${session.domain}`,
-        description: input.description?.trim() || "Generated from Operon Autopilot learn mode",
-        status: "DRAFT",
-        definition: reviewDefinition,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    workflowId = workflow.id;
+  if (!input.approve) {
+    return {
+      ok: true as const,
+      compiled: reviewDefinition,
+      parameterSchema: parameterized.schema,
+      generatedWorkflowId: null,
+    };
   }
+
+  await updateSessionForReview({
+    orgId: input.orgId,
+    sessionId: input.sessionId,
+    status: "APPROVED",
+  });
+
+  const firstAgent = await prisma.agent.findFirst({
+    where: {
+      organizationId: input.orgId,
+    },
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!firstAgent) {
+    return {
+      ok: false as const,
+      reason: "no_agent_available",
+      compiled: parameterized.definition,
+      parameterSchema: parameterized.schema,
+    };
+  }
+
+  const workflow = await prisma.workflow.create({
+    data: {
+      organizationId: input.orgId,
+      agentId: firstAgent.id,
+      createdById: session.userId,
+      name: input.name?.trim() || `Autopilot ${session.domain}`,
+      description: input.description?.trim() || "Generated from Operon Autopilot learn mode",
+      status: "DRAFT",
+      definition: reviewDefinition,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  workflowId = workflow.id;
 
   await completeSession({
     sessionId: input.sessionId,
