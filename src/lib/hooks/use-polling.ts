@@ -14,9 +14,10 @@ export function usePolling(task: () => Promise<void>, intervalMs: number, enable
       if (!mounted) {
         return;
       }
-      await task();
+      await task().catch(() => null);
     };
 
+    void run();
     const interval = setInterval(() => {
       void run();
     }, intervalMs);
