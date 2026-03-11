@@ -272,6 +272,12 @@ enum AutopilotActionType {
   CUSTOM
 }
 
+enum AutopilotRepairStrategy {
+  SELECTOR_SIMILARITY
+  TEXT_MATCH
+  DOM_TRAVERSAL
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -379,6 +385,7 @@ model Organization {
   autopilotSessions AutopilotSession[]
   autopilotActions AutopilotAction[]
   domainMemories DomainMemory[]
+  autopilotRepairEvents AutopilotRepairEvent[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -511,6 +518,7 @@ model Workflow {
   costAnomalies CostAnomaly[]
   promptInjectionEvents PromptInjectionEvent[]
   behaviorBaseline AgentBehaviorBaseline?
+  autopilotRepairEvents AutopilotRepairEvent[]
 
   @@index([organizationId, status])
   @@index([organizationId, agentId, createdAt])
@@ -564,6 +572,7 @@ model Execution {
   costEvents AgentCostEvent[]
   costAnomalies CostAnomaly[]
   promptInjectionEvents PromptInjectionEvent[]
+  autopilotRepairEvents AutopilotRepairEvent[]
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, agentId, createdAt])
@@ -1733,6 +1742,7 @@ model AutopilotSession {
   organization       Organization           @relation(fields: [orgId], references: [id], onDelete: Cascade)
   user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   actions            AutopilotAction[]
+  repairEvents       AutopilotRepairEvent[]
 
   @@index([orgId, status, startedAt])
   @@index([userId, startedAt])
@@ -1767,4 +1777,28 @@ model DomainMemory {
 
   @@unique([orgId, domain])
   @@index([orgId, reliabilityScore, updatedAt])
+}
+
+model AutopilotRepairEvent {
+  id               String                 @id @default(cuid())
+  orgId            String
+  sessionId        String?
+  workflowId       String?
+  runId            String?
+  domain           String
+  failedSelector   String?
+  repairedSelector String?
+  strategy         AutopilotRepairStrategy
+  confidence       Float                  @default(0)
+  success          Boolean                @default(false)
+  createdAt        DateTime               @default(now())
+  organization     Organization           @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  session          AutopilotSession?      @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  workflow         Workflow?              @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+  run              Execution?             @relation(fields: [runId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, createdAt])
+  @@index([sessionId, createdAt])
+  @@index([workflowId, createdAt])
+  @@index([runId, createdAt])
 }
