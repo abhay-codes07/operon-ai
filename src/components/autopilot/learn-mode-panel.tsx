@@ -32,6 +32,9 @@ export function LearnModePanel() {
 
   const [reviewDefinition, setReviewDefinition] = useState<CompiledDefinition | null>(null);
   const [createdWorkflowId, setCreatedWorkflowId] = useState<string | null>(null);
+  const [simFailedSelector, setSimFailedSelector] = useState("");
+  const [simCandidates, setSimCandidates] = useState("");
+  const [simResult, setSimResult] = useState<string | null>(null);
 
   async function startSession() {
     setError(null);
@@ -119,6 +122,55 @@ export function LearnModePanel() {
 
     setReviewDefinition(payload.compiled);
     setStatus("Workflow compiled. Review and approve.");
+  }
+
+  async function simulateRepair() {
+    setSimResult(null);
+    const candidateSelectors = simCandidates
+      .split("\n")
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    const response = await fetch("/api/autopilot/repair/simulate", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        domain: domain || "example.com",
+        failedSelector: simFailedSelector,
+        candidateSelectors,
+      }),
+    });
+
+    const payload = (await response.json().catch(() => null)) as
+      | {
+          result?: { repaired?: boolean; selector?: string; strategy?: string; confidence?: number; reason?: string };
+          valid?: boolean;
+          error?: { message?: string };
+        }
+      | null;
+
+    if (!response.ok) {
+      setSimResult(payload?.error?.message ?? "Repair simulation failed");
+      return;
+    }
+
+    if (!payload?.result) {
+      setSimResult("No repair result");
+      return;
+    }
+
+    if (!payload.result.repaired) {
+      setSimResult(`No repair found (${payload.result.reason ?? "unknown_reason"})`);
+      return;
+    }
+
+    setSimResult(
+      `Repaired to ${payload.result.selector ?? "n/a"} using ${payload.result.strategy ?? "unknown"} at ${
+        Math.round((payload.result.confidence ?? 0) * 100)
+      }% confidence`,
+    );
   }
 
   return (
@@ -232,6 +284,44 @@ export function LearnModePanel() {
           </Link>
         </section>
       ) : null}
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="space-y-1">
+          <h2 className="text-base font-semibold text-slate-900">Selector Repair Simulator</h2>
+          <p className="text-sm text-slate-600">Validate fallback selector quality before running in production.</p>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <label className="space-y-1 text-sm text-slate-700">
+            <span>Failed selector</span>
+            <input
+              value={simFailedSelector}
+              onChange={(event) => setSimFailedSelector(event.target.value)}
+              placeholder="#submit-button"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="space-y-1 text-sm text-slate-700">
+            <span>Candidate selectors (one per line)</span>
+            <textarea
+              value={simCandidates}
+              onChange={(event) => setSimCandidates(event.target.value)}
+              placeholder="#submit-btn&#10;[data-testid='submit']&#10;button[type='submit']"
+              className="h-28 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            />
+          </label>
+        </div>
+        <div className="mt-3">
+          <button
+            type="button"
+            onClick={() => void simulateRepair()}
+            disabled={!simFailedSelector.trim()}
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Simulate Repair
+          </button>
+        </div>
+        {simResult ? <p className="mt-3 text-sm text-slate-700">{simResult}</p> : null}
+      </section>
     </div>
   );
 }
