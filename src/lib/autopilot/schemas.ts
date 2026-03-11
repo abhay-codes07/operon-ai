@@ -56,3 +56,16 @@ export const selectorRepairRequestSchema = z.object({
   failedSelector: z.string().trim().min(1),
   candidateSelectors: z.array(z.string().trim().min(1)).default([]),
 });
+
+export const autopilotListSessionsQuerySchema = z.object({
+  status: z.enum(["RECORDING", "REVIEW", "APPROVED", "COMPLETED", "FAILED"]).optional(),
+  page: z.coerce.number().int().min(1).max(200).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+});
+
+export const autopilotListRepairEventsQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).max(200).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  workflowId: z.string().trim().min(1).optional(),
+  runId: z.string().trim().min(1).optional(),
+});
