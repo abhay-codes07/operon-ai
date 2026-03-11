@@ -9,6 +9,7 @@ import {
   updateSessionForReview,
 } from "@/lib/autopilot/session-recorder.service";
 import { updateMemoryFromRun } from "@/lib/autopilot/domain-memory.service";
+import { createWorkflowFingerprint } from "@/lib/autopilot/fingerprint.service";
 import { prisma } from "@/server/db/client";
 
 export async function createAutopilotSession(input: {
@@ -67,12 +68,14 @@ export async function finishAutopilotSession(input: {
   const parameterized = detectWorkflowParameters(compiled);
 
   const reviewDefinition = input.editedDefinition ?? (parameterized.definition as unknown as Record<string, unknown>);
+  const workflowFingerprint = createWorkflowFingerprint(reviewDefinition);
 
   await setSessionReviewPayload({
     sessionId: input.sessionId,
     orgId: input.orgId,
     compiledDefinition: reviewDefinition,
     parameterSchema: parameterized.schema as unknown as Record<string, unknown>,
+    workflowFingerprint,
   });
 
   const selectors = parameterized.definition.steps
@@ -97,6 +100,7 @@ export async function finishAutopilotSession(input: {
       ok: true as const,
       compiled: reviewDefinition,
       parameterSchema: parameterized.schema,
+      workflowFingerprint,
       generatedWorkflowId: null,
     };
   }
@@ -123,6 +127,7 @@ export async function finishAutopilotSession(input: {
       reason: "no_agent_available",
       compiled: parameterized.definition,
       parameterSchema: parameterized.schema,
+      workflowFingerprint,
     };
   }
 
@@ -153,6 +158,7 @@ export async function finishAutopilotSession(input: {
     ok: true as const,
     compiled: reviewDefinition,
     parameterSchema: parameterized.schema,
+    workflowFingerprint,
     generatedWorkflowId: workflowId ?? null,
   };
 }

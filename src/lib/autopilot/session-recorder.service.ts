@@ -108,6 +108,7 @@ export async function setSessionReviewPayload(input: {
   orgId: string;
   compiledDefinition: Record<string, unknown>;
   parameterSchema: Record<string, unknown>;
+  workflowFingerprint?: string;
 }) {
   return prisma.autopilotSession.updateMany({
     where: {
@@ -118,6 +119,7 @@ export async function setSessionReviewPayload(input: {
       status: "REVIEW",
       compiledDefinition: input.compiledDefinition,
       parameterSchema: input.parameterSchema,
+      workflowFingerprint: input.workflowFingerprint,
     },
   });
 }
@@ -147,6 +149,7 @@ export async function updateSessionForReview(input: {
   status?: "REVIEW" | "APPROVED";
   compiledDefinition?: Record<string, unknown>;
   parameterSchema?: Record<string, unknown>;
+  workflowFingerprint?: string;
 }) {
   return prisma.autopilotSession.updateMany({
     where: {
@@ -157,6 +160,7 @@ export async function updateSessionForReview(input: {
       ...(input.status ? { status: input.status } : {}),
       ...(input.compiledDefinition ? { compiledDefinition: input.compiledDefinition } : {}),
       ...(input.parameterSchema ? { parameterSchema: input.parameterSchema } : {}),
+      ...(input.workflowFingerprint ? { workflowFingerprint: input.workflowFingerprint } : {}),
     },
   });
 }
