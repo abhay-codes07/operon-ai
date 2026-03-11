@@ -25,6 +25,10 @@ import {
   startShieldMonitorWorker,
   stopShieldMonitorWorker,
 } from "@/server/queue/workers/shield-monitor.worker";
+import {
+  startAutopilotMemoryWorker,
+  stopAutopilotMemoryWorker,
+} from "@/server/queue/workers/autopilot-memory.worker";
 
 async function bootstrapWorker() {
   console.log("Starting WebOps AI execution worker...");
@@ -36,6 +40,7 @@ async function bootstrapWorker() {
   startCostMonitorWorker();
   startIntelligenceMonitorWorker();
   startShieldMonitorWorker();
+  startAutopilotMemoryWorker();
 
   const shutdown = async (signal: string) => {
     console.log(`Received ${signal}, shutting down worker...`);
@@ -47,6 +52,7 @@ async function bootstrapWorker() {
     await stopCostMonitorWorker();
     await stopIntelligenceMonitorWorker();
     await stopShieldMonitorWorker();
+    await stopAutopilotMemoryWorker();
     await closeQueueRedisConnection();
     process.exit(0);
   };
