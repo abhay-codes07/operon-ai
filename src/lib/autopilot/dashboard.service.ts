@@ -183,6 +183,35 @@ export async function getAutopilotSessionById(input: { orgId: string; sessionId:
   });
 }
 
+export async function listAutopilotSessionActions(input: {
+  orgId: string;
+  sessionId: string;
+  page: number;
+  pageSize: number;
+}) {
+  const where = {
+    sessionId: input.sessionId,
+    orgId: input.orgId,
+  };
+
+  const [items, total] = await Promise.all([
+    prisma.autopilotAction.findMany({
+      where,
+      orderBy: { timestamp: "asc" },
+      skip: (input.page - 1) * input.pageSize,
+      take: input.pageSize,
+    }),
+    prisma.autopilotAction.count({ where }),
+  ]);
+
+  return {
+    items,
+    total,
+    page: input.page,
+    pageSize: input.pageSize,
+  };
+}
+
 export async function listRecentAutopilotSessions(orgId: string, limit = 25) {
   return prisma.autopilotSession.findMany({
     where: { orgId },
