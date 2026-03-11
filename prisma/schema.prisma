@@ -255,6 +255,23 @@ enum ShieldSeverity {
   CRITICAL
 }
 
+enum AutopilotSessionStatus {
+  RECORDING
+  REVIEW
+  APPROVED
+  COMPLETED
+  FAILED
+}
+
+enum AutopilotActionType {
+  NAVIGATE
+  CLICK
+  INPUT
+  EXTRACT
+  WAIT
+  CUSTOM
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -289,6 +306,7 @@ model User {
   debugSessions DebugSession[]
   installedTools ToolInstallation[]
   complianceApprovals WorkflowComplianceApproval[] @relation("ComplianceApprovedBy")
+  autopilotSessions AutopilotSession[]
 
   @@index([createdAt])
 }
@@ -358,6 +376,9 @@ model Organization {
   competitorSignals CompetitorSignal[]
   shieldPolicies ShieldPolicy[]
   promptInjectionEvents PromptInjectionEvent[]
+  autopilotSessions AutopilotSession[]
+  autopilotActions AutopilotAction[]
+  domainMemories DomainMemory[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -1694,4 +1715,56 @@ model AgentBehaviorBaseline {
   workflow       Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 
   @@index([createdAt])
+}
+
+model AutopilotSession {
+  id                 String                 @id @default(cuid())
+  orgId              String
+  userId             String
+  domain             String
+  status             AutopilotSessionStatus @default(RECORDING)
+  startedAt          DateTime               @default(now())
+  completedAt        DateTime?
+  compiledDefinition Json?
+  parameterSchema    Json?
+  generatedWorkflowId String?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  organization       Organization           @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actions            AutopilotAction[]
+
+  @@index([orgId, status, startedAt])
+  @@index([userId, startedAt])
+}
+
+model AutopilotAction {
+  id        String              @id @default(cuid())
+  sessionId String
+  orgId     String
+  actionType AutopilotActionType
+  selector  String?
+  value     String?
+  metadata  Json?
+  timestamp DateTime            @default(now())
+  session   AutopilotSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  organization Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, timestamp])
+  @@index([orgId, timestamp])
+}
+
+model DomainMemory {
+  id                 String       @id @default(cuid())
+  orgId              String
+  domain             String
+  selectorPatterns   Json
+  navigationPatterns Json
+  reliabilityScore   Float        @default(0)
+  updatedAt          DateTime     @updatedAt
+  createdAt          DateTime     @default(now())
+  organization       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, domain])
+  @@index([orgId, reliabilityScore, updatedAt])
 }
