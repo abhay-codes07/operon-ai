@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { AutopilotDashboardPanel } from "@/components/dashboard/autopilot/autopilot-dashboard-panel";
 import { AutopilotLiveSummary } from "@/components/dashboard/autopilot/autopilot-live-summary";
+import { AutopilotSessionTableLive } from "@/components/dashboard/autopilot/autopilot-session-table-live";
 import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import {
@@ -94,6 +95,10 @@ export default async function DashboardAutopilotPage(): Promise<JSX.Element> {
             };
           })}
         />
+      </DashboardCard>
+
+      <DashboardCard title="Session Monitor" description="Live filtered view of Autopilot session states.">
+        <AutopilotSessionTableLive />
       </DashboardCard>
     </div>
   );
