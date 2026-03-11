@@ -100,12 +100,23 @@ Operators record actions in Learn Mode, review the generated workflow, parameter
 
 Domain Memory stores working selectors and navigation patterns per domain. Self-repair logic uses that memory to recover from selector drift and logs repair events for review in the Autopilot dashboard.
 
+Autopilot sessions now carry deterministic workflow fingerprints, explicit lifecycle states (`RECORDING`, `REVIEW`, `APPROVED`, `COMPLETED`, `FAILED`), and operator controls for manual approval/failure handling.
+
 Autopilot API surface:
 
 - `POST /api/autopilot/start`
 - `POST /api/autopilot/action`
 - `POST /api/autopilot/finish`
 - `GET /api/autopilot/session/[id]`
+- `PATCH /api/autopilot/session/[id]`
+- `POST /api/autopilot/session/[id]/approve`
+- `POST /api/autopilot/session/[id]/fail`
+- `GET /api/autopilot/session/[id]/actions`
+- `GET /api/autopilot/sessions`
+- `GET /api/autopilot/memories`
+- `GET /api/autopilot/repairs`
+- `GET /api/autopilot/summary`
+- `POST /api/autopilot/repair/simulate`
 
 Autopilot UI surface:
 
