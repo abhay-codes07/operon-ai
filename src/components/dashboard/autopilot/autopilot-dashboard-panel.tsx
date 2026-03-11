@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type SessionItem = {
   id: string;
   domain: string;
@@ -47,6 +49,9 @@ export function AutopilotDashboardPanel({ sessions, memories, repairs }: Autopil
               </p>
               <p className="text-xs text-slate-500">{session.userLabel}</p>
               <p className="text-xs text-slate-500">{new Date(session.startedAt).toLocaleString()}</p>
+              <Link href={`/autopilot/sessions/${session.id}`} className="text-xs font-semibold text-slate-700 underline">
+                Open session
+              </Link>
             </article>
           ))}
         </div>
