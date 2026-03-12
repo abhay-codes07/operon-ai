@@ -278,6 +278,12 @@ enum AutopilotRepairStrategy {
   DOM_TRAVERSAL
 }
 
+enum CoPilotInterventionType {
+  CONFIRM
+  OVERRIDE_CLICK
+  OVERRIDE_INPUT
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -386,6 +392,8 @@ model Organization {
   autopilotActions AutopilotAction[]
   domainMemories DomainMemory[]
   autopilotRepairEvents AutopilotRepairEvent[]
+  copilotSessions CoPilotSession[]
+  copilotInterventions CoPilotIntervention[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -519,6 +527,8 @@ model Workflow {
   promptInjectionEvents PromptInjectionEvent[]
   behaviorBaseline AgentBehaviorBaseline?
   autopilotRepairEvents AutopilotRepairEvent[]
+  copilotSessions CoPilotSession[]
+  copilotInterventions CoPilotIntervention[]
 
   @@index([organizationId, status])
   @@index([organizationId, agentId, createdAt])
@@ -1802,4 +1812,40 @@ model AutopilotRepairEvent {
   @@index([sessionId, createdAt])
   @@index([workflowId, createdAt])
   @@index([runId, createdAt])
+}
+
+model CoPilotSession {
+  id             String               @id @default(cuid())
+  organizationId String
+  workflowId     String
+  runId          String
+  startedAt      DateTime             @default(now())
+  endedAt        DateTime?
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  workflow       Workflow             @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  run            Execution            @relation(fields: [runId], references: [id], onDelete: Cascade)
+  interventions  CoPilotIntervention[]
+
+  @@index([organizationId, startedAt])
+  @@index([workflowId, startedAt])
+  @@index([runId, startedAt])
+}
+
+model CoPilotIntervention {
+  id                   String                 @id @default(cuid())
+  organizationId       String
+  sessionId            String
+  stepId               String
+  interventionType     CoPilotInterventionType @default(CONFIRM)
+  agentConfidence      Float
+  agentSuggestedAction String
+  humanAction          String
+  timestamp            DateTime               @default(now())
+  metadata             Json?
+  organization         Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  session              CoPilotSession         @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, timestamp])
+  @@index([sessionId, timestamp])
+  @@index([stepId, timestamp])
 }
