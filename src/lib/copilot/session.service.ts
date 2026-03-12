@@ -93,3 +93,32 @@ export async function listTrainingData(organizationId: string, limit = 500) {
     },
   });
 }
+
+export async function listCoPilotSessions(organizationId: string, limit = 50) {
+  return prisma.coPilotSession.findMany({
+    where: {
+      organizationId,
+    },
+    include: {
+      workflow: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      run: {
+        select: {
+          id: true,
+          status: true,
+        },
+      },
+      interventions: {
+        select: {
+          id: true,
+        },
+      },
+    },
+    orderBy: { startedAt: "desc" },
+    take: limit,
+  });
+}

@@ -55,6 +55,11 @@ export const dashboardNav = [
     description: "Approvals and live controls",
   },
   {
+    href: "/dashboard/copilot",
+    label: "Co-Pilot",
+    description: "Human-in-the-loop sessions",
+  },
+  {
     href: "/dashboard/mission-control",
     label: "Mission Control",
     description: "Fleet ops and incidents",
