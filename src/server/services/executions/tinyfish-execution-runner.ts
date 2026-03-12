@@ -75,6 +75,13 @@ import { scanDomContent } from "@/lib/shield/injection-detector.service";
 import { sendShieldAlert } from "@/lib/shield/alert.service";
 import { attemptSelfRepair } from "@/lib/autopilot/self-repair.service";
 import { updateMemoryFromRun } from "@/lib/autopilot/domain-memory.service";
+import { interceptExecutionStep } from "@/lib/copilot/execution-interceptor";
+import {
+  streamCoPilotAction,
+  streamCoPilotHelpRequested,
+} from "@/lib/copilot/copilot-channel";
+import { buildGhostActionPreview } from "@/lib/copilot/ghost-cursor.service";
+import { notifyCoPilotHelpRequested } from "@/lib/copilot/alert.service";
 import {
   getBehaviorBaseline,
   inferBehaviorBaselineFromWorkflowDefinition,
@@ -443,6 +450,60 @@ export async function runExecutionWithTinyFish(
       similarityScore: 0,
       attempts: [],
     };
+
+    const copilot = await interceptExecutionStep({
+        organizationId: input.organizationId,
+        workflowId: workflow.id,
+        runId: input.executionId,
+        stepId: replayStep.stepKey,
+        action: replayStep.action,
+        target: replayStep.target ?? undefined,
+        expectedOutcome:
+          (replayStep.metadata as { expectedOutcome?: string } | null)?.expectedOutcome ?? undefined,
+      });
+
+      await streamCoPilotAction({
+        organizationId: input.organizationId,
+        executionId: input.executionId,
+        stepId: replayStep.stepKey,
+        confidence: copilot.confidence,
+        action: replayStep.action,
+        target: replayStep.target ?? undefined,
+      }).catch(() => null);
+
+      if (copilot.state === "human_required" && copilot.sessionId) {
+        await streamCoPilotHelpRequested({
+          organizationId: input.organizationId,
+          executionId: input.executionId,
+          sessionId: copilot.sessionId,
+          stepId: replayStep.stepKey,
+          reasons: copilot.reasons,
+        }).catch(() => null);
+        await notifyCoPilotHelpRequested({
+          organizationId: input.organizationId,
+          executionId: input.executionId,
+          sessionId: copilot.sessionId,
+          stepId: replayStep.stepKey,
+          reasons: copilot.reasons,
+        }).catch(() => null);
+
+        await publishExecutionStreamEvent({
+          organizationId: input.organizationId,
+          executionId: input.executionId,
+          eventType: "copilot.ghost",
+          payload: {
+            sessionId: copilot.sessionId,
+            stepKey: replayStep.stepKey,
+            confidence: copilot.confidence,
+            preview: buildGhostActionPreview({
+              action: replayStep.action,
+              target: replayStep.target ?? undefined,
+            }),
+          },
+        }).catch(() => null);
+
+        continue;
+      }
 
     const approval = await ensureApprovalForStep({
       organizationId: input.organizationId,
