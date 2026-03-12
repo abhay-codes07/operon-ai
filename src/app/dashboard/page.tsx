@@ -193,6 +193,30 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </Link>
         </div>
       </DashboardCard>
+
+      <DashboardCard
+        title="Operon Co-Pilot"
+        description="Route low-confidence steps to human operators without losing runtime context."
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <article className="rounded-xl border border-slate-200 bg-white p-4">
+            <p className="text-xs text-slate-500">Collaboration Mode</p>
+            <p className="mt-1 text-sm font-semibold text-slate-900">Human-in-the-loop interception active</p>
+          </article>
+          <article className="rounded-xl border border-slate-200 bg-white p-4">
+            <p className="text-xs text-slate-500">Session Surface</p>
+            <p className="mt-1 text-sm font-semibold text-slate-900">Live intervention session dashboard</p>
+          </article>
+        </div>
+        <div className="pt-3">
+          <Link
+            href="/dashboard/copilot"
+            className="inline-flex h-9 items-center rounded-md bg-slate-900 px-3 text-sm font-medium text-white"
+          >
+            Open Co-Pilot Dashboard
+          </Link>
+        </div>
+      </DashboardCard>
     </div>
   );
 }
