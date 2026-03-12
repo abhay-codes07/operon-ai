@@ -123,6 +123,35 @@ Autopilot UI surface:
 - `/autopilot/learn` for recording, compiling, reviewing, and approving workflows.
 - `/dashboard/autopilot` for learned session history, domain memory quality, and repair telemetry.
 
+## Operon Co-Pilot
+
+Operon Co-Pilot introduces live human collaboration during autonomous browser execution.
+
+Each step is scored by a confidence engine. When confidence drops below threshold, the runtime intercepts the action, opens a Co-Pilot session, and requests human confirmation or override while preserving execution context.
+
+Core Co-Pilot capabilities:
+
+- Confidence scoring and risk classification for each action
+- Human-in-the-loop intervention sessions tied to workflow runs
+- Ghost cursor action previews before confirmation
+- Real-time stream events for Co-Pilot action, help request, and intervention
+- Deterministic replay integration via intervention timeline APIs
+- Training-data export of agent corrections
+
+Co-Pilot API surface:
+
+- `POST /api/copilot/intervene`
+- `POST /api/copilot/confirm`
+- `GET /api/copilot/training-data`
+- `GET /api/copilot/summary`
+- `GET /api/copilot/sessions`
+- `GET /api/copilot/session/[id]`
+
+Co-Pilot UI surface:
+
+- `/dashboard/copilot` for session operations and live metrics
+- `/copilot/session/[id]` for live collaboration view and intervention controls
+
 ## Operon Shield
 
 Operon Shield is the runtime security layer for autonomous browser agents.
