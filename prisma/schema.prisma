@@ -284,6 +284,12 @@ enum CoPilotInterventionType {
   OVERRIDE_INPUT
 }
 
+enum SandboxIdentityStatus {
+  ACTIVE
+  REVOKED
+  COMPROMISED
+}
+
 enum BillingPlan {
   FREE
   STARTER
@@ -394,6 +400,9 @@ model Organization {
   autopilotRepairEvents AutopilotRepairEvent[]
   copilotSessions CoPilotSession[]
   copilotInterventions CoPilotIntervention[]
+  sandboxIdentities SandboxIdentity[]
+  sandboxSessions SandboxSession[]
+  blastRadiusScores BlastRadiusScore[]
   subscriptions Subscription[]
   usageRecords  UsageRecord[]
 
@@ -529,6 +538,9 @@ model Workflow {
   autopilotRepairEvents AutopilotRepairEvent[]
   copilotSessions CoPilotSession[]
   copilotInterventions CoPilotIntervention[]
+  sandboxIdentityId String?
+  sandboxIdentity SandboxIdentity? @relation(fields: [sandboxIdentityId], references: [id], onDelete: SetNull)
+  blastRadiusScores BlastRadiusScore[]
 
   @@index([organizationId, status])
   @@index([organizationId, agentId, createdAt])
@@ -1848,4 +1860,51 @@ model CoPilotIntervention {
   @@index([organizationId, timestamp])
   @@index([sessionId, timestamp])
   @@index([stepId, timestamp])
+}
+
+model SandboxIdentity {
+  id             String               @id @default(cuid())
+  organizationId String
+  workflowId     String               @unique
+  email          String               @unique
+  fingerprintId  String
+  proxyId        String
+  status         SandboxIdentityStatus @default(ACTIVE)
+  credentialVault Json?
+  createdAt      DateTime             @default(now())
+  revokedAt      DateTime?
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  workflow       Workflow             @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  sessions       SandboxSession[]
+
+  @@index([organizationId, status, createdAt])
+}
+
+model SandboxSession {
+  id           String          @id @default(cuid())
+  identityId   String
+  organizationId String
+  domain       String
+  cookies      Json
+  lastActivity DateTime        @default(now())
+  createdAt    DateTime        @default(now())
+  identity     SandboxIdentity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([identityId, lastActivity])
+  @@index([organizationId, domain, lastActivity])
+}
+
+model BlastRadiusScore {
+  id             String       @id @default(cuid())
+  workflowId     String
+  organizationId String
+  score          Int
+  factors        Json
+  createdAt      DateTime     @default(now())
+  workflow       Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([workflowId, createdAt])
+  @@index([organizationId, createdAt])
 }
