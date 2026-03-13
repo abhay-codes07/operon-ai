@@ -33,6 +33,10 @@ import {
   startCoPilotMonitorWorker,
   stopCoPilotMonitorWorker,
 } from "@/server/queue/workers/copilot-monitor.worker";
+import {
+  startSandboxLifecycleWorker,
+  stopSandboxLifecycleWorker,
+} from "@/server/queue/workers/sandbox-lifecycle.worker";
 
 async function bootstrapWorker() {
   console.log("Starting WebOps AI execution worker...");
@@ -46,6 +50,7 @@ async function bootstrapWorker() {
   startShieldMonitorWorker();
   startAutopilotMemoryWorker();
   startCoPilotMonitorWorker();
+  startSandboxLifecycleWorker();
 
   const shutdown = async (signal: string) => {
     console.log(`Received ${signal}, shutting down worker...`);
@@ -59,6 +64,7 @@ async function bootstrapWorker() {
     await stopShieldMonitorWorker();
     await stopAutopilotMemoryWorker();
     await stopCoPilotMonitorWorker();
+    await stopSandboxLifecycleWorker();
     await closeQueueRedisConnection();
     process.exit(0);
   };
