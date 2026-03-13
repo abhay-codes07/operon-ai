@@ -9,6 +9,8 @@ import {
 import type { CreateWorkflowRequest } from "@/modules/workflows/schemas";
 import { buildWorkflowDefinition } from "@/server/services/workflows/workflow-builder";
 import { normalizeCronExpression } from "@/lib/utils/cron";
+import { createSandboxIdentity } from "@/lib/sandbox/identity-vault.service";
+import { recordBlastRadiusScore } from "@/lib/sandbox/blast-radius.service";
 
 export async function createWorkflowTemplate(input: {
   organizationId: string;
@@ -45,7 +47,7 @@ export async function createWorkflowFromTask(input: {
     retryLimit: input.payload.retryLimit,
   });
 
-  return createWorkflowTemplate({
+  const workflow = await createWorkflowTemplate({
     organizationId: input.organizationId,
     createdById: input.createdById,
     agentId: input.payload.agentId,
@@ -54,6 +56,23 @@ export async function createWorkflowFromTask(input: {
     scheduleCron: normalizeCronExpression(input.payload.scheduleCron),
     definition,
   });
+
+  await createSandboxIdentity({
+    organizationId: input.organizationId,
+    workflowId: workflow.id,
+    workflowName: workflow.name,
+  }).catch(() => null);
+
+  await recordBlastRadiusScore({
+    organizationId: input.organizationId,
+    workflowId: workflow.id,
+    authenticatedDomains: 0,
+    credentialScope: "DOMAIN",
+    privilegeLevel: "LOW",
+    isolationLevel: "STRONG",
+  }).catch(() => null);
+
+  return workflow;
 }
 
 export async function fetchWorkflowCatalog(input: {
