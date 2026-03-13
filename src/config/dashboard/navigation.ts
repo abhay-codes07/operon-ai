@@ -95,6 +95,11 @@ export const dashboardNav = [
     description: "Operational guardrails",
   },
   {
+    href: "/sandbox",
+    label: "Sandbox",
+    description: "Isolated identity economy",
+  },
+  {
     href: "/dashboard/shield",
     label: "Shield",
     description: "Prompt injection defense",

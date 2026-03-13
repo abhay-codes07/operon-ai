@@ -152,6 +152,34 @@ Co-Pilot UI surface:
 - `/dashboard/copilot` for session operations and live metrics
 - `/copilot/session/[id]` for live collaboration view and intervention controls
 
+## Operon Sandbox Economy
+
+Operon Sandbox Economy isolates every workflow behind a disposable digital identity so agent compromise cannot escalate to real operator credentials.
+
+Each workflow identity includes:
+
+- unique sandbox email
+- isolated cookie jar and session store
+- dedicated browser fingerprint
+- proxy assignment
+- domain-scoped credential vault
+- blast-radius scoring
+
+Containment model:
+
+```text
+Workflow -> SandboxIdentity -> SandboxSession(domain scoped)
+         -> BlastRadiusScore(time-series)
+         -> CredentialVault(domain -> credentials)
+```
+
+Security outcomes:
+
+- prompt injection impact is contained to one sandbox identity
+- cross-domain credential reuse is blocked
+- stale identities and sessions are auto-revoked by lifecycle worker
+- workflow cards expose blast radius badges for operator visibility
+
 ## Operon Shield
 
 Operon Shield is the runtime security layer for autonomous browser agents.

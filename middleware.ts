@@ -13,7 +13,9 @@ const protectedPrefixes = [
   "/api/shield",
   "/api/autopilot",
   "/api/copilot",
+  "/api/sandbox",
   "/copilot",
+  "/sandbox",
 ];
 const authPrefixes = ["/auth/sign-in", "/auth/sign-up"];
 
@@ -53,8 +55,10 @@ export const config = {
     "/api/shield/:path*",
     "/api/autopilot/:path*",
     "/api/copilot/:path*",
+    "/api/sandbox/:path*",
     "/autopilot/:path*",
     "/copilot/:path*",
+    "/sandbox/:path*",
     "/auth/sign-in",
     "/auth/sign-up",
   ],

@@ -41,7 +41,7 @@ export default async function DashboardWorkflowsPage({
     pageSize: 25,
   });
   const workflowIds = workflows.items.map((item) => item.id);
-  const [slaRows, incidentRows] = workflowIds.length
+  const [slaRows, incidentRows, blastRadiusRows] = workflowIds.length
     ? await Promise.all([
         prisma.workflowSLA.findMany({
           where: { workflowId: { in: workflowIds } },
@@ -60,8 +60,19 @@ export default async function DashboardWorkflowsPage({
             detectedAt: true,
           },
         }),
+        prisma.blastRadiusScore.findMany({
+          where: {
+            workflowId: { in: workflowIds },
+          },
+          select: {
+            workflowId: true,
+            score: true,
+            createdAt: true,
+          },
+          orderBy: { createdAt: "desc" },
+        }),
       ])
-    : [[], []];
+    : [[], [], []];
   const activeApprovals = workflowIds.length
     ? await prisma.workflowComplianceApproval.findMany({
         where: {
@@ -88,6 +99,12 @@ export default async function DashboardWorkflowsPage({
   const incidentCountMap = new Map<string, number>();
   for (const incident of incidentRows) {
     incidentCountMap.set(incident.workflowId, (incidentCountMap.get(incident.workflowId) ?? 0) + 1);
+  }
+  const blastRadiusMap = new Map<string, number>();
+  for (const row of blastRadiusRows) {
+    if (!blastRadiusMap.has(row.workflowId)) {
+      blastRadiusMap.set(row.workflowId, row.score);
+    }
   }
   const openBreachCount = incidentRows.length;
 
@@ -145,6 +162,7 @@ export default async function DashboardWorkflowsPage({
               hasSla,
               complianceApproved: approvedWorkflowIds.has(item.id),
               slaState: breaches > 0 ? "BREACHED" : warning ? "WARNING" : "HEALTHY",
+              blastRadiusScore: blastRadiusMap.get(item.id) ?? null,
             };
           })}
         />

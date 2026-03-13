@@ -16,6 +16,7 @@ type WorkflowTableItem = {
   slaState: "HEALTHY" | "WARNING" | "BREACHED";
   hasSla: boolean;
   complianceApproved: boolean;
+  blastRadiusScore: number | null;
   createdAt: Date;
 };
 
@@ -94,7 +95,13 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
                 </span>
               </td>
               <td className="px-4 py-3 text-sm text-slate-600">{workflow.scheduleCron ?? "Manual trigger"}</td>
-              <td className="px-4 py-3 text-sm text-slate-600">{workflow.definition.steps.length}</td>
+              <td className="px-4 py-3 text-sm text-slate-600">
+                {workflow.definition.steps.length}
+                <div className="mt-1 text-xs text-slate-500">
+                  Blast Radius: {workflow.blastRadiusScore ?? 0}/100{" "}
+                  {(workflow.blastRadiusScore ?? 0) <= 10 ? "(Sandboxed)" : ""}
+                </div>
+              </td>
               <td className="px-4 py-3">
                 <RunWorkflowButton
                   workflowId={workflow.id}
