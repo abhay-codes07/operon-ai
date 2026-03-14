@@ -4,6 +4,7 @@ import { URL } from "url";
 import IORedis from "ioredis";
 import { WebSocketServer, type WebSocket } from "ws";
 
+import { loadProcessEnvFromFiles } from "@/config/load-env";
 import { getAppEnv } from "@/config/env";
 import { getControlPlaneChannelName } from "@/server/services/control-plane/streaming-service";
 
@@ -13,6 +14,7 @@ type ClientSubscription = {
   executionId?: string;
 };
 
+loadProcessEnvFromFiles();
 const env = getAppEnv();
 const port = Number(process.env.CONTROL_PLANE_WS_PORT ?? 3101);
 const redis = new IORedis(env.REDIS_URL, {

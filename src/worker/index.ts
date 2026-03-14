@@ -1,3 +1,4 @@
+import { loadProcessEnvFromFiles } from "@/config/load-env";
 import { closeQueueRedisConnection } from "@/server/queue/connection";
 import {
   startMarketplaceReliabilityWorker,
@@ -39,6 +40,7 @@ import {
 } from "@/server/queue/workers/sandbox-lifecycle.worker";
 
 async function bootstrapWorker() {
+  loadProcessEnvFromFiles();
   console.log("Starting WebOps AI execution worker...");
   startExecutionWorker();
   startMarketplaceReliabilityWorker();

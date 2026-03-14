@@ -6,5 +6,7 @@ export const queueNames = {
 
 export function getQueueName(key: keyof typeof queueNames): string {
   const env = getAppEnv();
-  return `${env.BULLMQ_QUEUE_PREFIX}:${queueNames[key]}`;
+  // BullMQ v5 disallows ":" in queue names.
+  const safePrefix = env.BULLMQ_QUEUE_PREFIX.replace(/[:\s]+/g, "-");
+  return `${safePrefix}-${queueNames[key]}`;
 }
