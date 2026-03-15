@@ -1,107 +1,104 @@
-import { MetricCard } from "@/components/dashboard/metric-card";
-import { AppShell } from "@/components/layout/app-shell";
-import { siteConfig } from "@/config/site";
-import { Button } from "@/components/ui/button";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { StatusBadge } from "@/components/ui/status-badge";
+"use client";
 
-const recentExecutions = [
+import { useRouter } from "next/navigation";
+
+import { AppShell } from "@/components/layout/app-shell";
+import AnimatedShaderHero from "@/components/ui/animated-shader-hero";
+
+const productPillars = [
   {
-    id: "exec_9134",
-    agentName: "Invoice Reconciler",
-    workflow: "Portal login > export CSV > sync ERP",
-    status: "Completed",
-    timestamp: "2m ago",
+    title: "Execution Fabric",
+    body: "Launch durable browser automations with queue-backed retries, replay, and real-time run control.",
   },
   {
-    id: "exec_9133",
-    agentName: "Inventory Watchdog",
-    workflow: "Supplier site > stock check > Slack alert",
-    status: "Running",
-    timestamp: "8m ago",
+    title: "Safety Layer",
+    body: "Enforce approvals, sandbox identities, policy guardrails, and prompt-injection defense on every run.",
   },
   {
-    id: "exec_9132",
-    agentName: "Refund Processor",
-    workflow: "Gateway dashboard > verify > refund issue",
-    status: "Failed",
-    timestamp: "17m ago",
+    title: "Business Intelligence",
+    body: "Turn each workflow into an operating asset with SLA contracts, compliance artifacts, and FinOps telemetry.",
   },
 ] as const;
 
-function toBadgeVariant(status: string): "success" | "warning" | "danger" {
-  if (status === "Completed") {
-    return "success";
-  }
-
-  if (status === "Running") {
-    return "warning";
-  }
-
-  return "danger";
-}
+const proofGrid = [
+  { label: "Workflows orchestrated", value: "10k+" },
+  { label: "Execution events/day", value: "2.4M" },
+  { label: "Median recovery time", value: "<90s" },
+  { label: "Observed SLA reliability", value: "99.1%" },
+] as const;
 
 export default function Home(): JSX.Element {
+  const router = useRouter();
+
   return (
-    <main className="py-10 md:py-14">
-      <AppShell className="space-y-10">
-        <SectionHeading
-          eyebrow="Operations Command"
-          title="Autonomous web workflows, with full execution traceability"
-          description={`${siteConfig.name} deploys deterministic AI agents that operate live browser workflows across your SaaS stack.`}
-          actions={<Button>Create Agent</Button>}
-        />
+    <main>
+      <AnimatedShaderHero
+        trustBadge={{
+          text: "Control plane for autonomous web operations",
+          icons: ["◉"],
+        }}
+        headline={{
+          line1: "Operate AI Agents",
+          line2: "Like Production Systems",
+        }}
+        subtitle="Operon AI is where web agents are launched, governed, debugged, and optimized with enterprise-grade control."
+        buttons={{
+          primary: {
+            text: "Launch Console",
+            onClick: () => router.push("/dashboard"),
+          },
+          secondary: {
+            text: "Create Workflow",
+            onClick: () => router.push("/dashboard/workflows"),
+          },
+        }}
+      />
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <MetricCard
-            title="Active Agents"
-            value="14"
-            detail="3 added this week"
-            icon={<span className="text-xs font-semibold uppercase">AGT</span>}
-          />
-          <MetricCard
-            title="Executions Today"
-            value="287"
-            detail="+22% vs yesterday"
-            icon={<span className="text-xs font-semibold uppercase">RUN</span>}
-          />
-          <MetricCard
-            title="Success Rate"
-            value="96.4%"
-            detail="After automated retries"
-            icon={<span className="text-xs font-semibold uppercase">SLA</span>}
-          />
-          <MetricCard
-            title="Log Events"
-            value="12,483"
-            detail="Structured and searchable"
-            icon={<span className="text-xs font-semibold uppercase">LOG</span>}
-          />
-        </section>
-
-        <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">Recent Executions</h2>
-          <p className="mt-1 text-sm text-slate-600">Live task history across all agent workflows</p>
-
-          <div className="mt-6 space-y-3">
-            {recentExecutions.map((execution) => (
+      <section className="bg-slate-950 py-20 text-slate-100">
+        <AppShell className="space-y-10">
+          <div className="max-w-3xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-300">Why Teams Choose Operon</p>
+            <h2 className="mt-4 text-3xl font-semibold md:text-5xl">Built for operators managing real risk, not toy automations.</h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {productPillars.map((pillar) => (
               <article
-                key={execution.id}
-                className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 md:flex-row md:items-center md:justify-between"
+                key={pillar.title}
+                className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 p-6 shadow-[0_20px_40px_-30px_rgba(251,146,60,0.5)]"
               >
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">{execution.agentName}</p>
-                  <p className="text-xs text-slate-600">{execution.workflow}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <StatusBadge label={execution.status} variant={toBadgeVariant(execution.status)} />
-                  <p className="text-xs font-medium text-slate-500">{execution.timestamp}</p>
-                </div>
+                <h3 className="text-lg font-semibold text-white">{pillar.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-slate-300">{pillar.body}</p>
               </article>
             ))}
           </div>
-        </section>
-      </AppShell>
+        </AppShell>
+      </section>
+
+      <section className="bg-gradient-to-b from-slate-100 to-white py-20">
+        <AppShell className="space-y-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Operational Proof</p>
+              <h2 className="mt-3 text-3xl font-semibold text-slate-950 md:text-4xl">Visibility from trigger to business outcome.</h2>
+            </div>
+            <button
+              onClick={() => router.push("/dashboard/activity")}
+              className="inline-flex h-11 items-center justify-center rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-800"
+            >
+              View Live Timeline
+            </button>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {proofGrid.map((item) => (
+              <div key={item.label} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <p className="text-3xl font-semibold text-slate-950">{item.value}</p>
+                <p className="mt-2 text-sm text-slate-600">{item.label}</p>
+              </div>
+            ))}
+          </div>
+        </AppShell>
+      </section>
     </main>
   );
 }
