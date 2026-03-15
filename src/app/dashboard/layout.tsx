@@ -14,10 +14,10 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
 
   return (
     <main className="py-8 md:py-10">
-      <AppShell className="grid gap-5 lg:grid-cols-[280px,1fr]">
-        <aside className="space-y-3 lg:sticky lg:top-24 lg:h-fit">
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">WebOps Console</p>
+      <AppShell className="grid gap-6 lg:grid-cols-[300px,1fr]">
+        <aside className="space-y-3 lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1">
+          <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50 p-4 shadow-[0_20px_34px_-28px_rgba(15,23,42,0.7)]">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Operon Console</p>
             <p className="mt-1 text-sm font-semibold text-slate-900">{user.name ?? user.email}</p>
             <p className="text-xs text-slate-500">{user.role ?? "MEMBER"}</p>
           </div>
@@ -32,3 +32,4 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
     </main>
   );
 }
+

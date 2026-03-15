@@ -11,10 +11,15 @@ type DashboardCardProps = {
 
 export function DashboardCard({ title, description, action, children, className }: DashboardCardProps) {
   return (
-    <section className={cn("rounded-2xl border border-slate-200 bg-white p-5 shadow-sm", className)}>
+    <section
+      className={cn(
+        "rounded-2xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 p-5 shadow-[0_24px_40px_-34px_rgba(15,23,42,0.5)] backdrop-blur",
+        className,
+      )}
+    >
       {title || action ? (
         <div className="flex items-start justify-between gap-3">
-          {title ? <h2 className="text-base font-semibold tracking-tight text-slate-900">{title}</h2> : <div />}
+          {title ? <h2 className="text-base font-semibold tracking-tight text-slate-950">{title}</h2> : <div />}
           {action ? <div>{action}</div> : null}
         </div>
       ) : null}
