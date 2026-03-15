@@ -435,11 +435,11 @@ export default function AnimatedShaderHero({
         ) : null}
 
         <div className="mx-auto max-w-5xl space-y-6 text-center">
-          <div className="space-y-2">
-            <h1 className="animate-fade-in-up animation-delay-200 bg-gradient-to-r from-orange-300 via-yellow-400 to-amber-300 bg-clip-text text-5xl font-bold text-transparent md:text-7xl lg:text-8xl">
+          <div className="space-y-3 pb-2">
+            <h1 className="animate-fade-in-up animation-delay-200 bg-gradient-to-r from-orange-300 via-yellow-400 to-amber-300 bg-clip-text text-5xl font-bold leading-[1.1] text-transparent md:text-7xl md:leading-[1.08] lg:text-8xl lg:leading-[1.06]">
               {headline.line1}
             </h1>
-            <h1 className="animate-fade-in-up animation-delay-400 bg-gradient-to-r from-yellow-300 via-orange-400 to-red-400 bg-clip-text text-5xl font-bold text-transparent md:text-7xl lg:text-8xl">
+            <h1 className="animate-fade-in-up animation-delay-400 bg-gradient-to-r from-yellow-300 via-orange-400 to-red-400 bg-clip-text text-5xl font-bold leading-[1.1] text-transparent md:text-7xl md:leading-[1.08] lg:text-8xl lg:leading-[1.06]">
               {headline.line2}
             </h1>
           </div>

@@ -18,15 +18,32 @@
   --ring: rgba(15, 23, 42, 0.2);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   color: var(--ink-strong);
   background:
-    radial-gradient(circle at 0% 0%, #e2e8f0 0, transparent 35%),
-    radial-gradient(circle at 100% 0%, #cbd5e1 0, transparent 20%),
+    radial-gradient(circle at 0% 0%, #dbeafe 0, transparent 38%),
+    radial-gradient(circle at 100% 0%, #e2e8f0 0, transparent 22%),
+    radial-gradient(circle at 50% 100%, #f8fafc 0, transparent 35%),
     var(--surface-0);
 }
 
 @layer utilities {
+  .glass-panel {
+    @apply border border-white/30 bg-white/45 backdrop-blur-xl shadow-[0_24px_50px_-36px_rgba(15,23,42,0.55)];
+  }
+
+  .glass-panel-dark {
+    @apply border border-white/20 bg-slate-900/45 backdrop-blur-xl shadow-[0_24px_60px_-40px_rgba(2,6,23,0.9)];
+  }
+
+  .section-fade-in {
+    @apply animate-[sectionFade_850ms_ease-out];
+  }
+
   .text-ink-soft {
     color: var(--ink-soft);
   }
@@ -45,5 +62,16 @@ body {
 
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+@keyframes sectionFade {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

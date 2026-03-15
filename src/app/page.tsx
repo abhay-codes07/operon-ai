@@ -31,7 +31,7 @@ export default function Home(): JSX.Element {
   const router = useRouter();
 
   return (
-    <main>
+    <main className="relative overflow-x-hidden">
       <AnimatedShaderHero
         trustBadge={{
           text: "Control plane for autonomous web operations",
@@ -54,17 +54,19 @@ export default function Home(): JSX.Element {
         }}
       />
 
-      <section className="bg-slate-950 py-20 text-slate-100">
-        <AppShell className="space-y-10">
+      <section className="relative bg-slate-950 py-24 text-slate-100 section-fade-in">
+        <AppShell className="relative z-10 space-y-10">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-300">Why Teams Choose Operon</p>
-            <h2 className="mt-4 text-3xl font-semibold md:text-5xl">Built for operators managing real risk, not toy automations.</h2>
+            <h2 className="mt-4 text-3xl font-semibold text-white md:text-5xl">
+              Built for operators managing real risk, not toy automations.
+            </h2>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             {productPillars.map((pillar) => (
               <article
                 key={pillar.title}
-                className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 p-6 shadow-[0_20px_40px_-30px_rgba(251,146,60,0.5)]"
+                className="glass-panel-dark rounded-2xl p-6 transition-transform duration-500 hover:-translate-y-1"
               >
                 <h3 className="text-lg font-semibold text-white">{pillar.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-slate-300">{pillar.body}</p>
@@ -74,8 +76,9 @@ export default function Home(): JSX.Element {
         </AppShell>
       </section>
 
-      <section className="bg-gradient-to-b from-slate-100 to-white py-20">
-        <AppShell className="space-y-8">
+      <section className="relative overflow-hidden bg-gradient-to-b from-slate-100 to-white py-24 section-fade-in">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,rgba(251,191,36,0.18),transparent_35%),radial-gradient(circle_at_90%_0%,rgba(56,189,248,0.14),transparent_30%)]" />
+        <AppShell className="relative z-10 space-y-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Operational Proof</p>
@@ -91,7 +94,7 @@ export default function Home(): JSX.Element {
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {proofGrid.map((item) => (
-              <div key={item.label} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div key={item.label} className="glass-panel rounded-2xl p-6 transition-transform duration-500 hover:-translate-y-1">
                 <p className="text-3xl font-semibold text-slate-950">{item.value}</p>
                 <p className="mt-2 text-sm text-slate-600">{item.label}</p>
               </div>
