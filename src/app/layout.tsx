@@ -31,8 +31,9 @@ export default function RootLayout({
             <header className="border-b border-slate-200 bg-white/95 backdrop-blur">
               <AppShell className="flex h-16 items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-slate-900 text-sm font-semibold text-white">
-                    W
+                  <span className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 text-sm font-bold text-white shadow-sm">
+                    O
+                    <span className="pointer-events-none absolute -bottom-2 -right-2 h-5 w-5 rounded-full bg-amber-400/90 blur-sm" />
                   </span>
                   <p className="text-sm font-semibold tracking-wide text-slate-900">
                     {siteConfig.name}
