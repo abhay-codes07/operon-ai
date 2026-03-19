@@ -414,8 +414,8 @@ export async function runExecutionWithTinyFish(
       metadata: {
         expectedOutcome: step.expectedOutcome,
         providerExecutionId: parsed.providerExecutionId,
-        selfHealing: {
-          strategy: resolveSelectorWithFallback({
+        selfHealing: (() => {
+          const healingResult = resolveSelectorWithFallback({
             requestedSelector: step.target,
             semanticHint: `${step.action} ${step.expectedOutcome}`,
             retryLimit: 2,
@@ -424,8 +424,14 @@ export async function runExecutionWithTinyFish(
               { selector: `[data-testid='${step.id}']`, semanticLabel: step.expectedOutcome },
               { selector: `[aria-label*='${step.action}']`, semanticLabel: step.action },
             ],
-          }),
-        },
+          });
+          return {
+            resolvedSelector: healingResult.resolvedSelector,
+            strategy: healingResult.strategy,
+            similarityScore: healingResult.similarityScore,
+            attempts: healingResult.attempts,
+          };
+        })(),
       },
       startedAt: new Date(),
       finishedAt: new Date(),
