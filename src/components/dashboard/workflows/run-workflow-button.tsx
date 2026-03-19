@@ -53,30 +53,48 @@ export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonPro
     setError(null);
     setNeedsComplianceApproval(false);
 
-    const response = await fetch(`/api/internal/workflows/${workflowId}/execute`, {
-      method: "POST",
-    });
+    try {
+      const response = await fetch(`/api/internal/workflows/${workflowId}/execute`, {
+        method: "POST",
+      });
 
-    setIsRunning(false);
+      setIsRunning(false);
 
-    if (!response.ok) {
-      const payload = (await response.json().catch(() => null)) as
-        | { error?: string | { code?: string; message?: string } }
-        | null;
-      const errorCode =
-        typeof payload?.error === "object" && payload?.error !== null ? payload.error.code : undefined;
-      const errorMessage =
-        typeof payload?.error === "object" && payload?.error !== null
-          ? payload.error.message
-          : payload?.error;
-      if (errorCode === "WORKFLOW_NOT_COMPLIANCE_APPROVED") {
-        setNeedsComplianceApproval(true);
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => null)) as
+          | { error?: string | { code?: string; message?: string }; reasons?: string[] }
+          | null;
+        const errorCode =
+          typeof payload?.error === "object" && payload?.error !== null ? payload.error.code : undefined;
+        const errorMessage =
+          typeof payload?.error === "object" && payload?.error !== null
+            ? payload.error.message
+            : payload?.error;
+        const reasons = Array.isArray(payload?.reasons) ? payload.reasons.join(", ") : "";
+        
+        if (errorCode === "WORKFLOW_NOT_COMPLIANCE_APPROVED") {
+          setNeedsComplianceApproval(true);
+        }
+        
+        const fullError = reasons ? `${errorMessage ?? "Run failed"}: ${reasons}` : errorMessage ?? "Run failed";
+        setError(fullError);
+        console.error("Workflow execution failed:", {
+          status: response.status,
+          payload,
+          fullError,
+        });
+        return;
       }
-      setError(errorMessage ?? "Run failed");
-      return;
-    }
 
-    router.refresh();
+      const resultJson = await response.json().catch(() => ({}));
+      console.log("Workflow execution queued successfully:", resultJson);
+      router.refresh();
+    } catch (err) {
+      setIsRunning(false);
+      const errorMsg = err instanceof Error ? err.message : "Unknown error occurred";
+      setError(`Network error: ${errorMsg}`);
+      console.error("Workflow execution error:", err);
+    }
   }
 
   async function onSimulateWorkflow() {

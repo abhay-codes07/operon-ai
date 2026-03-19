@@ -32,6 +32,7 @@ export async function POST(request: Request, context: RouteContext) {
   const user = await requireOrganizationRole("MEMBER");
   const isDevMode = process.env.NODE_ENV === "development";
   const executionEnabled = await isAgentExecutionEnabled();
+  
   if (!executionEnabled) {
     return NextResponse.json(
       {
@@ -53,6 +54,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   const parsedParams = paramsSchema.safeParse(context.params);
   if (!parsedParams.success) {
+    console.error("[execute] Invalid workflow ID", context.params);
     return NextResponse.json({ error: "Invalid workflow identifier" }, { status: 400 });
   }
 
@@ -62,8 +64,18 @@ export async function POST(request: Request, context: RouteContext) {
   });
 
   if (!workflow) {
+    console.error("[execute] Workflow not found", {
+      organizationId: user.organizationId,
+      workflowId: parsedParams.data.workflowId,
+    });
     return NextResponse.json({ error: "Workflow not found" }, { status: 404 });
   }
+
+  console.log("[execute] Starting execution for workflow", {
+    workflowId: workflow.id,
+    organizationId: user.organizationId,
+    devMode: isDevMode,
+  });
 
   const routing = await resolveWorkflowForExecution({
     organizationId: user.organizationId!,
@@ -77,11 +89,13 @@ export async function POST(request: Request, context: RouteContext) {
           workflowId: routing.workflowId,
         });
   if (!selectedWorkflow) {
+    console.error("[execute] Routed workflow not found", { routingId: routing.workflowId });
     return NextResponse.json({ error: "Routed workflow not found" }, { status: 404 });
   }
 
   const approvedForExecution = await hasActiveWorkflowApproval(selectedWorkflow.id);
   if (!approvedForExecution && !isDevMode) {
+    console.warn("[execute] Workflow not approved", { workflowId: selectedWorkflow.id });
     return structuredApiError(
       403,
       "WORKFLOW_NOT_COMPLIANCE_APPROVED",
@@ -96,6 +110,10 @@ export async function POST(request: Request, context: RouteContext) {
       selectedWorkflow.definition as { steps?: Array<{ action?: string; target?: string }> } | null,
   });
   if (!policyEvaluation.allowed && !isDevMode) {
+    console.warn("[execute] Policy evaluation failed", {
+      workflowId: selectedWorkflow.id,
+      reasons: policyEvaluation.reasons,
+    });
     return NextResponse.json(
       {
         error: "Workflow violates organization security policy",

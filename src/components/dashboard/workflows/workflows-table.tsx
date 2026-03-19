@@ -105,7 +105,7 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
               <td className="px-4 py-3">
                 <RunWorkflowButton
                   workflowId={workflow.id}
-                  disabled={workflow.status === "ARCHIVED" || workflow.status === "DRAFT"}
+                  disabled={workflow.status === "ARCHIVED"}
                 />
               </td>
             </tr>
