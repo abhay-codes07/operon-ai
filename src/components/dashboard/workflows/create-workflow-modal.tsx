@@ -11,6 +11,11 @@ type AgentOption = {
   name: string;
 };
 
+type ValidationIssues = {
+  fieldErrors?: Record<string, string[] | undefined>;
+  formErrors?: string[];
+};
+
 type CreateWorkflowModalProps = {
   agents: AgentOption[];
 };
@@ -24,11 +29,25 @@ export function CreateWorkflowModal({ agents }: CreateWorkflowModalProps): JSX.E
   const [agentId, setAgentId] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [targetUrl, setTargetUrl] = useState("");
   const [naturalLanguageTask, setNaturalLanguageTask] = useState("");
   const [scheduleCron, setScheduleCron] = useState("");
   const [guardrailsText, setGuardrailsText] = useState("");
   const [timeoutSeconds, setTimeoutSeconds] = useState("300");
   const [retryLimit, setRetryLimit] = useState("1");
+
+  function normalizeTargetUrlInput(value: string): string | undefined {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return undefined;
+    }
+
+    if (/^https?:\/\//i.test(trimmed)) {
+      return trimmed;
+    }
+
+    return `https://${trimmed}`;
+  }
 
   const canSubmit = useMemo(() => {
     return agentId && name.trim().length >= 2 && naturalLanguageTask.trim().length >= 10;
@@ -59,6 +78,18 @@ export function CreateWorkflowModal({ agents }: CreateWorkflowModalProps): JSX.E
 
     setIsSubmitting(true);
 
+    const normalizedTargetUrl = normalizeTargetUrlInput(targetUrl);
+    if (normalizedTargetUrl) {
+      try {
+        // Validate before request to avoid generic server-side error.
+        new URL(normalizedTargetUrl);
+      } catch {
+        setIsSubmitting(false);
+        setError("Target Website URL is invalid. Use a valid domain or URL.");
+        return;
+      }
+    }
+
     const response = await fetch("/api/internal/workflows", {
       method: "POST",
       headers: {
@@ -68,6 +99,7 @@ export function CreateWorkflowModal({ agents }: CreateWorkflowModalProps): JSX.E
         agentId,
         name: name.trim(),
         description: description.trim() || undefined,
+        targetUrl: normalizedTargetUrl,
         naturalLanguageTask: naturalLanguageTask.trim(),
         scheduleCron: normalizedCron,
         timeoutSeconds: parsedTimeout,
@@ -82,8 +114,16 @@ export function CreateWorkflowModal({ agents }: CreateWorkflowModalProps): JSX.E
     setIsSubmitting(false);
 
     if (!response.ok) {
-      const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-      setError(payload?.error ?? "Unable to create workflow.");
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; issues?: ValidationIssues }
+        | null;
+      const fieldError = payload?.issues?.fieldErrors
+        ? Object.values(payload.issues.fieldErrors).find(
+            (entry): entry is string[] => Array.isArray(entry) && entry.length > 0,
+          )?.[0]
+        : undefined;
+      const formError = payload?.issues?.formErrors?.[0];
+      setError(fieldError ?? formError ?? payload?.error ?? "Unable to create workflow.");
       return;
     }
 
@@ -91,6 +131,7 @@ export function CreateWorkflowModal({ agents }: CreateWorkflowModalProps): JSX.E
     setAgentId("");
     setName("");
     setDescription("");
+    setTargetUrl("");
     setNaturalLanguageTask("");
     setScheduleCron("");
     setGuardrailsText("");
@@ -136,6 +177,16 @@ export function CreateWorkflowModal({ agents }: CreateWorkflowModalProps): JSX.E
                     required
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700">Target Website URL (Optional)</label>
+                <input
+                  value={targetUrl}
+                  onChange={(event) => setTargetUrl(event.target.value)}
+                  className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+                  placeholder="https://www.amazon.in/s?k=iphone"
+                />
               </div>
 
               <div className="space-y-2">

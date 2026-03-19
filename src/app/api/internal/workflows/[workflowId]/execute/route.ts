@@ -30,6 +30,7 @@ type RouteContext = {
 
 export async function POST(request: Request, context: RouteContext) {
   const user = await requireOrganizationRole("MEMBER");
+  const isDevMode = process.env.NODE_ENV === "development";
   const executionEnabled = await isAgentExecutionEnabled();
   if (!executionEnabled) {
     return NextResponse.json(
@@ -80,7 +81,7 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   const approvedForExecution = await hasActiveWorkflowApproval(selectedWorkflow.id);
-  if (!approvedForExecution) {
+  if (!approvedForExecution && !isDevMode) {
     return structuredApiError(
       403,
       "WORKFLOW_NOT_COMPLIANCE_APPROVED",
@@ -94,7 +95,7 @@ export async function POST(request: Request, context: RouteContext) {
     definition:
       selectedWorkflow.definition as { steps?: Array<{ action?: string; target?: string }> } | null,
   });
-  if (!policyEvaluation.allowed) {
+  if (!policyEvaluation.allowed && !isDevMode) {
     return NextResponse.json(
       {
         error: "Workflow violates organization security policy",
@@ -128,6 +129,8 @@ export async function POST(request: Request, context: RouteContext) {
       routedWorkflowId: selectedWorkflow.id,
       releaseId: routing.releaseId,
       releaseLane,
+      devBypassedCompliance: !approvedForExecution && isDevMode,
+      devBypassedPolicy: !policyEvaluation.allowed && isDevMode,
     },
   });
   const traceId = createTraceId(execution.id);

@@ -29,7 +29,6 @@ export default async function DashboardWorkflowsPage({
       : undefined;
   const agents = await fetchAgentCatalog({
     organizationId: user.organizationId!,
-    status: "ACTIVE",
     page: 1,
     pageSize: 100,
   });
@@ -114,7 +113,13 @@ export default async function DashboardWorkflowsPage({
         eyebrow="Workflow Builder"
         title="Workflow Library"
         description="Design, schedule, and deploy deterministic multi-step browser operations."
-        actions={<CreateWorkflowModal agents={agents.items.map((agent) => ({ id: agent.id, name: agent.name }))} />}
+        actions={
+          <CreateWorkflowModal
+            agents={agents.items
+              .filter((agent) => agent.status !== "ARCHIVED")
+              .map((agent) => ({ id: agent.id, name: agent.name }))}
+          />
+        }
       />
 
       <DashboardCard>

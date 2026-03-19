@@ -55,6 +55,7 @@ export async function executeTinyFishWorkflow(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-API-Key": config.apiKey,
         Authorization: `Bearer ${config.apiKey}`,
       },
       body: JSON.stringify(request),

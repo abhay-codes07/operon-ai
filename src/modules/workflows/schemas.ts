@@ -42,6 +42,7 @@ export const createWorkflowRequestSchema = z.object({
   agentId: z.string().cuid(),
   name: z.string().min(2).max(120),
   description: z.string().max(1000).optional(),
+  targetUrl: z.string().trim().min(2).max(500).optional(),
   scheduleCron: z
     .string()
     .max(100)

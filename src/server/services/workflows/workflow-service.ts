@@ -42,6 +42,7 @@ export async function createWorkflowFromTask(input: {
 }) {
   const definition = buildWorkflowDefinition({
     naturalLanguageTask: input.payload.naturalLanguageTask,
+    targetUrl: input.payload.targetUrl,
     guardrails: input.payload.guardrails,
     timeoutSeconds: input.payload.timeoutSeconds,
     retryLimit: input.payload.retryLimit,
