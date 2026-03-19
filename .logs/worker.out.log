@@ -1,0 +1,115 @@
+
+> operon-ai@0.1.0 worker
+> tsx src/worker/index.ts
+
+Starting WebOps AI execution worker...
+{"timestamp":"2026-03-16T19:57:02.433Z","severity":"INFO","message":"OperonHub reliability recompute cycle completed","component":"marketplace-reliability-worker","metadata":{"templateCount":0}}
+{"timestamp":"2026-03-16T19:57:02.457Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T19:57:02.462Z","severity":"INFO","message":"Intelligence monitor cycle completed","component":"intelligence-monitor-worker"}
+{"timestamp":"2026-03-16T19:57:02.462Z","severity":"INFO","message":"Sandbox lifecycle cycle completed","component":"sandbox-lifecycle-worker","metadata":{"expiredSessions":0,"revokedIdentities":0}}
+{"timestamp":"2026-03-16T19:57:02.463Z","severity":"INFO","message":"SLA monitor cycle completed","component":"sla-monitor-worker"}
+{"timestamp":"2026-03-16T19:57:02.464Z","severity":"INFO","message":"Operon Shield monitor cycle completed","component":"shield-monitor-worker","metadata":{"runCount":1}}
+{"timestamp":"2026-03-16T19:57:02.565Z","severity":"INFO","message":"Compliance passport report cycle completed","component":"compliance-report-worker","metadata":{"workflowCount":4,"generatedCount":4}}
+{"timestamp":"2026-03-16T19:57:02.583Z","severity":"INFO","message":"FinOps cost monitor cycle completed","component":"cost-monitor-worker","metadata":{"workflowsChecked":4,"exceededBudgetCount":0,"anomaliesDetected":0}}
+{"timestamp":"2026-03-16T19:57:02.660Z","severity":"INFO","message":"Dispatching TinyFish execution request","component":"tinyfish-client","executionId":"cmmtldvjx0003emhklrq4oh6f","workflowId":"cmmrra7p4000pemawunxyn1ko","organizationId":"cmmqooojp0005eme4lcd5fft0","metadata":{"stepCount":1}}
+{"timestamp":"2026-03-16T19:57:05.166Z","severity":"INFO","message":"Dispatching TinyFish execution request","component":"tinyfish-client","executionId":"cmmtldvjx0003emhklrq4oh6f","workflowId":"cmmrra7p4000pemawunxyn1ko","organizationId":"cmmqooojp0005eme4lcd5fft0","metadata":{"stepCount":1}}
+{"timestamp":"2026-03-16T19:57:07.591Z","severity":"INFO","message":"Dispatching TinyFish execution request","component":"tinyfish-client","executionId":"cmmtldvjx0003emhklrq4oh6f","workflowId":"cmmrra7p4000pemawunxyn1ko","organizationId":"cmmqooojp0005eme4lcd5fft0","metadata":{"stepCount":1}}
+{"timestamp":"2026-03-16T19:58:02.400Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T19:59:02.410Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:00:02.421Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:01:02.428Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:02:02.405Z","severity":"INFO","message":"Sandbox lifecycle cycle completed","component":"sandbox-lifecycle-worker","metadata":{"expiredSessions":0,"revokedIdentities":0}}
+{"timestamp":"2026-03-16T20:02:02.409Z","severity":"INFO","message":"SLA monitor cycle completed","component":"sla-monitor-worker"}
+{"timestamp":"2026-03-16T20:02:02.433Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:03:02.462Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:04:02.468Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:05:02.459Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:06:02.468Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:07:02.410Z","severity":"INFO","message":"Operon Shield monitor cycle completed","component":"shield-monitor-worker","metadata":{"runCount":1}}
+{"timestamp":"2026-03-16T20:07:02.432Z","severity":"INFO","message":"Sandbox lifecycle cycle completed","component":"sandbox-lifecycle-worker","metadata":{"expiredSessions":0,"revokedIdentities":0}}
+{"timestamp":"2026-03-16T20:07:02.437Z","severity":"INFO","message":"SLA monitor cycle completed","component":"sla-monitor-worker"}
+{"timestamp":"2026-03-16T20:07:02.469Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:07:02.477Z","severity":"INFO","message":"FinOps cost monitor cycle completed","component":"cost-monitor-worker","metadata":{"workflowsChecked":4,"exceededBudgetCount":0,"anomaliesDetected":0}}
+{"timestamp":"2026-03-16T20:08:02.481Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:09:02.478Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:10:02.478Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:11:02.487Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:12:02.424Z","severity":"INFO","message":"Sandbox lifecycle cycle completed","component":"sandbox-lifecycle-worker","metadata":{"expiredSessions":0,"revokedIdentities":0}}
+{"timestamp":"2026-03-16T20:12:02.445Z","severity":"INFO","message":"SLA monitor cycle completed","component":"sla-monitor-worker"}
+{"timestamp":"2026-03-16T20:12:02.512Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:13:02.503Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:14:02.518Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:15:02.519Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:16:02.523Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:17:02.408Z","severity":"INFO","message":"Operon Shield monitor cycle completed","component":"shield-monitor-worker","metadata":{"runCount":1}}
+{"timestamp":"2026-03-16T20:17:02.428Z","severity":"INFO","message":"SLA monitor cycle completed","component":"sla-monitor-worker"}
+{"timestamp":"2026-03-16T20:17:02.443Z","severity":"INFO","message":"Sandbox lifecycle cycle completed","component":"sandbox-lifecycle-worker","metadata":{"expiredSessions":0,"revokedIdentities":0}}
+{"timestamp":"2026-03-16T20:17:02.501Z","severity":"INFO","message":"FinOps cost monitor cycle completed","component":"cost-monitor-worker","metadata":{"workflowsChecked":4,"exceededBudgetCount":0,"anomaliesDetected":0}}
+{"timestamp":"2026-03-16T20:17:02.531Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:18:02.532Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:19:02.541Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:20:02.547Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:22:11.341Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:22:11.356Z","severity":"INFO","message":"Sandbox lifecycle cycle completed","component":"sandbox-lifecycle-worker","metadata":{"expiredSessions":0,"revokedIdentities":0}}
+{"timestamp":"2026-03-16T20:22:11.359Z","severity":"INFO","message":"SLA monitor cycle completed","component":"sla-monitor-worker"}
+{"timestamp":"2026-03-16T20:23:10.110Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:24:10.116Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:25:10.123Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:26:10.130Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:27:02.260Z","severity":"INFO","message":"Operon Shield monitor cycle completed","component":"shield-monitor-worker","metadata":{"runCount":1}}
+{"timestamp":"2026-03-16T20:27:02.265Z","severity":"INFO","message":"Intelligence monitor cycle completed","component":"intelligence-monitor-worker"}
+{"timestamp":"2026-03-16T20:27:02.310Z","severity":"INFO","message":"FinOps cost monitor cycle completed","component":"cost-monitor-worker","metadata":{"workflowsChecked":5,"exceededBudgetCount":0,"anomaliesDetected":0}}
+{"timestamp":"2026-03-16T20:27:10.134Z","severity":"INFO","message":"Sandbox lifecycle cycle completed","component":"sandbox-lifecycle-worker","metadata":{"expiredSessions":0,"revokedIdentities":0}}
+{"timestamp":"2026-03-16T20:27:10.138Z","severity":"INFO","message":"SLA monitor cycle completed","component":"sla-monitor-worker"}
+{"timestamp":"2026-03-16T20:27:10.140Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:28:10.187Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:29:10.157Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:30:10.165Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:31:10.180Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:32:10.146Z","severity":"INFO","message":"SLA monitor cycle completed","component":"sla-monitor-worker"}
+{"timestamp":"2026-03-16T20:32:10.152Z","severity":"INFO","message":"Sandbox lifecycle cycle completed","component":"sandbox-lifecycle-worker","metadata":{"expiredSessions":0,"revokedIdentities":0}}
+{"timestamp":"2026-03-16T20:32:10.189Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:33:10.199Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:34:10.203Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:35:10.205Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:36:10.219Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:37:02.260Z","severity":"INFO","message":"Operon Shield monitor cycle completed","component":"shield-monitor-worker","metadata":{"runCount":1}}
+{"timestamp":"2026-03-16T20:37:02.330Z","severity":"INFO","message":"FinOps cost monitor cycle completed","component":"cost-monitor-worker","metadata":{"workflowsChecked":5,"exceededBudgetCount":0,"anomaliesDetected":0}}
+{"timestamp":"2026-03-16T20:37:10.146Z","severity":"INFO","message":"SLA monitor cycle completed","component":"sla-monitor-worker"}
+{"timestamp":"2026-03-16T20:37:10.158Z","severity":"INFO","message":"Sandbox lifecycle cycle completed","component":"sandbox-lifecycle-worker","metadata":{"expiredSessions":0,"revokedIdentities":0}}
+{"timestamp":"2026-03-16T20:37:10.225Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:38:10.256Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:39:10.236Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:40:10.245Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:41:10.252Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:42:10.157Z","severity":"INFO","message":"SLA monitor cycle completed","component":"sla-monitor-worker"}
+{"timestamp":"2026-03-16T20:42:10.162Z","severity":"INFO","message":"Sandbox lifecycle cycle completed","component":"sandbox-lifecycle-worker","metadata":{"expiredSessions":0,"revokedIdentities":0}}
+{"timestamp":"2026-03-16T20:42:10.262Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:43:10.284Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:44:10.262Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:45:10.259Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:46:10.274Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:47:02.262Z","severity":"INFO","message":"Operon Shield monitor cycle completed","component":"shield-monitor-worker","metadata":{"runCount":0}}
+{"timestamp":"2026-03-16T20:47:02.327Z","severity":"INFO","message":"FinOps cost monitor cycle completed","component":"cost-monitor-worker","metadata":{"workflowsChecked":5,"exceededBudgetCount":0,"anomaliesDetected":0}}
+{"timestamp":"2026-03-16T20:47:10.156Z","severity":"INFO","message":"SLA monitor cycle completed","component":"sla-monitor-worker"}
+{"timestamp":"2026-03-16T20:47:10.162Z","severity":"INFO","message":"Sandbox lifecycle cycle completed","component":"sandbox-lifecycle-worker","metadata":{"expiredSessions":0,"revokedIdentities":0}}
+{"timestamp":"2026-03-16T20:47:10.283Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:48:10.286Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:49:10.296Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:50:10.303Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:51:10.307Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:52:10.170Z","severity":"INFO","message":"SLA monitor cycle completed","component":"sla-monitor-worker"}
+{"timestamp":"2026-03-16T20:52:10.175Z","severity":"INFO","message":"Sandbox lifecycle cycle completed","component":"sandbox-lifecycle-worker","metadata":{"expiredSessions":0,"revokedIdentities":0}}
+{"timestamp":"2026-03-16T20:52:10.320Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:53:10.343Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:54:10.343Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:55:10.339Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:56:10.349Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:57:02.276Z","severity":"INFO","message":"Intelligence monitor cycle completed","component":"intelligence-monitor-worker"}
+{"timestamp":"2026-03-16T20:57:02.294Z","severity":"INFO","message":"Operon Shield monitor cycle completed","component":"shield-monitor-worker","metadata":{"runCount":0}}
+{"timestamp":"2026-03-16T20:57:02.355Z","severity":"INFO","message":"FinOps cost monitor cycle completed","component":"cost-monitor-worker","metadata":{"workflowsChecked":5,"exceededBudgetCount":0,"anomaliesDetected":0}}
+{"timestamp":"2026-03-16T20:57:10.163Z","severity":"INFO","message":"Sandbox lifecycle cycle completed","component":"sandbox-lifecycle-worker","metadata":{"expiredSessions":0,"revokedIdentities":0}}
+{"timestamp":"2026-03-16T20:57:10.167Z","severity":"INFO","message":"SLA monitor cycle completed","component":"sla-monitor-worker"}
+{"timestamp":"2026-03-16T20:57:10.370Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:58:10.369Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}
+{"timestamp":"2026-03-16T20:59:10.371Z","severity":"INFO","message":"Co-Pilot monitor cycle completed","component":"copilot-monitor-worker","metadata":{"staleSessionsClosed":0}}

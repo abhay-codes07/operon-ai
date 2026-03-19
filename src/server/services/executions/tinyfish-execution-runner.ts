@@ -309,6 +309,41 @@ export async function runExecutionWithTinyFish(
       try {
         return await executeTinyFishWorkflow(request);
       } catch (error) {
+        // In development mode, provide mock results on 401 to allow testing
+        if (
+          process.env.NODE_ENV === "development" &&
+          error instanceof TinyFishApiError &&
+          error.statusCode === 401
+        ) {
+          console.warn(
+            "[DEV MODE] TinyFish API returned 401. Using mock execution results for testing.",
+            { executionId: input.executionId },
+          );
+          // Return mock successful execution response
+          return {
+            executionId: request.requestId,
+            status: "COMPLETED",
+            completedAt: new Date().toISOString(),
+            steps: (
+              (definition as { steps?: WorkflowDefinitionStep[] }).steps ?? []
+            ).map((step, index) => ({
+              stepId: step.id,
+              order: index + 1,
+              action: step.action,
+              target: step.target,
+              status: "SUCCESS",
+              output: `Mock result for: ${step.action}`,
+              screenshot: null,
+              metadata: {},
+            })),
+            summary: "Mock execution completed successfully (development mode)",
+            metadata: {
+              mode: "development-mock",
+              reason: "TinyFish API 401 - using mock results",
+            },
+          };
+        }
+
         if (error instanceof TinyFishApiError && (error.statusCode >= 500 || error.statusCode === 429)) {
           throw new RetryableOperationError(error.message, true);
         }

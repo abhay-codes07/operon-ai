@@ -1,0 +1,13 @@
+Error: spawn EPERM
+    at ChildProcess.spawn (node:internal/child_process:421:11)
+    at spawn (node:child_process:796:9)
+    at fork (node:child_process:174:10)
+    at C:\operon-ai\node_modules\next\dist\cli\next-dev.js:213:45
+    at new Promise (<anonymous>)
+    at startServer (C:\operon-ai\node_modules\next\dist\cli\next-dev.js:199:16)
+    at runDevServer (C:\operon-ai\node_modules\next\dist\cli\next-dev.js:280:23)
+    at Module.nextDev (C:\operon-ai\node_modules\next\dist\cli\next-dev.js:288:11) {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'spawn'
+}

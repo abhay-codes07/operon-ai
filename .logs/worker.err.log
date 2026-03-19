@@ -1,0 +1,376 @@
+{"timestamp":"2026-03-16T19:57:07.883Z","severity":"ERROR","message":"Queue job failed","component":"execution-worker","executionId":"cmmtldvjx0003emhklrq4oh6f","organizationId":"cmmqooojp0005eme4lcd5fft0","traceId":"67c167029e6ef9034f795814","metadata":{"failedReason":"TinyFish request failed with status 401"}}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1134:18)
+    at afterConnectMultiple (node:net:1715:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 6379
+    },
+    Error: connect EADDRINUSE 127.0.0.1:6379
+        at createConnectionError (node:net:1678:14)
+        at afterConnectMultiple (node:net:1708:16) {
+      errno: -4091,
+      code: 'EADDRINUSE',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 6379
+    }
+  ]
+}

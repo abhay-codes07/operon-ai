@@ -1,0 +1,38 @@
+
+> operon-ai@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.5
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 2.2s
+ ○ Compiling / ...
+ ✓ Compiled / in 4.9s (590 modules)
+ ✓ Compiled in 635ms (288 modules)
+ GET / 200 in 5613ms
+ ✓ Compiled in 80ms (274 modules)
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 1222ms (541 modules)
+ ✓ Compiled (569 modules)
+ GET /favicon.ico 200 in 2006ms
+ GET /api/auth/session 200 in 2410ms
+ GET /api/auth/session 200 in 66ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 2.8s (1270 modules)
+ GET /dashboard 307 in 3700ms
+ ○ Compiling /auth/sign-in ...
+ ✓ Compiled /auth/sign-in in 1005ms (1263 modules)
+ GET /dashboard 307 in 1327ms
+ GET /auth/sign-in 200 in 117ms
+ GET /api/auth/session 200 in 120ms
+ GET /api/auth/session 200 in 56ms
+   Reload env: .env
+ ✓ Compiled in 388ms (1263 modules)
+   Reload env: .env
+ ✓ Compiled in 457ms (875 modules)
+   Reload env: .env
+ ✓ Compiled in 336ms (875 modules)
+   Reload env: .env
+ ✓ Compiled in 272ms (875 modules)

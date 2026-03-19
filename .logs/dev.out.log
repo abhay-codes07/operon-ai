@@ -1,0 +1,58 @@
+
+> operon-ai@0.1.0 dev
+> next dev --port 3000
+
+  ▲ Next.js 14.2.5
+  - Local:        http://localhost:3000
+  - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 1889ms
+ ✓ Compiled /api/auth/[...nextauth] in 497ms (267 modules)
+ GET /api/auth/session 200 in 1082ms
+ ○ Compiling /dashboard/workflows ...
+ ✓ Compiled /dashboard/workflows in 2.8s (1008 modules)
+ ✓ Compiled in 491ms (319 modules)
+ GET /dashboard/workflows 200 in 3323ms
+ ✓ Compiled /favicon.ico in 375ms (716 modules)
+ ✓ Compiled (743 modules)
+ GET /favicon.ico 200 in 684ms
+ GET /api/auth/session 200 in 811ms
+ GET /api/internal/system/kill-switch 200 in 827ms
+ GET /api/internal/system/kill-switch 200 in 832ms
+ GET /api/auth/session 200 in 114ms
+ ✓ Compiled /api/internal/workflows in 415ms (712 modules)
+ POST /api/internal/workflows 201 in 791ms
+ GET /dashboard/workflows?_rsc=1mu6m 200 in 143ms
+ ○ Compiling /workflows/[id]/compliance ...
+ ✓ Compiled /workflows/[id]/compliance in 1079ms (1046 modules)
+ GET /workflows/cmmtmsyfg0001em50k53omh3u/compliance?_rsc=e5xpz 200 in 247ms
+ ✓ Compiled /api/compliance/workflows/[id]/approve in 344ms (728 modules)
+ POST /api/compliance/workflows/cmmtmsyfg0001em50k53omh3u/approve 201 in 898ms
+ ✓ Compiled /api/internal/system/kill-switch in 303ms (732 modules)
+ GET /api/internal/system/kill-switch 200 in 415ms
+ GET /api/internal/system/kill-switch 200 in 417ms
+ GET /dashboard/workflows 200 in 288ms
+ ✓ Compiled /api/auth/[...nextauth] in 481ms (759 modules)
+ ✓ Compiled (761 modules)
+ GET /favicon.ico 200 in 1317ms
+ GET /api/auth/session 200 in 1305ms
+ GET /api/internal/system/kill-switch 200 in 1318ms
+ GET /api/internal/system/kill-switch 200 in 1329ms
+ GET /api/auth/session 200 in 37ms
+ ○ Compiling /dashboard/agents ...
+ ✓ Compiled /dashboard/agents in 751ms (1084 modules)
+ GET /dashboard/agents?_rsc=10zx8 200 in 76ms
+ ○ Compiling /dashboard/activity ...
+ ✓ Compiled /dashboard/activity in 1187ms (1116 modules)
+ GET /dashboard/activity?_rsc=19x6h 200 in 106ms
+ ✓ Compiled /api/internal/executions in 335ms (795 modules)
+ GET /api/internal/executions?page=1&pageSize=12 200 in 473ms
+ GET /api/internal/executions?page=1&pageSize=12 200 in 477ms
+ ✓ Compiled /api/internal/executions/[executionId]/logs in 403ms (797 modules)
+ GET /api/internal/executions/cmmtldvjx0003emhklrq4oh6f/logs?page=1&pageSize=50 200 in 925ms
+ GET /api/internal/executions/cmmtldvjx0003emhklrq4oh6f/logs?page=1&pageSize=50 200 in 963ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 3.5s (1456 modules)
+ GET /dashboard?_rsc=1gtj6 200 in 285ms
+[?25h

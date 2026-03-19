@@ -1,0 +1,5 @@
+
+> operon-ai@0.1.0 control-plane
+> tsx src/control-plane/server.ts
+
+Control plane websocket server listening on :3201
