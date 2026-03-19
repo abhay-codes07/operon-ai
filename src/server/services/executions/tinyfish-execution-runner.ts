@@ -322,28 +322,37 @@ export async function runExecutionWithTinyFish(
             { executionId: input.executionId, errorReason },
           );
           
-          // Return mock successful execution response
+          // Return mock execution response matching TinyFishExecutionResponse type
           return {
-            executionId: request.requestId,
-            status: "COMPLETED",
-            completedAt: new Date().toISOString(),
-            steps: (
-              (definition as { steps?: WorkflowDefinitionStep[] }).steps ?? []
-            ).map((step, index) => ({
-              stepId: step.id,
-              order: index + 1,
-              action: step.action,
-              target: step.target,
-              status: "SUCCESS",
-              output: `Mock result for: ${step.action}`,
-              screenshot: null,
-              metadata: {},
-            })),
-            summary: "Mock execution completed successfully (development mode)",
-            metadata: {
-              mode: "development-mock",
+            providerExecutionId: request.requestId,
+            status: "succeeded" as const,
+            summary: "Mock workflow execution completed successfully (development mode)",
+            output: {
+              result: "success",
+              mode: "mock",
               reason: `TinyFish API error - using mock results (${errorReason})`,
             },
+            events: [
+              {
+                level: "info" as const,
+                message: `[DEV MODE] Mock execution results - actual error was: ${errorReason}`,
+                timestamp: new Date().toISOString(),
+                metadata: { mode: "development-mock" },
+              },
+              ...(
+                (definition as { steps?: WorkflowDefinitionStep[] }).steps ?? []
+              ).map((step, index) => ({
+                level: "info" as const,
+                message: `Step ${index + 1}: ${step.action} completed successfully`,
+                timestamp: new Date().toISOString(),
+                metadata: {
+                  stepId: step.id,
+                  action: step.action,
+                  target: step.target,
+                },
+              })),
+            ],
+            screenshots: [],
           };
         }
 
