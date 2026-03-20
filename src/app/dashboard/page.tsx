@@ -6,6 +6,7 @@ import { listTemplates } from "@/lib/marketplace/marketplace.service";
 import { requireAuthenticatedUser } from "@/server/auth/authorization";
 import { fetchChangeRadarFeed } from "@/server/services/monitoring/change-radar-service";
 import { getExecutionQueueHealth } from "@/server/queue/monitoring/health";
+import { fetchDashboardMetrics } from "@/server/services/dashboard/metrics-service";
 import { prisma } from "@/server/db/client";
 
 type DashboardPageProps = {
@@ -25,6 +26,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     page: 1,
     pageSize: 5,
   }).catch(() => ({ items: [] as Array<{ id: string; title: string; reliabilityScore: number; installCount: number }> }));
+  const metrics = user.organizationId ? await fetchDashboardMetrics(user.organizationId).catch(() => null) : null;
   const [approvalCount, violationCount] = user.organizationId
     ? await Promise.all([
         prisma.workflowComplianceApproval.count({
@@ -60,23 +62,23 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700/50">
           <p className="text-slate-400 text-sm font-semibold">Active Agents</p>
-          <p className="text-4xl font-bold text-cyan-400 mt-2">14</p>
-          <p className="text-slate-500 text-xs mt-2">↑ 2 this week</p>
+          <p className="text-4xl font-bold text-cyan-400 mt-2">{metrics?.activeAgents ?? "—"}</p>
+          <p className="text-slate-500 text-xs mt-2">{metrics?.activeAgentsChange ? `↑ ${metrics.activeAgentsChange}% this week` : "No recent activity"}</p>
         </div>
         <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700/50">
           <p className="text-slate-400 text-sm font-semibold">Daily Executions</p>
-          <p className="text-4xl font-bold text-blue-400 mt-2">287</p>
-          <p className="text-slate-500 text-xs mt-2">↑ 12% from yesterday</p>
+          <p className="text-4xl font-bold text-blue-400 mt-2">{metrics?.dailyExecutions ?? "—"}</p>
+          <p className="text-slate-500 text-xs mt-2">{metrics?.executionChange ? `${metrics.executionChange > 0 ? '↑' : '↓'} ${Math.abs(metrics.executionChange)}% from yesterday` : "—"}</p>
         </div>
         <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700/50">
           <p className="text-slate-400 text-sm font-semibold">Success Rate</p>
-          <p className="text-4xl font-bold text-green-400 mt-2">96.4%</p>
-          <p className="text-slate-500 text-xs mt-2">Excellent performance</p>
+          <p className="text-4xl font-bold text-green-400 mt-2">{metrics?.successRate ?? "—"}%</p>
+          <p className="text-slate-500 text-xs mt-2">{metrics?.successRate && metrics.successRate > 90 ? "Excellent performance" : "Monitor closely"}</p>
         </div>
         <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700/50">
           <p className="text-slate-400 text-sm font-semibold">Avg Runtime</p>
-          <p className="text-4xl font-bold text-purple-400 mt-2">1m 42s</p>
-          <p className="text-slate-500 text-xs mt-2">Optimized performance</p>
+          <p className="text-4xl font-bold text-purple-400 mt-2">{metrics?.avgRuntime ?? "—"}</p>
+          <p className="text-slate-500 text-xs mt-2">{metrics?.avgRuntimeSeconds && metrics.avgRuntimeSeconds < 300 ? "Optimized performance" : "—"}</p>
         </div>
       </div>
 

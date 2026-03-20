@@ -33,10 +33,14 @@ function extractUrlFromTask(
     github: "https://github.com",
     linkedin: "https://www.linkedin.com",
     twitter: "https://twitter.com",
+    "x.com": "https://x.com",
     facebook: "https://www.facebook.com",
     instagram: "https://www.instagram.com",
     stripe: "https://stripe.com",
     shopify: "https://shopify.com",
+    walmart: "https://www.walmart.com",
+    target: "https://www.target.com",
+    bestbuy: "https://www.bestbuy.com",
   };
 
   // Look for website mentions
@@ -60,7 +64,20 @@ function extractUrlFromTask(
     }
   }
 
-  // Default fallback
+  // For generic multi-site tasks (like "visit popular websites"), use a generic URL
+  // This allows the AI agent to intelligently choose where to go based on the task
+  if (task.includes("website") || task.includes("browse") || task.includes("visit")) {
+    // Use example.com as a base for the agent to start from and navigate
+    // The agent will intelligently determine target sites based on the task
+    return "https://www.example.com";
+  }
+
+  // For tasks with extraction keywords, use Google as the starting point
+  if (task.includes("search") || task.includes("find") || task.includes("look for")) {
+    return "https://www.google.com";
+  }
+
+  // Default fallback for any other generic tasks
   return "https://www.example.com";
 }
 
@@ -99,3 +116,4 @@ export function buildTinyFishExecutionRequest(
     metadata: input.metadata,
   };
 }
+
