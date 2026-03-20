@@ -48,13 +48,20 @@ function mapLogLevel(level: "debug" | "info" | "warn" | "error"): LogLevel {
 export function parseTinyFishExecutionResponse(
   response: TinyFishExecutionResponse,
 ): ParsedTinyFishResult {
+  if (!response) {
+    throw new Error("TinyFish response is null or undefined");
+  }
+
+  const events = response.events || [];
+  const screenshots = response.screenshots || [];
+
   return {
     status: mapExecutionStatus(response.status),
     providerExecutionId: response.providerExecutionId,
     summary: response.summary,
     output: response.output,
     errorMessage: response.error?.message,
-    logs: response.events.map((event) => ({
+    logs: events.map((event) => ({
       level: mapLogLevel(event.level),
       message: event.message,
       metadata: {
@@ -62,6 +69,6 @@ export function parseTinyFishExecutionResponse(
         ...event.metadata,
       },
     })),
-    screenshots: response.screenshots,
+    screenshots: screenshots,
   };
 }

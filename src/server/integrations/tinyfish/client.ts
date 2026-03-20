@@ -48,6 +48,8 @@ export async function executeTinyFishWorkflow(
       organizationId: request.organizationId,
       metadata: {
         stepCount: request.steps.length,
+        url: request.url,
+        goal: request.goal,
       },
     });
 
@@ -78,14 +80,34 @@ export async function executeTinyFishWorkflow(
       );
     }
 
+    const responseStr = typeof payload === "string" ? payload : JSON.stringify(payload);
+    console.log("[TinyFish Response]", {
+      executionId: request.requestId,
+      responseLength: responseStr.length,
+      responseSample: responseStr.substring(0, 500),
+    });
+
     logInfo("TinyFish execution request accepted", {
       component: "tinyfish-client",
       executionId: request.requestId,
       workflowId: request.workflowId,
       organizationId: request.organizationId,
+      responseKeys: Object.keys(payload as Record<string, unknown>),
     });
 
     return payload as TinyFishExecutionResponse;
+  } catch (error) {
+    // Abort error typically means timeout or explicit abort
+    if (error instanceof Error && error.name === "AbortError") {
+      console.error("[TinyFish Abort Error]", {
+        executionId: request.requestId,
+        message: error.message,
+        timeoutMs: config.timeoutMs,
+        url: request.url,
+      });
+      throw new Error(`TinyFish request aborted (timeout: ${config.timeoutMs}ms)`);
+    }
+    throw error;
   } finally {
     clearTimeout(timeoutHandle);
   }

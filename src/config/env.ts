@@ -68,7 +68,7 @@ function readRequiredEnv(key: RequiredStringEnvKey): string {
 function readTimeoutMs(value: string | undefined): number {
   const parsed = Number(value);
 
-  if (!Number.isInteger(parsed) || parsed < 1_000 || parsed > 120_000) {
+  if (!Number.isInteger(parsed) || parsed < 1_000 || parsed > 600_000) {
     return 30_000;
   }
 
