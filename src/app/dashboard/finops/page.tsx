@@ -1,7 +1,5 @@
 import Link from "next/link";
 
-import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
-import { SectionHeading } from "@/components/ui/section-heading";
 import { FinOpsAnomalyAlerts } from "@/components/dashboard/finops/finops-anomaly-alerts";
 import { FinOpsLiveSummary } from "@/components/dashboard/finops/finops-live-summary";
 import { listCostAnomalies } from "@/lib/finops/anomaly.service";
@@ -18,13 +16,15 @@ export default async function DashboardFinOpsPage(): Promise<JSX.Element> {
   ]);
 
   return (
-    <div className="space-y-5">
-      <SectionHeading
-        eyebrow="Operon FinOps"
-        title="Agent Cost Intelligence"
-        description="Cost attribution, budget posture, anomaly detection, and ROI scoring."
-      />
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-yellow-600 to-orange-600 rounded-2xl p-8 text-white">
+        <h1 className="text-4xl font-bold mb-2">Agent Cost Intelligence</h1>
+        <p className="text-yellow-100 text-lg">Operon FinOps</p>
+        <p className="text-yellow-200 text-sm mt-2">Cost attribution, budget posture, anomaly detection, and ROI scoring.</p>
+      </div>
 
+      {/* Live Summary */}
       <FinOpsLiveSummary
         initial={{
           totalSpendUsd: monthly.totalUsd,
@@ -33,45 +33,53 @@ export default async function DashboardFinOpsPage(): Promise<JSX.Element> {
         }}
       />
 
-      <DashboardCard title="Workflow Cost Ranking">
-        <div className="space-y-2">
+      {/* Main Cards */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Workflow Cost Ranking */}
+        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm p-8">
+          <h2 className="text-2xl font-bold text-white mb-6">Workflow Cost Ranking</h2>
           {monthly.workflows.length === 0 ? (
-            <p className="text-sm text-slate-600">No workflow cost events yet.</p>
+            <p className="text-slate-500">No workflow cost events yet.</p>
           ) : (
-            monthly.workflows.map((item) => (
-              <article key={item.workflowId} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-slate-900">{item.workflowName}</p>
-                  <p className="text-xs font-semibold text-slate-700">${item.totalUsd.toFixed(2)}</p>
-                </div>
-                <Link href={`/workflows/${item.workflowId}/finops`} className="text-xs text-slate-600 underline">
-                  Open workflow cost view
+            <div className="space-y-3">
+              {monthly.workflows.map((item) => (
+                <Link key={item.workflowId} href={`/workflows/${item.workflowId}/finops`} className="bg-slate-900/50 rounded-lg border border-slate-700/50 p-4 hover:border-amber-500/50 transition-colors block">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <p className="text-white font-semibold">{item.workflowName}</p>
+                    <p className="text-lg font-bold text-yellow-400">${item.totalUsd.toFixed(2)}</p>
+                  </div>
+                  <p className="text-xs text-slate-500">Click to view detailed cost analysis</p>
                 </Link>
-              </article>
-            ))
+              ))}
+            </div>
           )}
         </div>
-      </DashboardCard>
 
-      <DashboardCard title="ROI Ranking">
-        <div className="space-y-2">
+        {/* ROI Ranking */}
+        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm p-8">
+          <h2 className="text-2xl font-bold text-white mb-6">ROI Ranking</h2>
           {roiItems.length === 0 ? (
-            <p className="text-sm text-slate-600">No ROI profiles available yet.</p>
+            <p className="text-slate-500">No ROI profiles available yet.</p>
           ) : (
-            roiItems.slice(0, 20).map((item) => (
-              <article key={item.workflowId} className="rounded-lg border border-slate-200 bg-white p-3">
-                <p className="text-sm font-semibold text-slate-900">{item.workflowName}</p>
-                <p className="text-xs text-slate-600">
-                  Value/Run ${item.valuePerRun.toFixed(2)} • Cost/Run ${item.costPerRun.toFixed(4)} • ROI{" "}
-                  {item.roi ? item.roi.toFixed(2) : "N/A"}
-                </p>
-              </article>
-            ))
+            <div className="space-y-3">
+              {roiItems.slice(0, 20).map((item) => (
+                <div key={item.workflowId} className="bg-slate-900/50 rounded-lg border border-slate-700/50 p-4 hover:border-green-500/50 transition-colors">
+                  <p className="text-white font-semibold mb-2">{item.workflowName}</p>
+                  <div className="grid grid-cols-3 gap-2 text-xs">
+                    <div className="text-slate-400">Value/Run <span className="text-green-400 font-semibold">${item.valuePerRun.toFixed(2)}</span></div>
+                    <div className="text-slate-400">Cost/Run <span className="text-orange-400 font-semibold">${item.costPerRun.toFixed(4)}</span></div>
+                    <div className="text-slate-400">ROI <span className={item.roi && item.roi > 0 ? "text-green-400 font-semibold" : "text-slate-500"}>{item.roi ? item.roi.toFixed(2) : "N/A"}</span></div>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
-      </DashboardCard>
+      </div>
 
-      <DashboardCard title="Cost Anomaly Alerts">
+      {/* Cost Anomaly Alerts */}
+      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm p-8">
+        <h2 className="text-2xl font-bold text-white mb-6">Cost Anomaly Alerts</h2>
         <FinOpsAnomalyAlerts
           items={anomalies.map((item) => ({
             id: item.id,
@@ -82,7 +90,7 @@ export default async function DashboardFinOpsPage(): Promise<JSX.Element> {
             workflow: item.workflow,
           }))}
         />
-      </DashboardCard>
+      </div>
     </div>
   );
 }

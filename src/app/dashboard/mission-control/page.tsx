@@ -1,7 +1,5 @@
-import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
 import { DeployAgentModal } from "@/components/dashboard/mission-control/deploy-agent-modal";
 import { MissionControlDashboard } from "@/components/dashboard/mission-control/mission-control-dashboard";
-import { SectionHeading } from "@/components/ui/section-heading";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { fetchAgentCatalog } from "@/server/services/agents/agent-service";
 import { fetchAgentDeploymentState } from "@/server/services/mission-control/deployment-service";
@@ -31,13 +29,15 @@ export default async function DashboardMissionControlPage(): Promise<JSX.Element
   ]);
 
   return (
-    <div className="space-y-5">
-      <SectionHeading
-        eyebrow="Mission Control"
-        title="Real-Time Fleet Operations"
-        description="Unified control plane for autonomous web agents, incident response, and recovery runbooks."
-      />
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white">
+        <h1 className="text-4xl font-bold mb-2">Real-Time Fleet Operations</h1>
+        <p className="text-indigo-100 text-lg">Mission Control</p>
+        <p className="text-indigo-200 text-sm mt-2">Unified control plane for autonomous web agents, incident response, and recovery runbooks.</p>
+      </div>
 
+      {/* Main Dashboard */}
       <MissionControlDashboard
         initialFleet={fleet.fleet.map((item) => ({
           ...item,
@@ -69,51 +69,66 @@ export default async function DashboardMissionControlPage(): Promise<JSX.Element
         }}
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <DashboardCard
-          title="Agent Deployment Interface"
-          description="Deploy or scale agents and monitor rollout state."
-          action={
+      {/* Control Cards */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Deployment Card */}
+        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm p-8">
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-1">Agent Deployment</h2>
+              <p className="text-slate-400 text-sm">Deploy or scale agents and monitor rollout state.</p>
+            </div>
             <DeployAgentModal
               agents={agents.items.map((agent) => ({
                 id: agent.id,
                 name: agent.name,
               }))}
             />
-          }
-        >
-          {deployments.length === 0 ? (
-            <p className="text-sm text-slate-600">No agent deployments yet.</p>
-          ) : (
-            <div className="space-y-2">
-              {deployments.map((deployment) => (
-                <article key={deployment.id} className="rounded-xl border border-slate-200 bg-white p-3">
-                  <p className="text-sm font-semibold text-slate-900">{deployment.agent.name}</p>
-                  <p className="text-xs text-slate-600">
-                    Desired {deployment.desiredRuns} • Actual {deployment.actualRuns} • {deployment.status}
-                  </p>
-                </article>
-              ))}
-            </div>
-          )}
-        </DashboardCard>
+          </div>
 
-        <DashboardCard title="Automated Runbooks" description="Recent recovery actions triggered by Mission Control.">
-          {runbookExecutions.length === 0 ? (
-            <p className="text-sm text-slate-600">No runbook executions yet.</p>
+          {deployments.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-slate-500">No agent deployments yet. Create one to get started.</p>
+            </div>
           ) : (
-            <div className="space-y-2">
-              {runbookExecutions.map((item) => (
-                <article key={item.id} className="rounded-xl border border-slate-200 bg-white p-3">
-                  <p className="text-sm font-semibold text-slate-900">{item.runbook.name}</p>
-                  <p className="text-xs text-slate-600">
-                    {item.status} • {new Date(item.createdAt).toLocaleString()}
-                  </p>
-                </article>
+            <div className="space-y-3">
+              {deployments.map((deployment) => (
+                <div key={deployment.id} className="bg-slate-900/50 rounded-lg border border-slate-700/50 p-4 hover:border-cyan-500/50 transition-colors">
+                  <p className="text-white font-semibold">{deployment.agent.name}</p>
+                  <div className="flex gap-4 mt-2 text-sm text-slate-400">
+                    <span>🎯 Desired: <span className="text-white font-semibold">{deployment.desiredRuns}</span></span>
+                    <span>✓ Actual: <span className="text-white font-semibold">{deployment.actualRuns}</span></span>
+                    <span className={`font-semibold ${deployment.status === "ACTIVE" ? "text-green-400" : "text-yellow-400"}`}>{deployment.status}</span>
+                  </div>
+                </div>
               ))}
             </div>
           )}
-        </DashboardCard>
+        </div>
+
+        {/* Runbooks Card */}
+        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm p-8">
+          <h2 className="text-2xl font-bold text-white mb-2">Automated Runbooks</h2>
+          <p className="text-slate-400 text-sm mb-6">Recent recovery actions triggered by Mission Control.</p>
+
+          {runbookExecutions.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-slate-500">No runbook executions yet.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {runbookExecutions.map((item) => (
+                <div key={item.id} className="bg-slate-900/50 rounded-lg border border-slate-700/50 p-4 hover:border-green-500/50 transition-colors">
+                  <p className="text-white font-semibold">{item.runbook.name}</p>
+                  <div className="flex gap-4 mt-2 text-sm text-slate-400">
+                    <span className={`font-semibold ${item.status === "COMPLETED" ? "text-green-400" : "text-blue-400"}`}>● {item.status}</span>
+                    <span className="text-slate-500">{new Date(item.createdAt).toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
