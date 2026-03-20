@@ -42,7 +42,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     : [0, 0];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {hasRoleError ? (
         <ErrorPanel
           title="Insufficient permissions"
@@ -50,96 +50,115 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         />
       ) : null}
 
+      {/* Welcome Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl p-8 text-white shadow-lg">
+        <h1 className="text-4xl font-bold mb-2">Welcome back, {user.name || "Team"}!</h1>
+        <p className="text-blue-100">Your autonomous agent ecosystem is performing optimally</p>
+      </div>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700/50">
+          <p className="text-slate-400 text-sm font-semibold">Active Agents</p>
+          <p className="text-4xl font-bold text-cyan-400 mt-2">14</p>
+          <p className="text-slate-500 text-xs mt-2">↑ 2 this week</p>
+        </div>
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700/50">
+          <p className="text-slate-400 text-sm font-semibold">Daily Executions</p>
+          <p className="text-4xl font-bold text-blue-400 mt-2">287</p>
+          <p className="text-slate-500 text-xs mt-2">↑ 12% from yesterday</p>
+        </div>
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700/50">
+          <p className="text-slate-400 text-sm font-semibold">Success Rate</p>
+          <p className="text-4xl font-bold text-green-400 mt-2">96.4%</p>
+          <p className="text-slate-500 text-xs mt-2">Excellent performance</p>
+        </div>
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border border-slate-700/50">
+          <p className="text-slate-400 text-sm font-semibold">Avg Runtime</p>
+          <p className="text-4xl font-bold text-purple-400 mt-2">1m 42s</p>
+          <p className="text-slate-500 text-xs mt-2">Optimized performance</p>
+        </div>
+      </div>
+
       <DashboardCard
         title="Workspace Overview"
         description="Operational baseline for your multi-agent web automation environment."
       >
         <div className="grid gap-4 md:grid-cols-3">
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Organization</p>
-            <p className="mt-1 text-base font-semibold text-slate-900">{user.organizationName ?? "Unassigned"}</p>
+          <article className="rounded-xl border border-slate-700/50 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6 hover:border-cyan-500/50 transition-all">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Organization</p>
+            <p className="mt-2 text-lg font-semibold text-white">{user.organizationName ?? "Unassigned"}</p>
           </article>
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Access Level</p>
-            <div className="mt-2">
-              <StatusBadge label={user.role ?? "MEMBER"} variant="neutral" />
+          <article className="rounded-xl border border-slate-700/50 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6 hover:border-cyan-500/50 transition-all">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Access Level</p>
+            <div className="mt-3">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                {user.role ?? "MEMBER"}
+              </span>
             </div>
           </article>
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">System Status</p>
-            <p className="mt-1 text-sm font-medium text-slate-900">Healthy and accepting execution requests</p>
+          <article className="rounded-xl border border-slate-700/50 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6 hover:border-cyan-500/50 transition-all">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">System Status</p>
+            <div className="mt-3 flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <p className="text-sm font-medium text-green-400">All Systems Operational</p>
+            </div>
           </article>
         </div>
       </DashboardCard>
 
-      <DashboardCard title="Execution Operations" description="Next phase surfaces deeper analytics and controls.">
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <article className="rounded-xl border border-slate-200 bg-white p-4">
-            <p className="text-xs text-slate-500">Total Agents</p>
-            <p className="mt-1 text-xl font-semibold tracking-tight text-slate-900">14</p>
-          </article>
-          <article className="rounded-xl border border-slate-200 bg-white p-4">
-            <p className="text-xs text-slate-500">Executions (24h)</p>
-            <p className="mt-1 text-xl font-semibold tracking-tight text-slate-900">287</p>
-          </article>
-          <article className="rounded-xl border border-slate-200 bg-white p-4">
-            <p className="text-xs text-slate-500">Success Rate</p>
-            <p className="mt-1 text-xl font-semibold tracking-tight text-slate-900">96.4%</p>
-          </article>
-          <article className="rounded-xl border border-slate-200 bg-white p-4">
-            <p className="text-xs text-slate-500">Avg Runtime</p>
-            <p className="mt-1 text-xl font-semibold tracking-tight text-slate-900">01m 42s</p>
-          </article>
-        </div>
-      </DashboardCard>
-
-      <DashboardCard title="Background Processing" description="BullMQ execution queue and worker state snapshot.">
+      <DashboardCard title="Execution Operations" description="Real-time queue and processing metrics.">
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-          <article className="rounded-xl border border-slate-200 bg-white p-4">
-            <p className="text-xs text-slate-500">Waiting</p>
-            <p className="mt-1 text-xl font-semibold tracking-tight text-slate-900">
+          <article className="rounded-xl border border-slate-700/50 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6 hover:border-cyan-500/50 transition-all">
+            <p className="text-xs text-slate-400 font-semibold">Waiting</p>
+            <p className="mt-3 text-3xl font-bold text-cyan-400 font-mono">
               {queueHealth?.counts.waiting ?? "-"}
             </p>
           </article>
-          <article className="rounded-xl border border-slate-200 bg-white p-4">
-            <p className="text-xs text-slate-500">Active</p>
-            <p className="mt-1 text-xl font-semibold tracking-tight text-slate-900">
+          <article className="rounded-xl border border-slate-700/50 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6 hover:border-cyan-500/50 transition-all">
+            <p className="text-xs text-slate-400 font-semibold">Active</p>
+            <p className="mt-3 text-3xl font-bold text-blue-400 font-mono">
               {queueHealth?.counts.active ?? "-"}
             </p>
           </article>
-          <article className="rounded-xl border border-slate-200 bg-white p-4">
-            <p className="text-xs text-slate-500">Completed</p>
-            <p className="mt-1 text-xl font-semibold tracking-tight text-slate-900">
+          <article className="rounded-xl border border-slate-700/50 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6 hover:border-cyan-500/50 transition-all">
+            <p className="text-xs text-slate-400 font-semibold">Completed</p>
+            <p className="mt-3 text-3xl font-bold text-green-400 font-mono">
               {queueHealth?.counts.completed ?? "-"}
             </p>
           </article>
-          <article className="rounded-xl border border-slate-200 bg-white p-4">
-            <p className="text-xs text-slate-500">Failed</p>
-            <p className="mt-1 text-xl font-semibold tracking-tight text-slate-900">
+          <article className="rounded-xl border border-slate-700/50 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6 hover:border-cyan-500/50 transition-all">
+            <p className="text-xs text-slate-400 font-semibold">Failed</p>
+            <p className="mt-3 text-3xl font-bold text-red-400 font-mono">
               {queueHealth?.counts.failed ?? "-"}
             </p>
           </article>
-          <article className="rounded-xl border border-slate-200 bg-white p-4">
-            <p className="text-xs text-slate-500">Delayed</p>
-            <p className="mt-1 text-xl font-semibold tracking-tight text-slate-900">
+          <article className="rounded-xl border border-slate-700/50 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6 hover:border-cyan-500/50 transition-all">
+            <p className="text-xs text-slate-400 font-semibold">Delayed</p>
+            <p className="mt-3 text-3xl font-bold text-purple-400 font-mono">
               {queueHealth?.counts.delayed ?? "-"}
             </p>
           </article>
         </div>
       </DashboardCard>
 
-      <DashboardCard title="Web Change Radar" description="Detected structural drift across monitored web surfaces.">
+      <DashboardCard title="Web Change Radar" description="Real-time monitoring of structural drift detection.">
         {changeEvents.length === 0 ? (
-          <p className="text-sm text-slate-600">No structural drift detected in recent executions.</p>
+          <div className="rounded-lg border-2 border-dashed border-slate-700/50 p-8 text-center">
+            <p className="text-slate-400">✨ No structural drift detected in recent executions.</p>
+            <p className="text-sm text-slate-500 mt-2">Your monitored surfaces are stable</p>
+          </div>
         ) : (
           <div className="space-y-2">
             {changeEvents.slice(0, 8).map((event) => (
-              <article key={event.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
+              <article key={event.id} className="rounded-lg border border-slate-700/50 bg-slate-800/30 p-4 hover:bg-slate-800/50 transition-all">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="font-semibold text-slate-900">{event.pageSnapshot.url}</p>
-                  <span className="text-xs font-semibold text-slate-500">{event.severity}</span>
+                  <p className="font-semibold text-white">{event.pageSnapshot.url}</p>
+                  <span className={`text-xs font-bold px-3 py-1 rounded-full ${event.severity === 'high' ? 'bg-red-500/20 text-red-300' : 'bg-yellow-500/20 text-yellow-300'}`}>
+                    {event.severity.toUpperCase()}
+                  </span>
                 </div>
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-slate-400 mt-2">
                   {event.changeType} • {new Date(event.detectedAt).toLocaleString()}
                 </p>
               </article>

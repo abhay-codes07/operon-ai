@@ -3,8 +3,6 @@ import Link from "next/link";
 import { AutopilotDashboardPanel } from "@/components/dashboard/autopilot/autopilot-dashboard-panel";
 import { AutopilotLiveSummary } from "@/components/dashboard/autopilot/autopilot-live-summary";
 import { AutopilotSessionTableLive } from "@/components/dashboard/autopilot/autopilot-session-table-live";
-import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
-import { SectionHeading } from "@/components/ui/section-heading";
 import {
   getAutopilotSummary,
   listAutopilotRepairEvents,
@@ -34,23 +32,26 @@ export default async function DashboardAutopilotPage(): Promise<JSX.Element> {
     .reduce((sum, item) => sum + item.count, 0);
 
   return (
-    <div className="space-y-5">
-      <SectionHeading
-        eyebrow="Operon Autopilot"
-        title="Learning and Self-Repair Control"
-        description="Monitor captured sessions, memory quality, and auto-repair activity."
-      />
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-8 text-white">
+        <h1 className="text-4xl font-bold mb-2">Operon Autopilot</h1>
+        <p className="text-purple-100 text-lg">Learning and Self-Repair Control</p>
+        <p className="text-purple-200 text-sm mt-2">Monitor captured sessions, memory quality, and auto-repair activity.</p>
+      </div>
 
-      <DashboardCard
-        title="Learn Mode"
-        description="Capture a workflow from live interactions and compile it into a reusable, editable runbook."
-        action={
-          <Link href="/autopilot/learn" className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white">
+      {/* Learn Mode Card */}
+      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm p-8">
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-1">Learn Mode</h2>
+            <p className="text-slate-400">Capture a workflow from live interactions and compile it into a reusable, editable runbook.</p>
+          </div>
+          <Link href="/autopilot/learn" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-all transform hover:scale-105">
             Open Learn Mode
           </Link>
-        }
-      >
-        <div className="mb-4">
+        </div>
+        <div className="mb-6">
           <AutopilotLiveSummary
             initial={{
               totalSessions,
@@ -95,11 +96,14 @@ export default async function DashboardAutopilotPage(): Promise<JSX.Element> {
             };
           })}
         />
-      </DashboardCard>
+      </div>
 
-      <DashboardCard title="Session Monitor" description="Live filtered view of Autopilot session states.">
+      {/* Session Monitor Card */}
+      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm p-8">
+        <h2 className="text-2xl font-bold text-white mb-2">Session Monitor</h2>
+        <p className="text-slate-400 mb-6">Live filtered view of Autopilot session states.</p>
         <AutopilotSessionTableLive />
-      </DashboardCard>
+      </div>
     </div>
   );
 }
