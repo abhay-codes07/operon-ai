@@ -306,62 +306,7 @@ export async function runExecutionWithTinyFish(
 
   const providerResponse = await withRetry(
     async () => {
-      try {
-        return await executeTinyFishWorkflow(request);
-      } catch (error) {
-        // In development mode, provide mock results on any error to allow testing
-        if (process.env.NODE_ENV === "development") {
-          const errorReason = error instanceof TinyFishApiError 
-            ? `TinyFish API ${error.statusCode}` 
-            : error instanceof Error 
-              ? error.message 
-              : "Unknown error";
-          
-          console.warn(
-            "[DEV MODE] TinyFish API call failed. Using mock execution results for testing.",
-            { executionId: input.executionId, errorReason },
-          );
-          
-          // Return mock execution response matching TinyFishExecutionResponse type
-          return {
-            providerExecutionId: request.requestId,
-            status: "succeeded" as const,
-            summary: "Mock workflow execution completed successfully (development mode)",
-            output: {
-              result: "success",
-              mode: "mock",
-              reason: `TinyFish API error - using mock results (${errorReason})`,
-            },
-            events: [
-              {
-                level: "info" as const,
-                message: `[DEV MODE] Mock execution results - actual error was: ${errorReason}`,
-                timestamp: new Date().toISOString(),
-                metadata: { mode: "development-mock" },
-              },
-              ...(
-                (definition as { steps?: WorkflowDefinitionStep[] }).steps ?? []
-              ).map((step, index) => ({
-                level: "info" as const,
-                message: `Step ${index + 1}: ${step.action} completed successfully`,
-                timestamp: new Date().toISOString(),
-                metadata: {
-                  stepId: step.id,
-                  action: step.action,
-                  target: step.target,
-                },
-              })),
-            ],
-            screenshots: [],
-          };
-        }
-
-        if (error instanceof TinyFishApiError && (error.statusCode >= 500 || error.statusCode === 429)) {
-          throw new RetryableOperationError(error.message, true);
-        }
-
-        throw error;
-      }
+      return await executeTinyFishWorkflow(request);
     },
     {
       maxAttempts: 3,
