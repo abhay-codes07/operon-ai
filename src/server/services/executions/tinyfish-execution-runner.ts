@@ -304,17 +304,27 @@ export async function runExecutionWithTinyFish(
     },
   });
 
-  const providerResponse = await withRetry(
-    async () => {
-      return await executeTinyFishWorkflow(request);
-    },
-    {
-      maxAttempts: 3,
-      baseDelayMs: 500,
-      maxDelayMs: 4_000,
-      shouldRetry: shouldRetryTinyFishError,
-    },
-  );
+  let providerResponse: any;
+  try {
+    providerResponse = await withRetry(
+      async () => {
+        return await executeTinyFishWorkflow(request);
+      },
+      {
+        maxAttempts: 3,
+        baseDelayMs: 500,
+        maxDelayMs: 4_000,
+        shouldRetry: shouldRetryTinyFishError,
+      },
+    );
+  } catch (error) {
+    console.error("[Execution] TinyFish API failed:", {
+      executionId: input.executionId,
+      error: error instanceof Error ? error.message : String(error),
+      errorPayload: error instanceof TinyFishApiError ? error.payload : undefined,
+    });
+    throw error;
+  }
 
   const parsed = parseTinyFishExecutionResponse(providerResponse);
   let gatewayBlockedReason: string | null = null;

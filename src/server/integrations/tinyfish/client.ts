@@ -65,6 +65,12 @@ export async function executeTinyFishWorkflow(
     const payload = (await response.json().catch(() => null)) as unknown;
 
     if (!response.ok) {
+      console.error("[TinyFish API Error]", {
+        status: response.status,
+        statusText: response.statusText,
+        payload,
+        requestId: request.requestId,
+      });
       throw new TinyFishApiError(
         `TinyFish request failed with status ${response.status}`,
         response.status,
