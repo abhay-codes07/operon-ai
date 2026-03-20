@@ -92,7 +92,6 @@ export async function executeTinyFishWorkflow(
       executionId: request.requestId,
       workflowId: request.workflowId,
       organizationId: request.organizationId,
-      responseKeys: Object.keys(payload as Record<string, unknown>),
     });
 
     return payload as TinyFishExecutionResponse;

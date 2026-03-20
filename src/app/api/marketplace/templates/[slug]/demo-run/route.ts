@@ -81,6 +81,7 @@ export async function POST(request: Request, context: RouteContext) {
   const requestId = randomUUID();
   const definition = parsedDefinition.data;
   const goal = parsedBody.data.goal ?? definition.naturalLanguageTask;
+  const url = parsedBody.data.url ?? "";
   const injectedSteps = parsedBody.data.url
     ? [
         {
@@ -100,6 +101,8 @@ export async function POST(request: Request, context: RouteContext) {
     workflowId: `operonhub:${template.slug}:${latestVersion.version}`,
     workflowName: template.title,
     naturalLanguageTask: goal,
+    url,
+    goal,
     steps: injectedSteps,
     guardrails: definition.guardrails,
     timeoutSeconds: definition.timeoutSeconds,

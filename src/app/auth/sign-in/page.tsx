@@ -37,7 +37,7 @@ export default async function SignInPage(): Promise<JSX.Element> {
 
         {/* Footer */}
         <div className="text-center mt-8 text-slate-400 text-sm">
-          <p>Don't have an account? <a href="/auth/sign-up" className="text-blue-400 hover:text-cyan-400 transition-colors font-semibold">Sign up for free</a></p>
+          <p>Don&apos;t have an account? <a href="/auth/sign-up" className="text-blue-400 hover:text-cyan-400 transition-colors font-semibold">Sign up for free</a></p>
         </div>
       </div>
     </main>
