@@ -1,7 +1,5 @@
 import { AgentPolicyManager } from "@/components/dashboard/security/agent-policy-manager";
 import { AuditLogViewer } from "@/components/dashboard/security/audit-log-viewer";
-import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
-import { SectionHeading } from "@/components/ui/section-heading";
 import { SecurityPolicyForm } from "@/components/dashboard/security/security-policy-form";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { fetchAgentCatalog } from "@/server/services/agents/agent-service";
@@ -26,13 +24,18 @@ export default async function DashboardSecurityPage(): Promise<JSX.Element> {
   ]);
 
   return (
-    <div className="space-y-5">
-      <SectionHeading
-        eyebrow="Operational Guardrails"
-        title="Security Policy Engine"
-        description="Define domain, action, and timing controls that govern autonomous workflow execution."
-      />
-      <DashboardCard title="Organization Policy" description="Policy checks are enforced before execution dispatch">
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-red-600 to-rose-600 rounded-2xl p-8 text-white">
+        <h1 className="text-4xl font-bold mb-2">Security Policy Engine</h1>
+        <p className="text-red-100 text-lg">Operational Guardrails</p>
+        <p className="text-red-200 text-sm mt-2">Define domain, action, and timing controls that govern autonomous workflow execution.</p>
+      </div>
+
+      {/* Organization Policy */}
+      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm p-8">
+        <h2 className="text-2xl font-bold text-white mb-2">Organization Policy</h2>
+        <p className="text-slate-400 text-sm mb-6">Policy checks are enforced before execution dispatch</p>
         <SecurityPolicyForm
           initialPolicy={{
             domainAllowlist: policy?.domainAllowlist ?? [],
@@ -43,11 +46,12 @@ export default async function DashboardSecurityPage(): Promise<JSX.Element> {
             requireHttps: policy?.requireHttps ?? true,
           }}
         />
-      </DashboardCard>
-      <DashboardCard
-        title="Secure Agent Gateway Policy"
-        description="Configure per-agent policy-as-code constraints."
-      >
+      </div>
+
+      {/* Agent Policies */}
+      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm p-8">
+        <h2 className="text-2xl font-bold text-white mb-2">Secure Agent Gateway Policy</h2>
+        <p className="text-slate-400 text-sm mb-6">Configure per-agent policy-as-code constraints.</p>
         <AgentPolicyManager
           agents={agents.items.map((item) => ({
             id: item.id,
@@ -61,11 +65,12 @@ export default async function DashboardSecurityPage(): Promise<JSX.Element> {
             updatedAt: item.updatedAt.toISOString(),
           }))}
         />
-      </DashboardCard>
-      <DashboardCard
-        title="Execution Audit Ledger"
-        description="Every intercepted action and policy decision from the secure gateway."
-      >
+      </div>
+
+      {/* Audit Ledger */}
+      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm p-8">
+        <h2 className="text-2xl font-bold text-white mb-2">Execution Audit Ledger</h2>
+        <p className="text-slate-400 text-sm mb-6">Every intercepted action and policy decision from the secure gateway.</p>
         <AuditLogViewer
           initialItems={auditLogs.map((item) => ({
             id: item.id,
@@ -89,7 +94,7 @@ export default async function DashboardSecurityPage(): Promise<JSX.Element> {
             })),
           }))}
         />
-      </DashboardCard>
+      </div>
     </div>
   );
 }
