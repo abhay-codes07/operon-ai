@@ -12,6 +12,8 @@ export type TinyFishExecutionRequest = {
   workflowId: string;
   workflowName: string;
   naturalLanguageTask: string;
+  url: string;
+  goal: string;
   steps: TinyFishStepPayload[];
   guardrails: string[];
   timeoutSeconds: number;

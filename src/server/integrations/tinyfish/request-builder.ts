@@ -15,6 +15,9 @@ type BuildTinyFishExecutionRequestInput = {
 export function buildTinyFishExecutionRequest(
   input: BuildTinyFishExecutionRequestInput,
 ): TinyFishExecutionRequest {
+  // Extract the first step's target as the URL (new API format)
+  const firstStepTarget = input.definition.steps?.[0]?.target || "https://example.com";
+  
   return {
     requestId: input.requestId,
     organizationId: input.organizationId,
@@ -22,6 +25,8 @@ export function buildTinyFishExecutionRequest(
     workflowId: input.workflowId,
     workflowName: input.workflowName,
     naturalLanguageTask: input.definition.naturalLanguageTask,
+    url: firstStepTarget,
+    goal: input.definition.naturalLanguageTask,
     steps: input.definition.steps.map((step) => ({
       id: step.id,
       action: step.action,
