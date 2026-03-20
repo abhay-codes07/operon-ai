@@ -78,11 +78,10 @@ export default function Home(): JSX.Element {
 
   return (
     <main className="relative overflow-x-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-      {/* Animated background */}
-      <div className="fixed inset-0 opacity-30 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-screen filter blur-3xl animate-pulse" style={{ animationDelay: "1s" }}></div>
-        <div className="absolute top-1/2 right-1/3 w-96 h-96 bg-cyan-500 rounded-full mix-blend-screen filter blur-3xl animate-pulse" style={{ animationDelay: "2s" }}></div>
+      {/* Subtle animated background - reduced for performance */}
+      <div className="fixed inset-0 opacity-20 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl" style={{animation: "pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite"}}></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-screen filter blur-3xl" style={{animation: "pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite 2s"}}></div>
       </div>
 
       {/* Navigation */}
@@ -95,7 +94,7 @@ export default function Home(): JSX.Element {
           <div className="flex items-center space-x-8 z-10">
             <button onClick={() => router.push("/dashboard")} className="text-slate-300 hover:text-white transition-colors">Dashboard</button>
             <button onClick={() => router.push("/dashboard/workflows")} className="text-slate-300 hover:text-white transition-colors">Workflows</button>
-            <button onClick={() => router.push("/auth/signin")} className="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all">Sign In</button>
+            <button onClick={() => router.push("/auth/sign-in")} className="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all">Sign In</button>
           </div>
         </div>
       </nav>
@@ -117,7 +116,7 @@ export default function Home(): JSX.Element {
               Empower your enterprise with AI-driven autonomous agents. Build, deploy, and manage complex workflows that learn and adapt in real-time.
             </p>
             <div className="flex gap-4 pt-4 flex-wrap">
-              <button onClick={() => router.push("/auth/signin")} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all transform hover:scale-105 flex items-center gap-2">
+              <button onClick={() => router.push("/auth/sign-in")} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all transform hover:scale-105 flex items-center gap-2">
                 Get Started <ArrowRight size={20} />
               </button>
               <button className="px-8 py-4 border-2 border-slate-500 rounded-lg font-bold text-lg hover:border-slate-300 transition-all">
@@ -145,10 +144,9 @@ export default function Home(): JSX.Element {
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl backdrop-blur-sm border border-slate-700/50"></div>
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="relative w-64 h-64">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full opacity-20 animate-pulse"></div>
-                <div className="absolute inset-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full opacity-10 animate-pulse" style={{ animationDelay: "0.5s" }}></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full opacity-10" style={{animation: "pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite"}}></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Brain size={120} className="text-cyan-400 animate-bounce" />
+                  <Brain size={120} className="text-cyan-400" style={{animation: "float 3s ease-in-out infinite"}} />
                 </div>
               </div>
             </div>
@@ -233,7 +231,7 @@ export default function Home(): JSX.Element {
           </h2>
           <p className="text-xl text-slate-400 mb-8">Join enterprises worldwide already automating complex workflows with Operon</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button onClick={() => router.push("/auth/signin")} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all transform hover:scale-105">
+            <button onClick={() => router.push("/auth/sign-in")} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all transform hover:scale-105">
               Start Free Trial
             </button>
             <button className="px-8 py-4 border-2 border-slate-500 rounded-lg font-bold text-lg hover:border-slate-300 transition-all">

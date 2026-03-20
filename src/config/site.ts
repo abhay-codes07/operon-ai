@@ -1,10 +1,10 @@
 export const siteConfig = {
-  name: "WebOps AI",
-  tagline: "AI Agent Operations Platform",
+  name: "Operon",
+  tagline: "Autonomous AI Agents Platform",
   description:
-    "Deploy AI-powered web agents that execute deterministic, auditable workflows on live websites.",
+    "Deploy AI-powered autonomous agents that execute complex workflows with full autonomy, security, and auditability.",
   links: {
     docs: "/docs",
-    support: "mailto:founders@webops.ai",
+    support: "mailto:founders@operon.ai",
   },
 } as const;
