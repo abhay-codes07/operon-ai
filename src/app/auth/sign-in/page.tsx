@@ -20,24 +20,21 @@ export default async function SignInPage(): Promise<JSX.Element> {
       </div>
 
       <div className="w-full max-w-md relative z-10">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <div className="flex items-center justify-center space-x-2 mb-6">
-            <Zap className="text-blue-400" size={32} />
-            <span className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 text-transparent bg-clip-text">Operon</span>
+        {/* Logo */}
+        <div className="flex items-center justify-center gap-2.5 mb-8">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/25">
+            <Zap className="text-white" size={20} />
           </div>
-          <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
-          <p className="text-slate-400">Enter your credentials to access your AI automation console</p>
+          <span className="text-2xl font-bold tracking-tight text-white">Operon</span>
         </div>
 
-        {/* Form Container */}
-        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 p-8 backdrop-blur-sm">
+        {/* Card */}
+        <div className="rounded-2xl border border-slate-700/60 bg-slate-900/80 p-8 shadow-[0_24px_64px_-24px_rgba(0,0,0,0.7)] backdrop-blur-xl">
+          <div className="mb-6">
+            <h1 className="text-xl font-bold text-white">Welcome back</h1>
+            <p className="mt-1 text-sm text-slate-400">Sign in to your AI automation console</p>
+          </div>
           <SignInForm />
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-8 text-slate-400 text-sm">
-          <p>Don&apos;t have an account? <a href="/auth/sign-up" className="text-blue-400 hover:text-cyan-400 transition-colors font-semibold">Sign up for free</a></p>
         </div>
       </div>
     </main>

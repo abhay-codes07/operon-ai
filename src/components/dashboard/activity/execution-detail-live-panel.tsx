@@ -15,6 +15,7 @@ import { AgentMemoryPanel } from "./agent-memory-panel";
 import { FailureAnalysisPanel } from "./failure-analysis-panel";
 import { DebugSessionPanel } from "./debug-session-panel";
 import { GenerateToolButton } from "./generate-tool-button";
+import { ExecutionOutputViewer } from "./execution-output-viewer";
 
 type ExecutionDetail = {
   id: string;
@@ -189,7 +190,7 @@ export function ExecutionDetailLivePanel({
         <div className="flex items-center gap-2">
           <Link
             href={`/dashboard/live/${execution.id}`}
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            className="rounded-lg border border-slate-700/60 bg-slate-800/60 px-3 py-1.5 text-xs font-semibold text-slate-300 transition-colors hover:border-cyan-500/40 hover:text-cyan-400"
           >
             Live View
           </Link>
@@ -201,41 +202,61 @@ export function ExecutionDetailLivePanel({
       </div>
 
       <DashboardCard title={`Execution ${execution.id.slice(-8)}`} description="Detailed execution telemetry">
-        <div className="grid gap-4 md:grid-cols-4">
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <div className="grid gap-3 md:grid-cols-4">
+          <article className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-4">
             <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Trigger</p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">{execution.trigger}</p>
+            <p className="mt-2 text-sm font-semibold text-white">{execution.trigger}</p>
           </article>
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <article className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-4">
             <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Agent</p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">{execution.agentId.slice(-8)}</p>
+            <p className="mt-2 font-mono text-sm font-semibold text-white">{execution.agentId.slice(-8)}</p>
           </article>
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <article className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-4">
             <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Workflow</p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">{execution.workflowId?.slice(-8) ?? "N/A"}</p>
+            <p className="mt-2 font-mono text-sm font-semibold text-white">{execution.workflowId?.slice(-8) ?? "N/A"}</p>
           </article>
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <article className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-4">
             <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Logs</p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">{mappedLogs.length}</p>
+            <p className="mt-2 text-sm font-semibold text-white">{mappedLogs.length}</p>
           </article>
         </div>
 
         {execution.errorMessage ? (
-          <div className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-rose-700">Error</p>
-            <p className="mt-1 text-sm text-rose-700">{execution.errorMessage}</p>
-          </div>
-        ) : null}
-
-        {execution.outputPayload ? (
-          <div className="mt-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Output Payload</p>
-            <pre className="mt-2 max-h-80 overflow-auto rounded-lg border border-slate-200 bg-slate-950 p-3 text-xs text-slate-100">
-              {JSON.stringify(execution.outputPayload, null, 2)}
-            </pre>
+          <div className="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/10 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-rose-400">Error</p>
+            <p className="mt-1 text-sm text-rose-300">{execution.errorMessage}</p>
           </div>
         ) : null}
       </DashboardCard>
+
+      {/* Smart execution results display */}
+      {execution.outputPayload && execution.status === "SUCCEEDED" ? (
+        <DashboardCard
+          title="Execution Results"
+          description={
+            (execution.outputPayload.output as Record<string, unknown> | undefined) &&
+            Object.keys(execution.outputPayload.output as Record<string, unknown>).length > 0
+              ? "Structured output returned by the autonomous agent"
+              : "Agent completed — full output payload below"
+          }
+        >
+          <ExecutionOutputViewer
+            outputPayload={execution.outputPayload}
+            summary={(execution.outputPayload.summary as string | undefined)}
+            status={execution.status}
+          />
+        </DashboardCard>
+      ) : null}
+
+      {/* Show output for failed runs too */}
+      {execution.outputPayload && execution.status === "FAILED" ? (
+        <DashboardCard title="Output Payload" description="Partial output collected before failure">
+          <ExecutionOutputViewer
+            outputPayload={execution.outputPayload}
+            status={execution.status}
+          />
+        </DashboardCard>
+      ) : null}
 
       <DashboardCard title="Execution Timeline" description="Ordered events emitted during processing">
         <ExecutionLogTimeline logs={mappedLogs} />

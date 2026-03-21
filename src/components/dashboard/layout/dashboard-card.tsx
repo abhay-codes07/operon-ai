@@ -13,17 +13,17 @@ export function DashboardCard({ title, description, action, children, className 
   return (
     <section
       className={cn(
-        "rounded-2xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 p-5 shadow-[0_24px_40px_-34px_rgba(15,23,42,0.5)] backdrop-blur",
+        "rounded-2xl border border-slate-700/60 bg-gradient-to-b from-slate-800/80 to-slate-900/80 p-5 shadow-[0_24px_40px_-20px_rgba(0,0,0,0.5)] backdrop-blur",
         className,
       )}
     >
       {title || action ? (
         <div className="flex items-start justify-between gap-3">
-          {title ? <h2 className="text-base font-semibold tracking-tight text-slate-950">{title}</h2> : <div />}
+          {title ? <h2 className="text-base font-semibold tracking-tight text-white">{title}</h2> : <div />}
           {action ? <div>{action}</div> : null}
         </div>
       ) : null}
-      {description ? <p className="mt-1 text-sm text-slate-600">{description}</p> : null}
+      {description ? <p className="mt-1 text-sm text-slate-400">{description}</p> : null}
       <div className={cn(title || description ? "mt-5" : "")}>{children}</div>
     </section>
   );

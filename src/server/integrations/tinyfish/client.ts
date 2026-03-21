@@ -2,6 +2,28 @@ import { getAppEnv } from "@/config/env";
 import { logInfo } from "@/server/observability/logger";
 
 import type { TinyFishExecutionRequest, TinyFishExecutionResponse } from "./types";
+import type { TinyFishExecutionStatus } from "./types";
+
+// Normalize TinyFish status strings to our internal contract.
+// TinyFish API returns uppercase ("COMPLETED", "FAILED") while our type uses lowercase.
+function normalizeTinyFishStatus(raw: string | undefined): TinyFishExecutionStatus {
+  switch ((raw ?? "").toUpperCase()) {
+    case "COMPLETED":
+    case "SUCCEEDED":
+    case "SUCCESS":
+      return "succeeded";
+    case "RUNNING":
+    case "IN_PROGRESS":
+      return "running";
+    case "QUEUED":
+    case "PENDING":
+      return "queued";
+    case "FAILED":
+    case "ERROR":
+    default:
+      return "failed";
+  }
+}
 
 type TinyFishClientConfig = {
   baseUrl: string;
@@ -94,7 +116,24 @@ export async function executeTinyFishWorkflow(
       organizationId: request.organizationId,
     });
 
-    return payload as TinyFishExecutionResponse;
+    // Normalize TinyFish API response to our internal format.
+    // TinyFish uses different field names and status strings than our type contract.
+    const raw = payload as Record<string, unknown>;
+    const normalized: TinyFishExecutionResponse = {
+      // TinyFish uses "run_id"; fall back to our requestId if absent
+      providerExecutionId: (raw.run_id as string) ?? request.requestId,
+      // Normalize status: TinyFish returns uppercase "COMPLETED"/"FAILED"
+      status: normalizeTinyFishStatus(raw.status as string),
+      // TinyFish uses "result" for output data
+      output: (raw.result ?? raw.output) as Record<string, unknown> | undefined,
+      summary: raw.summary as string | undefined,
+      // TinyFish may not return events/screenshots; default to empty arrays
+      events: (raw.events as TinyFishExecutionResponse["events"]) ?? [],
+      screenshots: (raw.screenshots as TinyFishExecutionResponse["screenshots"]) ?? [],
+      error: raw.error as TinyFishExecutionResponse["error"] | undefined,
+    };
+
+    return normalized;
   } catch (error) {
     // Abort error typically means timeout or explicit abort
     if (error instanceof Error && error.name === "AbortError") {

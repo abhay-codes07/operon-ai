@@ -67,8 +67,8 @@ export default async function DashboardExecutionDetailPage({
   return (
     <div className="space-y-5">
       <div className="flex items-center">
-        <Link href="/dashboard/activity" className="text-sm font-medium text-slate-700 underline-offset-2 hover:underline">
-          Back to Activity
+        <Link href="/dashboard/activity" className="text-sm font-medium text-slate-400 underline-offset-2 transition-colors hover:text-cyan-400 hover:underline">
+          ← Back to Activity
         </Link>
       </div>
       <ExecutionDetailLivePanel

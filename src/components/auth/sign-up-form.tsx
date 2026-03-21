@@ -56,14 +56,13 @@ export function SignUpForm(): JSX.Element {
     router.refresh();
   }
 
+  const inputClass =
+    "h-10 w-full rounded-lg border border-slate-700/60 bg-slate-800/60 px-3 text-sm text-white placeholder-slate-500 outline-none transition-colors focus:border-cyan-500/60 focus:bg-slate-800 focus:ring-1 focus:ring-cyan-500/30";
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="space-y-1">
-        <h1 className="text-xl font-semibold text-slate-900">Create your workspace</h1>
-        <p className="text-sm text-slate-600">Set up your organization and start deploying web agents.</p>
-      </div>
+    <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-slate-700" htmlFor="fullName">
+        <label className="block text-xs font-semibold uppercase tracking-widest text-slate-500" htmlFor="fullName">
           Full Name
         </label>
         <input
@@ -71,12 +70,12 @@ export function SignUpForm(): JSX.Element {
           required
           value={formData.fullName}
           onChange={(event) => setFormData((current) => ({ ...current, fullName: event.target.value }))}
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm outline-none ring-slate-900/20 focus:ring-2"
+          className={inputClass}
           placeholder="Abhay Sharma"
         />
       </div>
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-slate-700" htmlFor="organizationName">
+        <label className="block text-xs font-semibold uppercase tracking-widest text-slate-500" htmlFor="organizationName">
           Organization Name
         </label>
         <input
@@ -86,12 +85,12 @@ export function SignUpForm(): JSX.Element {
           onChange={(event) =>
             setFormData((current) => ({ ...current, organizationName: event.target.value }))
           }
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm outline-none ring-slate-900/20 focus:ring-2"
+          className={inputClass}
           placeholder="TinyFish Labs"
         />
       </div>
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-slate-700" htmlFor="email">
+        <label className="block text-xs font-semibold uppercase tracking-widest text-slate-500" htmlFor="email">
           Work Email
         </label>
         <input
@@ -100,12 +99,12 @@ export function SignUpForm(): JSX.Element {
           required
           value={formData.email}
           onChange={(event) => setFormData((current) => ({ ...current, email: event.target.value }))}
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm outline-none ring-slate-900/20 focus:ring-2"
+          className={inputClass}
           placeholder="founder@tinyfish.ai"
         />
       </div>
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-slate-700" htmlFor="password">
+        <label className="block text-xs font-semibold uppercase tracking-widest text-slate-500" htmlFor="password">
           Password
         </label>
         <input
@@ -115,17 +114,21 @@ export function SignUpForm(): JSX.Element {
           required
           value={formData.password}
           onChange={(event) => setFormData((current) => ({ ...current, password: event.target.value }))}
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm outline-none ring-slate-900/20 focus:ring-2"
+          className={inputClass}
           placeholder="Minimum 8 characters"
         />
       </div>
-      {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
+      {error ? (
+        <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2.5">
+          <p className="text-sm font-medium text-rose-400">{error}</p>
+        </div>
+      ) : null}
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? "Creating account..." : "Create Account"}
       </Button>
-      <p className="text-sm text-slate-600">
+      <p className="text-sm text-slate-500">
         Already have an account?{" "}
-        <Link href="/auth/sign-in" className="font-medium text-slate-900 underline-offset-2 hover:underline">
+        <Link href="/auth/sign-in" className="font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
           Sign in
         </Link>
       </p>

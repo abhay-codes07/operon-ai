@@ -40,14 +40,13 @@ export function SignInForm(): JSX.Element {
     router.refresh();
   }
 
+  const inputClass =
+    "h-10 w-full rounded-lg border border-slate-700/60 bg-slate-800/60 px-3 text-sm text-white placeholder-slate-500 outline-none transition-colors focus:border-cyan-500/60 focus:bg-slate-800 focus:ring-1 focus:ring-cyan-500/30";
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="space-y-1">
-        <h1 className="text-xl font-semibold text-slate-900">Sign in to WebOps AI</h1>
-        <p className="text-sm text-slate-600">Manage your autonomous agents and execution workflows.</p>
-      </div>
+    <form onSubmit={onSubmit} className="space-y-5">
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-slate-700" htmlFor="email">
+        <label className="block text-xs font-semibold uppercase tracking-widest text-slate-500" htmlFor="email">
           Email
         </label>
         <input
@@ -56,12 +55,12 @@ export function SignInForm(): JSX.Element {
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm outline-none ring-slate-900/20 focus:ring-2"
+          className={inputClass}
           placeholder="founder@company.com"
         />
       </div>
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-slate-700" htmlFor="password">
+        <label className="block text-xs font-semibold uppercase tracking-widest text-slate-500" htmlFor="password">
           Password
         </label>
         <input
@@ -70,17 +69,21 @@ export function SignInForm(): JSX.Element {
           required
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm outline-none ring-slate-900/20 focus:ring-2"
+          className={inputClass}
           placeholder="Enter your password"
         />
       </div>
-      {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
+      {error ? (
+        <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2.5">
+          <p className="text-sm font-medium text-rose-400">{error}</p>
+        </div>
+      ) : null}
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? "Signing in..." : "Sign In"}
       </Button>
-      <p className="text-sm text-slate-600">
-        New to WebOps AI?{" "}
-        <Link href="/auth/sign-up" className="font-medium text-slate-900 underline-offset-2 hover:underline">
+      <p className="text-sm text-slate-500">
+        New to Operon?{" "}
+        <Link href="/auth/sign-up" className="font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
           Create your account
         </Link>
       </p>
