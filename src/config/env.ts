@@ -9,6 +9,13 @@ export type AppEnv = {
   STRIPE_PRICE_STARTER: string;
   STRIPE_PRICE_GROWTH: string;
   SLACK_WEBHOOK_URL?: string;
+  ANTHROPIC_API_KEY?: string;
+  ALERT_EMAIL_FROM?: string;
+  ALERT_EMAIL_TO?: string;
+  SMTP_HOST?: string;
+  SMTP_PORT?: number;
+  SMTP_USER?: string;
+  SMTP_PASS?: string;
   TINYFISH_API_KEY: string;
   TINYFISH_BASE_URL: string;
   TINYFISH_EXECUTE_PATH: string;
@@ -113,6 +120,13 @@ export function getAppEnv(): AppEnv {
     STRIPE_PRICE_STARTER: readRequiredEnv("STRIPE_PRICE_STARTER"),
     STRIPE_PRICE_GROWTH: readRequiredEnv("STRIPE_PRICE_GROWTH"),
     SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL?.trim() || undefined,
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY?.trim() || undefined,
+    ALERT_EMAIL_FROM: process.env.ALERT_EMAIL_FROM?.trim() || undefined,
+    ALERT_EMAIL_TO: process.env.ALERT_EMAIL_TO?.trim() || undefined,
+    SMTP_HOST: process.env.SMTP_HOST?.trim() || undefined,
+    SMTP_PORT: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined,
+    SMTP_USER: process.env.SMTP_USER?.trim() || undefined,
+    SMTP_PASS: process.env.SMTP_PASS?.trim() || undefined,
     TINYFISH_API_KEY: readRequiredEnv("TINYFISH_API_KEY"),
     TINYFISH_BASE_URL: readRequiredEnv("TINYFISH_BASE_URL"),
     TINYFISH_EXECUTE_PATH: readRequiredEnv("TINYFISH_EXECUTE_PATH"),

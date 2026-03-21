@@ -16,6 +16,7 @@ import { FailureAnalysisPanel } from "./failure-analysis-panel";
 import { DebugSessionPanel } from "./debug-session-panel";
 import { GenerateToolButton } from "./generate-tool-button";
 import { ExecutionOutputViewer } from "./execution-output-viewer";
+import { ScreenshotGallery } from "./screenshot-gallery";
 
 type ExecutionDetail = {
   id: string;
@@ -255,6 +256,13 @@ export function ExecutionDetailLivePanel({
             outputPayload={execution.outputPayload}
             status={execution.status}
           />
+        </DashboardCard>
+      ) : null}
+
+      {/* Screenshots from TinyFish agent */}
+      {(execution.status === "SUCCEEDED" || execution.status === "FAILED") ? (
+        <DashboardCard title="Agent Screenshots" description="Visual captures taken by the autonomous agent at each step">
+          <ScreenshotGallery executionId={execution.id} />
         </DashboardCard>
       ) : null}
 

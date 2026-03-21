@@ -88,6 +88,8 @@ import {
   upsertBehaviorBaseline,
 } from "@/lib/shield/policy.service";
 
+import { sendExecutionAlert } from "@/server/services/notifications/execution-alert-service";
+
 import {
   appendExecutionEvent,
   saveExecutionResult,
@@ -775,6 +777,28 @@ export async function runExecutionWithTinyFish(
     organizationId: input.organizationId,
     executionId: input.executionId,
     status: finalStatus,
+  });
+
+  sendExecutionAlert({
+    executionId: input.executionId,
+    workflowName: workflow.name,
+    agentId: input.agentId,
+    status: finalStatus === "SUCCEEDED" ? "SUCCEEDED" : "FAILED",
+    summary: parsed.summary ?? undefined,
+    errorMessage: finalErrorMessage ?? undefined,
+    outputPayload: {
+      provider: "tinyfish",
+      providerExecutionId: parsed.providerExecutionId,
+      summary: parsed.summary,
+      output: parsed.output,
+      screenshots: storedScreenshots,
+    },
+    durationMs:
+      finalizedExecution.startedAt && finalizedExecution.finishedAt
+        ? finalizedExecution.finishedAt.getTime() - finalizedExecution.startedAt.getTime()
+        : undefined,
+  }).catch((err: unknown) => {
+    console.error("[ExecutionAlert] Failed to send alert:", err instanceof Error ? err.message : err);
   });
 
   if (finalStatus === "SUCCEEDED") {

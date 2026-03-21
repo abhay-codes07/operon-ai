@@ -20,7 +20,9 @@
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "@prisma/client": "^6.16.3",
+    "@types/nodemailer": "^7.0.11",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.70.1",
     "date-fns": "^4.1.0",
@@ -28,6 +30,7 @@
     "lucide-react": "^0.577.0",
     "next": "14.2.5",
     "next-auth": "^4.24.13",
+    "nodemailer": "^7.0.13",
     "prisma": "^6.16.3",
     "react": "^18",
     "react-dom": "^18",

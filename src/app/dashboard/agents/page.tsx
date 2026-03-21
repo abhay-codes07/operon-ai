@@ -1,8 +1,12 @@
 import { CreateAgentModal } from "@/components/dashboard/agents/create-agent-modal";
 import { AgentsTable } from "@/components/dashboard/agents/agents-table";
+import { AgentComparisonLeaderboard } from "@/components/dashboard/agents/agent-comparison-leaderboard";
 import { StatusFilter } from "@/components/dashboard/layout/status-filter";
+import { DashboardCard } from "@/components/dashboard/layout/dashboard-card";
+import { SectionHeading } from "@/components/ui/section-heading";
 import { requireOrganizationRole } from "@/server/auth/authorization";
 import { fetchAgentCatalog } from "@/server/services/agents/agent-service";
+import { fetchReliabilityDashboard } from "@/server/services/agents/reliability-service";
 
 type DashboardAgentsPageProps = {
   searchParams?: {
@@ -21,46 +25,66 @@ export default async function DashboardAgentsPage({
     searchParams?.status === "ARCHIVED"
       ? searchParams.status
       : undefined;
-  const result = await fetchAgentCatalog({
-    organizationId: user.organizationId!,
-    status: statusFilter,
-    page: 1,
-    pageSize: 25,
-  });
+
+  const [result, reliabilityRows] = await Promise.all([
+    fetchAgentCatalog({
+      organizationId: user.organizationId!,
+      status: statusFilter,
+      page: 1,
+      pageSize: 25,
+    }),
+    fetchReliabilityDashboard(user.organizationId!),
+  ]);
+
+  // Build name map from agents
+  const agentNameMap = new Map(result.items.map((a) => [a.id, { name: a.name, status: a.status }]));
+
+  const leaderboardEntries = reliabilityRows
+    .filter((row: (typeof reliabilityRows)[number]) => row.totalExecutions > 0)
+    .map((row: (typeof reliabilityRows)[number], index: number) => ({
+      rank: index + 1,
+      agentId: row.agentId,
+      agentName: agentNameMap.get(row.agentId)?.name ?? `Agent …${row.agentId.slice(-6)}`,
+      agentStatus: agentNameMap.get(row.agentId)?.status ?? "UNKNOWN",
+      reliabilityScore: row.reliabilityScore,
+      successRate: row.successRate,
+      totalExecutions: row.totalExecutions,
+      avgExecutionMs: row.avgExecutionMs,
+      failureFrequency: row.failureFrequency,
+    }));
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
-      <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-2xl p-8 text-white">
-        <h1 className="text-4xl font-bold mb-2">Autonomous Web Agents</h1>
-        <p className="text-orange-100 text-lg">Agent Registry</p>
-        <p className="text-orange-200 text-sm mt-2">Provision and monitor the agents responsible for website workflow execution.</p>
-      </div>
+      <SectionHeading
+        eyebrow="Autonomous Agents"
+        title="Agent Registry"
+        description="Provision and monitor the agents responsible for website workflow execution."
+      />
 
-      {/* Main Card */}
-      <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700/50 backdrop-blur-sm p-6 space-y-6">
-        {/* Filter and Action Bar */}
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-slate-300 font-semibold">Filter by Status</p>
-          </div>
-          <div className="flex gap-3">
-            <StatusFilter
-              options={[
-                { label: "All", value: "ALL" },
-                { label: "Draft", value: "DRAFT" },
-                { label: "Active", value: "ACTIVE" },
-                { label: "Paused", value: "PAUSED" },
-                { label: "Archived", value: "ARCHIVED" },
-              ]}
-            />
-            <CreateAgentModal organizationName={user.organizationName} />
-          </div>
+      {/* Comparison Leaderboard */}
+      <DashboardCard
+        title="Agent Performance Leaderboard"
+        description="Ranked by reliability score — composite of success rate, retry rate, and average execution speed."
+      >
+        <AgentComparisonLeaderboard entries={leaderboardEntries} />
+      </DashboardCard>
+
+      {/* Agent table */}
+      <DashboardCard title="All Agents">
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <StatusFilter
+            options={[
+              { label: "All", value: "ALL" },
+              { label: "Draft", value: "DRAFT" },
+              { label: "Active", value: "ACTIVE" },
+              { label: "Paused", value: "PAUSED" },
+              { label: "Archived", value: "ARCHIVED" },
+            ]}
+          />
+          <CreateAgentModal organizationName={user.organizationName} />
         </div>
-
-        {/* Agents Table */}
         <AgentsTable agents={result.items} />
-      </div>
+      </DashboardCard>
     </div>
   );
 }
