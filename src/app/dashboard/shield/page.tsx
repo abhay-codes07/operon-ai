@@ -49,7 +49,7 @@ export default async function DashboardShieldPage(): Promise<JSX.Element> {
           initialAllowedDomains={Array.isArray(policy?.allowedDomains) ? (policy.allowedDomains as string[]) : []}
           initialBlockedActions={Array.isArray(policy?.blockedActions) ? (policy.blockedActions as string[]) : []}
         />
-        <div className="mt-3 border-t border-slate-100 pt-3">
+        <div className="mt-3 border-t border-slate-700/60 pt-3">
           <ShieldTestAttackButton />
         </div>
       </DashboardCard>
