@@ -24,6 +24,18 @@ export const dashboardNav = [
     icon: "GitBranch",
   },
   {
+    href: "/dashboard/swarm",
+    label: "Swarm",
+    description: "Parallel agent orchestration",
+    icon: "Layers",
+  },
+  {
+    href: "/dashboard/sentinels",
+    label: "Sentinels",
+    description: "Web intelligence tripwires",
+    icon: "Eye",
+  },
+  {
     href: "/dashboard/releases",
     label: "Releases",
     description: "Canary rollout control",

@@ -17,6 +17,7 @@ import { DebugSessionPanel } from "./debug-session-panel";
 import { GenerateToolButton } from "./generate-tool-button";
 import { ExecutionOutputViewer } from "./execution-output-viewer";
 import { ScreenshotGallery } from "./screenshot-gallery";
+import { AgentDnaPanel } from "./agent-dna-panel";
 
 type ExecutionDetail = {
   id: string;
@@ -275,6 +276,13 @@ export function ExecutionDetailLivePanel({
         description="Stepwise replay with captured DOM snapshots for time-travel debugging"
       >
         <ExecutionReplayViewer steps={replay.steps} snapshots={replay.snapshots} />
+      </DashboardCard>
+
+      <DashboardCard
+        title="Agent DNA"
+        description="Behavioral fingerprint extracted from this execution — transferable as a pattern template to new agents"
+      >
+        <AgentDnaPanel steps={replay.steps} executionId={execution.id} />
       </DashboardCard>
 
       <DashboardCard title="Self-Healing Decisions" description="Selector fallback and semantic recovery actions">

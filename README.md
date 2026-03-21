@@ -1,365 +1,278 @@
+<div align="center">
+
+![TinyFish Hackathon 2026](https://img.shields.io/badge/TinyFish_Hackathon_2026-Submission-22d3ee?style=for-the-badge&labelColor=040611)
+![Mind2Web Accuracy](https://img.shields.io/badge/Mind2Web_Accuracy-89.9%25-22d3ee?style=for-the-badge&labelColor=040611)
+![Next.js 14](https://img.shields.io/badge/Next.js_14-App_Router-000?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=for-the-badge&logo=typescript&logoColor=white)
+
 # Operon AI
 
-## Category Thesis
+**The web is now programmable.**
 
-Operon AI defines the category of Autonomous Web Operations Infrastructure.
+Operon is an enterprise-grade autonomous web agent platform powered by [TinyFish AI](https://tinyfish.ai). Deploy fleets of parallel agents that navigate, extract, and act across any website — with full observability, security, and learning built in.
 
-It is the control layer for organizations that run revenue, product, and operational workflows across live websites, where execution reliability matters as much as intelligence.
+[Live Demo](https://operon-ai.vercel.app) · [Dashboard](https://operon-ai.vercel.app/dashboard) · [GitHub](https://github.com/abhay-codes07/operon-ai)
 
-## The New Operational Frontier
+</div>
 
-The browser has become a production surface, not just a user interface.
+---
 
-Critical business work now depends on repeated web interactions across fragmented systems. The bottleneck is no longer access to AI. The bottleneck is operating AI workflows with consistency, accountability, and control.
+## Why Operon
 
-Autonomous web workflows are becoming a core operating primitive. Operon turns that primitive into a system of record.
+|  | Operon / TinyFish | OpenAI Operator | Claude Computer Use | Browser Use |
+|---|---|---|---|---|
+| **Mind2Web Accuracy** | **89.9%** | 61.3% | 56.3% | 30.0% |
+| **Easy→Hard Degradation** | **−15.6 pts** | −39 pts | −45 pts | −58 pts |
+| **Parallel Agents** | **1,000** | 1 | 1 | 1 |
+| **Cost / operation** | **$0.015** | ~$0.08 | ~$0.12 | varies |
 
-## What Operon Enables
+TinyFish holds up under compound-error multi-step scenarios where every other tool collapses. Operon is the management layer that makes those capabilities production-grade.
 
-Operon converts fragile, manual browser work into governed operational throughput.
+---
 
-Teams ship faster without sacrificing oversight. Workflows execute with clear ownership, predictable recovery, and traceable outcomes. Operational decisions move from guesswork to evidence.
+## Features
 
-The result is durable leverage: more work completed, fewer operational breaks, and a tighter path from intent to execution.
-
-## Who This Is For
-
-Operon serves product, growth, RevOps, QA, and operations teams that depend on recurring browser-based processes to run the business.
-
-It fits organizations where workflow reliability directly influences revenue, customer experience, and delivery velocity.
-
-## Core Product Tenets
-
-Operon is workflow-first. Agent behavior is defined, reviewable, and repeatable.
-
-Operon is reliability-first. Execution is orchestrated for continuity under real operational conditions.
-
-Operon is accountability-first. Every run produces a clear operational trail.
-
-Operon is governance-first. Access, tenancy boundaries, and usage controls are non-negotiable system behavior.
-
-Operon is commercially aligned. Product usage and business model constraints remain in sync.
-
-## Demo Scenario
-
-A growth operations lead creates a workflow to monitor competitor pricing changes and trigger internal follow-up.
-
-An agent executes the workflow on schedule, handles multi-step navigation, and records the full run context. The team reviews timeline events, validates outcomes, and retries failed runs with full traceability.
-
-What was previously manual and intermittent becomes dependable and continuous.
-
-## Engineering Posture
-
-Operon is engineered as operating infrastructure, not task automation.
-
-System boundaries are explicit. Execution state is durable. Operational behavior is observable. Governance is enforced at the platform level.
-
-The architecture is designed to preserve product velocity without compromising control.
-
-## Advanced Runtime Capabilities
-
-Deterministic Replay captures execution steps and DOM state for time-travel debugging.
-
-Self-Healing Execution resolves selector drift through semantic fallback strategies and scored recovery paths.
-
-Agent Memory persists run metadata and failure resolution patterns so future runs adapt with context.
-
-Operational Guardrails enforce organization policy for domains, actions, and execution windows before dispatch.
-
-Workflow Simulation predicts path quality and selector risk before any live action is taken.
-
-Agent Reliability Scoring computes trust from success rate, retries, failure frequency, and runtime duration.
-
-Failure Root Cause Analysis classifies execution failures into structured categories with evidence from logs, steps, and DOM context.
-
-Cross-Agent Knowledge Graph shares domain intelligence and recurring signals across all agents in an organization.
-
-Web Change Radar computes DOM hashes, detects structural drift, and raises actionable change alerts in the dashboard.
-
-Autonomy Mode learns recurring selector failures and proposes safe adaptive workflow definitions for operator review.
-
-Real-Time Agent Control Plane enables live session streaming, approval gates, runtime controls, emergency shutdown, and debug attach workflows.
-
-Dynamic Tool Generation Engine allows agents to generate, validate, version, install, and continuously optimize reusable automation tools from failed runs.
-
-Operon Mission Control provides a real-time control plane for fleet status, incident detection, operational metrics, automated recovery runbooks, and controlled agent deployment.
-
-Secure Agent Gateway intercepts every agent action with policy-as-code enforcement, sandboxed execution, risk scoring, and immutable execution audit trails.
-
-Progressive Workflow Delivery adds canary traffic routing, release health snapshots, and automatic rollback when live failure thresholds are breached.
-
-Operon Shield adds a dedicated prompt-injection defense layer that separates trusted workflow intent from untrusted web content at runtime, sanitizes context windows, and blocks unsafe execution paths before action dispatch.
-
-Operon Autopilot introduces learn-mode recording, workflow compilation, domain memory, and self-repair so operators can teach a flow once and keep it running as websites change.
-
-## Operon Autopilot
-
-Operon Autopilot converts live operator behavior into reusable workflow infrastructure.
-
-Operators record actions in Learn Mode, review the generated workflow, parameterize dynamic inputs, and approve it into the standard workflow runtime.
-
-Domain Memory stores working selectors and navigation patterns per domain. Self-repair logic uses that memory to recover from selector drift and logs repair events for review in the Autopilot dashboard.
-
-Autopilot sessions now carry deterministic workflow fingerprints, explicit lifecycle states (`RECORDING`, `REVIEW`, `APPROVED`, `COMPLETED`, `FAILED`), and operator controls for manual approval/failure handling.
-
-Autopilot API surface:
-
-- `POST /api/autopilot/start`
-- `POST /api/autopilot/action`
-- `POST /api/autopilot/finish`
-- `GET /api/autopilot/session/[id]`
-- `PATCH /api/autopilot/session/[id]`
-- `POST /api/autopilot/session/[id]/approve`
-- `POST /api/autopilot/session/[id]/fail`
-- `GET /api/autopilot/session/[id]/actions`
-- `GET /api/autopilot/sessions`
-- `GET /api/autopilot/memories`
-- `GET /api/autopilot/repairs`
-- `GET /api/autopilot/summary`
-- `POST /api/autopilot/repair/simulate`
-
-Autopilot UI surface:
-
-- `/autopilot/learn` for recording, compiling, reviewing, and approving workflows.
-- `/dashboard/autopilot` for learned session history, domain memory quality, and repair telemetry.
-
-## Operon Co-Pilot
-
-Operon Co-Pilot introduces live human collaboration during autonomous browser execution.
-
-Each step is scored by a confidence engine. When confidence drops below threshold, the runtime intercepts the action, opens a Co-Pilot session, and requests human confirmation or override while preserving execution context.
-
-Core Co-Pilot capabilities:
-
-- Confidence scoring and risk classification for each action
-- Human-in-the-loop intervention sessions tied to workflow runs
-- Ghost cursor action previews before confirmation
-- Real-time stream events for Co-Pilot action, help request, and intervention
-- Deterministic replay integration via intervention timeline APIs
-- Training-data export of agent corrections
-
-Co-Pilot API surface:
-
-- `POST /api/copilot/intervene`
-- `POST /api/copilot/confirm`
-- `GET /api/copilot/training-data`
-- `GET /api/copilot/summary`
-- `GET /api/copilot/sessions`
-- `GET /api/copilot/session/[id]`
-
-Co-Pilot UI surface:
-
-- `/dashboard/copilot` for session operations and live metrics
-- `/copilot/session/[id]` for live collaboration view and intervention controls
-
-## Operon Sandbox Economy
-
-Operon Sandbox Economy isolates every workflow behind a disposable digital identity so agent compromise cannot escalate to real operator credentials.
-
-Each workflow identity includes:
-
-- unique sandbox email
-- isolated cookie jar and session store
-- dedicated browser fingerprint
-- proxy assignment
-- domain-scoped credential vault
-- blast-radius scoring
-
-Containment model:
-
-```text
-Workflow -> SandboxIdentity -> SandboxSession(domain scoped)
-         -> BlastRadiusScore(time-series)
-         -> CredentialVault(domain -> credentials)
-```
-
-Security outcomes:
-
-- prompt injection impact is contained to one sandbox identity
-- cross-domain credential reuse is blocked
-- stale identities and sessions are auto-revoked by lifecycle worker
-- workflow cards expose blast radius badges for operator visibility
-
-## Operon Shield
-
-Operon Shield is the runtime security layer for autonomous browser agents.
-
-It enforces three guarantees:
-
-- Instruction integrity: trusted workflow instructions remain isolated from untrusted page content.
-- Runtime containment: suspicious actions are blocked or paused through policy checks and behavior baselines.
-- Security observability: prompt injection attempts are logged, scored, alerted, and surfaced in a live threat timeline.
-
-Core Shield surfaces:
-
-- `GET /api/shield/events`
-- `POST /api/shield/policies`
-- `GET /api/shield/policies`
-- `GET /api/shield/summary`
-- `GET /api/shield/timeline`
-- `POST /api/shield/test-injection`
-- `GET /api/shield/workflows/[id]/status`
-- `GET|POST /api/shield/workflows/[id]/baseline`
-- `POST /api/shield/workflows/[id]/baseline/infer`
-
-UI surfaces:
-
-- `/dashboard/shield` for threat posture, policy controls, timeline, and demo-attack simulation.
-- `/workflows/[id]/shield` for workflow-level trusted/untrusted context review and baseline enforcement.
-
-## OperonHub Marketplace
-
-OperonHub is the workflow marketplace for real-world TinyFish web agent automations.
-
-Organizations can publish reusable templates, install them instantly, and run live demos against production websites.
-
-Template reliability is continuously scored from execution outcomes, ratings, and recency. A background worker recomputes scores every 6 hours.
-
-### Publish
-
-Teams publish versioned templates with workflow definitions, changelogs, pricing metadata, and category tags.
-
-### Install
-
-Organizations install templates into their workspace with tracked version state and lifecycle status.
-
-### Reliability Scoring
-
-OperonHub computes reliability from execution outcomes, marketplace ratings, and release freshness, then updates leaderboard ranking.
-
-### Live Agents
-
-Template detail pages can trigger live demo runs through TinyFish, returning structured event traces and run output.
-
-## Workflow SLA Contracts
-
-Workflow SLA Contracts let each workflow define schedule expectations, maximum failure rate, runtime timeout, rolling windows, and escalation channels.
-
-SLA monitor workers evaluate execution timeout, missed schedules, and failure-rate thresholds every 5 minutes and create structured breach incidents automatically.
-
-Incidents can be reviewed and resolved from the Incident Center, with attached run-log context and operator retry actions.
-
-## Business Impact Dashboard
-
-Business Impact profiles map workflows to value categories and estimated dollar value per successful run.
-
-The Impact Dashboard aggregates monthly ROI, savings, and revenue-protection totals while ranking top-value workflows.
-
-## Operon Pipelines
-
-Operon Pipelines orchestrate multiple agents as a single durable run.  
-Each step executes in sequence, passes structured output forward, and records full run state for recovery and audit.
-
-Execution model:
-
-- `Pipeline` defines ordered agent steps with input/output mappings.
-- `PipelineRun` tracks lifecycle (`RUNNING`, `PAUSED`, `FAILED`, `COMPLETED`).
-- `PipelineStepRun` binds each step to an underlying agent execution and captures payload handoff.
-
-Operational controls:
-
-- Start, pause, and resume pipeline runs through API and UI controls.
-- On step failure, the pipeline pauses and exposes manual retry/skip controls.
-- Background pipeline runner worker advances eligible steps and resolves completion.
-
-Observability and governance:
-
-- Live run monitor shows step state, execution links, and current pipeline status.
-- Audit trail events include `PIPELINE_CREATED`, `PIPELINE_STARTED`, `PIPELINE_STEP_COMPLETED`, `PIPELINE_FAILED`, and `PIPELINE_RESUMED`.
-- Pipeline stats endpoint supports operational dashboards (`/api/pipelines/stats`).
-
-## Operon FinOps
-
-Operon FinOps provides execution-level cost intelligence across agents, workflows, and pipelines.
-
-Core capabilities:
-
-- Cost attribution by event type (`LLM_CALL`, `BROWSER_RUNTIME`, `RETRY`, `SELF_HEALING`)
-- Workflow cost summaries (`total`, `avg per run`, `monthly spend`)
-- Budget controls with threshold alerts and automatic throttling strategies
-- ROI scoring using workflow business impact vs execution cost
-- Cost anomaly detection for runs that exceed baseline cost by >3x
-- Pipeline step-level and run-level cost breakdowns
-
-Operational endpoints:
-
-- `GET /api/finops/workflows/[id]`
-- `GET /api/finops/anomalies`
-- `POST /api/finops/budget`
-- `GET /api/finops/roi`
-- `GET /api/finops/summary`
-- `GET /api/finops/pipelines/[id]`
-
-## Competitive Intelligence Nerve Center
-
-Operon runs autonomous competitor-monitoring agents in parallel and synthesizes change signals into actionable insights.
-
-Nerve Center capabilities:
-
-- Competitor registry with organization-scoped targets
-- Multi-signal monitoring (`PRICING_CHANGE`, `FEATURE_CHANGE`, `REVIEW_SENTIMENT`, `JOB_POSTING`, `HEADCOUNT_CHANGE`)
-- Parallel agent execution across pricing, feature, review, jobs, and headcount monitors
-- Signal aggregation and insight synthesis for high-impact competitor changes
-- Daily morning briefing generation and Slack alert delivery
-- Intelligence dashboard for signals, trend visualization, alerts, and competitor operations
-
-Primary intelligence endpoints:
-
-- `GET /api/intelligence/competitors`
-- `POST /api/intelligence/competitors`
-- `DELETE /api/intelligence/competitors/[id]`
-- `GET /api/intelligence/signals`
-- `GET /api/intelligence/insights`
-- `POST /api/intelligence/run`
-- `GET /api/intelligence/report`
-
-## AI Agent Compliance Passport
-
-Every workflow carries a Compliance Passport that records approvals, execution actions, visited domains, extracted data categories, and policy violations.
-
-Production execution is blocked until the current workflow version has an active compliance approval. When a workflow definition changes, prior approval is no longer valid.
-
-Passports generate plain-English summaries for non-engineering stakeholders, assign risk levels (`LOW`, `MEDIUM`, `HIGH`), and expose downloadable PDF reports.
-
-Compliance monitoring runs continuously:
-
-- Runtime event capture logs `READ`, `WRITE`, `SUBMIT`, and `EXTRACT` actions per run.
-- Violation detection flags out-of-allowlist domains, excessive extraction, and policy breaches.
-- Daily compliance worker refreshes workflow passport summaries automatically.
-- Audit trail entries are written for `WORKFLOW_APPROVED`, `WORKFLOW_REVOKED`, and `COMPLIANCE_VIOLATION`.
-
-Compliance API surface:
-
-- `GET /api/compliance/workflows/[id]`
-- `POST /api/compliance/workflows/[id]/request`
-- `POST /api/compliance/workflows/[id]/approve`
-- `POST /api/compliance/workflows/[id]/revoke`
-- `GET /api/compliance/workflows/[id]/events`
-- `GET /api/compliance/passport/[workflowId]`
-- `GET /api/compliance/passport/[workflowId]/pdf`
-- `GET /api/compliance/violations`
-- `GET /api/compliance/dashboard`
-
-## Local Development
+### 🌊 Swarm Orchestration *(new — unique)*
+Launch fleets of parallel TinyFish agents across multiple target sites simultaneously from a single command. A live swarm dashboard shows every agent's real-time status in a grid. Results aggregate automatically when all agents report back — cross-site intelligence in seconds, not hours.
 
 ```bash
+POST /api/internal/swarm/launch
+{ "agentId": "...", "workflowId": "...", "targetUrls": ["amazon.com", "ebay.com", "walmart.com"] }
+```
+
+### 👁 Sentinel Watchlist *(new — unique)*
+Deploy always-on sentinel agents that monitor specific URLs on a schedule. Unlike dumb DOM diffing, sentinels use Claude AI to determine if a change is **semantically meaningful** — then auto-generate an intelligence briefing: *"Amazon renamed their Prime tier and added a new upsell step to checkout. Your workflow selector needs updating."*
+
+### 🧬 Agent DNA Transfer *(new — unique)*
+After each successful execution, Operon extracts a **behavioral fingerprint** — the exact action sequence, selector patterns, and timing that worked. This DNA is stored and transferable to new agents, giving them near-instant first-run success. A visual DNA helix shows pattern confidence per step.
+
+### 🔴 Real-Time SSE Execution Stream
+Live execution events stream from the BullMQ worker to your browser via Server-Sent Events — no extra WebSocket server. Auto-closes when execution reaches terminal status.
+
+### 📸 Screenshot Gallery
+TinyFish execution screenshots stored at each agent step, viewable in a full-screen gallery with keyboard navigation.
+
+### 🧠 NL Workflow Builder
+Describe a task in plain English → Claude Haiku decomposes it into a complete `WorkflowDefinition` JSON with target URL, cron schedule, guardrails, timeout, and step breakdown.
+
+### 📧 Execution Alerts
+Email + Slack notifications on every execution completion, with branded dark-theme email that includes price comparison tables parsed from the agent output.
+
+### 📊 Agent Performance Leaderboard
+Side-by-side reliability ranking: composite score (success rate × 0.6, retry penalty × 0.2, failure frequency × 0.15, latency × 0.05), color-coded score bars, avg execution duration.
+
+### 🛡 Operon Shield
+Runtime prompt injection defense — every agent action scanned before execution. Pattern-matched injections blocked (riskScore ≥ 70) with full threat telemetry timeline.
+
+### 🔧 Self-Healing Selectors
+Semantic fallback when target selectors fail. Tries `data-testid`, `aria-label`, and fuzzy similarity scoring. All resolutions stored with strategy and confidence score.
+
+### 🏥 Failure Root Cause Analysis
+Automated failure classification (`SELECTOR_DRIFT`, `NAVIGATION_FAILURE`, `AUTHENTICATION_ISSUE`, `PAGE_LOAD_TIMEOUT`) from logs, failed steps, and DOM snapshots.
+
+### 🔁 Deterministic Replay
+Every execution step recorded with DOM snapshot — enabling step-by-step time-travel debugging.
+
+### 🧑‍✈️ Human-in-the-Loop Co-Pilot
+When agent confidence drops below threshold, execution pauses. Operators review the ghost-cursor preview and approve or override — then step resumes autonomously.
+
+### 🚀 Mission Control
+Fleet-level incident detection with automated runbook execution across `SELECTOR_ERROR_LOOP`, `FAILURE_SPIKE`, and `RETRY_LOOP` patterns.
+
+### 📈 FinOps Intelligence
+Per-run cost tracking (browser runtime + LLM tokens + self-healing), monthly aggregation, anomaly detection, and per-workflow budget enforcement.
+
+### ✅ Compliance Passport
+Full audit trail of every agent action with plain-English compliance summary via Claude. Violation detection with configurable thresholds.
+
+### 🕹 Canary Releases
+Progressive rollout for workflow definition changes with automatic rollback on failure threshold breach.
+
+### 🔬 Sandbox Identities
+Isolated synthetic personas for testing — disposable credentials, isolated session state, blast-radius scoring.
+
+### 🏪 OperonHub Marketplace
+Publish, discover, and install reusable workflow templates with versioning and one-click installation.
+
+---
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────┐
+│                   Next.js 14 App                      │
+│  ┌──────────────┐  ┌─────────────┐  ┌─────────────┐  │
+│  │  App Router  │  │  API Routes │  │  NextAuth   │  │
+│  │  (RSC + CC)  │  │  80+ routes │  │  RBAC       │  │
+│  └──────────────┘  └─────────────┘  └─────────────┘  │
+└───────────────────────────┬──────────────────────────┘
+                            │ BullMQ jobs
+          ┌─────────────────▼──────────────────┐
+          │         Execution Worker            │
+          │    tinyfish-execution-runner.ts      │
+          │  ┌──────────────────────────────┐  │
+          │  │   TinyFish Web Agent API     │  │
+          │  │   (SSE streaming response)   │  │
+          │  └──────────────────────────────┘  │
+          │  Shield · Self-Healing · FinOps     │
+          │  Compliance · DNA · Alerts · Replay  │
+          └──────────────────┬─────────────────┘
+                             │
+          ┌──────────────────▼─────────────────┐
+          │       PostgreSQL (Prisma)           │
+          │       50+ models · migrations       │
+          └────────────────────────────────────┘
+```
+
+**Key patterns:**
+- **Server Components** for dashboard data fetching — zero client-side API overhead
+- **BullMQ Worker** as a separate process (`npm run worker:dev`)
+- **SSE** via `/api/internal/executions/[id]/sse` — no WebSocket server required
+- **Repository pattern** — services → repositories → Prisma
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript 5 |
+| Styling | Tailwind CSS |
+| Database | PostgreSQL + Prisma ORM |
+| Queue | BullMQ + Redis |
+| Auth | NextAuth.js v4 |
+| Web Agents | TinyFish Web Agent API |
+| LLM | Anthropic Claude (Haiku 4.5) |
+| Billing | Stripe |
+| Email Alerts | Nodemailer (SMTP) |
+| Deployment | Docker + docker-compose |
+
+---
+
+## Quick Start
+
+### Prerequisites
+- Node.js 20+
+- Docker (for PostgreSQL + Redis)
+- TinyFish API key — [get one free](https://tinyfish.ai)
+- Anthropic API key — [console.anthropic.com](https://console.anthropic.com) *(optional)*
+
+### 1. Clone & install
+```bash
+git clone https://github.com/abhay-codes07/operon-ai.git
+cd operon-ai
 npm install
-cp .env.example .env.local
-npm run prisma:generate
-npm run dev
-npm run worker:dev
-npm run db:seed
 ```
 
-Control plane websocket gateway:
-
+### 2. Configure environment
 ```bash
-npm run control-plane:dev
+cp .env.example .env
+# Fill in: DATABASE_URL, REDIS_URL, TINYFISH_API_KEY, NEXTAUTH_SECRET
 ```
 
-## Production Guide Notice
+### 3. Start infrastructure
+```bash
+docker-compose up -d   # PostgreSQL on :5433, Redis on :6379
+```
 
-Production rollout guidance is documented in:
+### 4. Set up database
+```bash
+npx prisma migrate deploy
+npx prisma db seed
+```
 
-- `docs/DEPLOYMENT.md`
-- `docs/ARCHITECTURE.md`
+### 5. Run the app
+```bash
+# Terminal 1 — Next.js dev server
+npm run dev
+
+# Terminal 2 — BullMQ execution worker (REQUIRED for agents to execute)
+npm run worker:dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). Sign in with the seed credentials from `.env`.
+
+---
+
+## Environment Variables
+
+See [`.env.example`](.env.example) for the full annotated reference.
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `TINYFISH_API_KEY` | ✅ | TinyFish Web Agent API key |
+| `DATABASE_URL` | ✅ | PostgreSQL connection string (port 5433 in docker-compose) |
+| `REDIS_URL` | ✅ | Redis connection string |
+| `NEXTAUTH_SECRET` | ✅ | 32-byte random secret |
+| `ANTHROPIC_API_KEY` | optional | Powers NL workflow builder + sentinel briefings |
+| `SMTP_HOST` + `ALERT_EMAIL_TO` | optional | Email alerts on execution completion |
+| `SLACK_WEBHOOK_URL` | optional | Slack notifications on execution completion |
+
+---
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── dashboard/          # 20+ dashboard pages
+│   │   ├── swarm/          # Swarm Orchestrator
+│   │   ├── sentinels/      # Sentinel Watchlist
+│   │   ├── agents/         # Agent registry + leaderboard
+│   │   ├── activity/       # Execution timeline + detail
+│   │   ├── workflows/      # Workflow builder
+│   │   ├── shield/         # Prompt injection defense
+│   │   └── ...
+│   ├── api/internal/       # 80+ API routes
+│   └── page.tsx            # Landing page
+├── components/
+│   ├── dashboard/
+│   │   ├── swarm/          # SwarmCanvas, SwarmLaunchForm
+│   │   ├── sentinels/      # SentinelGrid, AddSentinelModal
+│   │   └── activity/       # AgentDnaPanel, ExecutionOutputViewer, ...
+│   └── ui/                 # Button, Card, SectionHeading, ...
+├── server/
+│   ├── services/           # Business logic
+│   │   ├── executions/     # tinyfish-execution-runner.ts (core)
+│   │   ├── notifications/  # execution-alert-service.ts
+│   │   └── sentinels/      # sentinel-service.ts
+│   ├── integrations/tinyfish/  # client, request-builder, response-parser
+│   └── queue/              # BullMQ producers + workers
+├── lib/                    # shield, finops, compliance, sla, copilot, ...
+└── config/                 # Navigation, env schema
+
+prisma/
+├── schema.prisma           # 50+ models
+└── migrations/
+
+worker/                     # BullMQ worker entry point (separate process)
+```
+
+---
+
+## Hackathon & Accelerator
+
+Built for the **[TinyFish Hackathon 2026](https://www.hackerearth.com/challenges/hackathon/the-tiny-fish-hackathon-2026/)** — submission deadline March 29, 2026.
+
+**Three novel features designed to win:**
+
+1. **Swarm Orchestration** — Direct showcase of TinyFish's 1,000 concurrent agent capability. No other hackathon project will have a real-time visual grid of parallel agents across multiple websites.
+
+2. **Semantic Sentinel Watchlist** — Turns agents from one-shot tools into persistent web intelligence infrastructure. The LLM "is this change meaningful?" layer is the differentiator.
+
+3. **Agent DNA Transfer** — Genuine autonomous learning beyond key-value memory. Behavioral fingerprints that make agents smarter with every run.
+
+Also applying for the **[TinyFish Accelerator](https://tinyfish.ai/accelerator)** — Operon is B2B infrastructure for enterprises deploying autonomous web agents at scale, which is precisely the Mango Capital / TinyFish investment thesis.
+
+---
+
+## License
+
+MIT
+
+---
+
+<div align="center">
+  <p>Built on <a href="https://tinyfish.ai">TinyFish AI</a> · Powered by Anthropic Claude · TinyFish Hackathon 2026</p>
+</div>
