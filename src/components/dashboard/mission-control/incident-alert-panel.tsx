@@ -56,12 +56,12 @@ export function IncidentAlertPanel({ items }: { items: IncidentItem[] }): JSX.El
             </div>
             <p className="text-xs text-slate-500">{new Date(incident.detectedAt).toLocaleString()}</p>
           </div>
-          <p className="mt-2 text-sm text-slate-700">{incident.description}</p>
+          <p className="mt-2 text-sm text-slate-300">{incident.description}</p>
           <p className="mt-1 text-xs text-slate-500">
             Agent {incident.agentId?.slice(-8) ?? "N/A"} • Execution {incident.executionId?.slice(-8) ?? "N/A"}
           </p>
           <div className="mt-3 flex items-center justify-between">
-            <p className="text-xs font-medium text-slate-600">Status: {incident.status}</p>
+            <p className="text-xs font-medium text-slate-400">Status: {incident.status}</p>
             {incident.status !== "RESOLVED" ? (
               <Button type="button" variant="secondary" onClick={() => resolve(incident.id)}>
                 Resolve

@@ -108,7 +108,7 @@ export function MissionControlDashboard({
                   <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Updated</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-sm text-slate-700">
+              <tbody className="divide-y divide-slate-800/60 text-sm text-slate-300">
                 {fleet.map((agent) => (
                   <tr key={agent.id}>
                     <td className="px-3 py-2">

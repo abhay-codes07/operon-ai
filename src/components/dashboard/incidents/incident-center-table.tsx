@@ -80,7 +80,7 @@ export function IncidentCenterTable({ items }: IncidentCenterTableProps): JSX.El
                   ) : null}
                   <button
                     type="button"
-                    className="rounded border border-slate-300 px-2 py-1 text-xs"
+                    className="rounded border border-slate-700/60 px-2 py-1 text-xs text-slate-300"
                     onClick={() => setOpenDetails((current) => (current === row.id ? null : row.id))}
                   >
                     {openDetails === row.id ? "Hide Details" : "View Details"}
