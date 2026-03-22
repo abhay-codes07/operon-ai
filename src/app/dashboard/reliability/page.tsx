@@ -16,37 +16,37 @@ export default async function DashboardReliabilityPage(): Promise<JSX.Element> {
         description="Operational trust scorecards derived from execution outcomes and runtime behavior."
       />
       <DashboardCard>
-        <div className="overflow-hidden rounded-xl border border-slate-200">
-          <table className="min-w-full divide-y divide-slate-200 bg-white">
-            <thead className="bg-slate-50">
+        <div className="overflow-hidden rounded-xl border border-slate-700/60">
+          <table className="min-w-full divide-y divide-slate-800">
+            <thead className="bg-slate-900/60">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-slate-500">
                   Agent
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-slate-500">
                   Reliability
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-slate-500">
                   Success Rate
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-slate-500">
                   Retry Rate
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-slate-500">
                   Avg Runtime
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
+            <tbody className="divide-y divide-slate-800/60 text-sm">
               {items.map((item) => (
-                <tr key={item.id}>
-                  <td className="px-4 py-3 font-medium text-slate-900">{item.agentId.slice(-8)}</td>
+                <tr key={item.id} className="hover:bg-slate-800/30 transition-colors">
+                  <td className="px-4 py-3 font-mono font-medium text-slate-300">{item.agentId.slice(-8)}</td>
                   <td className="px-4 py-3">
                     <ReliabilityScoreBadge score={item.reliabilityScore} />
                   </td>
-                  <td className="px-4 py-3">{(item.successRate * 100).toFixed(1)}%</td>
-                  <td className="px-4 py-3">{(item.retryRate * 100).toFixed(1)}%</td>
-                  <td className="px-4 py-3">{Math.round(item.avgExecutionMs / 1000)}s</td>
+                  <td className="px-4 py-3 text-slate-300">{(item.successRate * 100).toFixed(1)}%</td>
+                  <td className="px-4 py-3 text-slate-300">{(item.retryRate * 100).toFixed(1)}%</td>
+                  <td className="px-4 py-3 text-slate-300">{Math.round(item.avgExecutionMs / 1000)}s</td>
                 </tr>
               ))}
             </tbody>

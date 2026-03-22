@@ -20,10 +20,11 @@ export default async function DashboardIntelligencePage(): Promise<JSX.Element> 
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-amber-600 to-yellow-600 rounded-2xl p-8 text-white">
-        <h1 className="text-4xl font-bold mb-2">Autonomous Competitive Intelligence Nerve Center</h1>
-        <p className="text-amber-100 text-lg">Intelligence</p>
-        <p className="text-amber-200 text-sm mt-2">Parallel agents monitor competitors and synthesize actionable signals.</p>
+      <div className="relative rounded-2xl overflow-hidden border border-cyan-500/20 bg-slate-900/80 p-8">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-blue-600/10 pointer-events-none" />
+        <p className="text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-2">Intelligence</p>
+        <h1 className="text-3xl font-bold text-white mb-2">Autonomous Competitive Intelligence</h1>
+        <p className="text-slate-400 text-sm">Parallel agents monitor competitors and synthesize actionable signals.</p>
       </div>
 
       {/* Grid Layout */}

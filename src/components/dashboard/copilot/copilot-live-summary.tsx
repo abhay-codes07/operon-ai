@@ -30,17 +30,17 @@ export function CoPilotLiveSummary({ initial }: CoPilotLiveSummaryProps) {
 
   return (
     <div className="grid gap-3 md:grid-cols-3">
-      <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-3">
         <p className="text-xs text-slate-500">Sessions</p>
-        <p className="text-lg font-semibold text-slate-900">{state.sessionCount}</p>
+        <p className="text-lg font-semibold text-white">{state.sessionCount}</p>
       </article>
-      <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-3">
         <p className="text-xs text-slate-500">Interventions</p>
-        <p className="text-lg font-semibold text-slate-900">{state.interventionCount}</p>
+        <p className="text-lg font-semibold text-white">{state.interventionCount}</p>
       </article>
-      <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-3">
         <p className="text-xs text-slate-500">Avg Agent Confidence</p>
-        <p className="text-lg font-semibold text-slate-900">{Math.round(state.averageAgentConfidence * 100)}%</p>
+        <p className="text-lg font-semibold text-white">{Math.round(state.averageAgentConfidence * 100)}%</p>
       </article>
     </div>
   );

@@ -26,7 +26,7 @@ type ExecutionReplayViewerProps = {
 };
 
 const stepStatusClasses: Record<ReplayStep["status"], string> = {
-  PENDING: "bg-slate-100 text-slate-700",
+  PENDING: "bg-slate-800/60 text-slate-300",
   RUNNING: "bg-sky-100 text-sky-700",
   SUCCEEDED: "bg-emerald-100 text-emerald-700",
   FAILED: "bg-rose-100 text-rose-700",
@@ -49,18 +49,18 @@ export function ExecutionReplayViewer({
 
   return (
     <div className="grid gap-4 lg:grid-cols-[320px,1fr]">
-      <div className="rounded-xl border border-slate-200 bg-white">
-        <div className="border-b border-slate-200 px-4 py-3">
+      <div className="rounded-xl border border-slate-700/60 bg-slate-900">
+        <div className="border-b border-slate-700/60 px-4 py-3">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Replay Steps</p>
         </div>
-        <ol className="max-h-[440px] overflow-auto divide-y divide-slate-100">
+        <ol className="max-h-[440px] overflow-auto divide-y divide-slate-800/60">
           {steps.map((step) => (
             <li key={step.id}>
               <button
                 type="button"
                 onClick={() => setSelectedStepId(step.id)}
-                className={`w-full px-4 py-3 text-left transition hover:bg-slate-50 ${
-                  selectedStepId === step.id ? "bg-slate-50" : ""
+                className={`w-full px-4 py-3 text-left transition hover:bg-slate-800/40 ${
+                  selectedStepId === step.id ? "bg-slate-800/40" : ""
                 }`}
               >
                 <div className="flex items-center justify-between gap-3">
@@ -75,7 +75,7 @@ export function ExecutionReplayViewer({
                     {step.status}
                   </span>
                 </div>
-                <p className="mt-1 text-sm font-semibold text-slate-900">{step.action}</p>
+                <p className="mt-1 text-sm font-semibold text-white">{step.action}</p>
                 <p className="text-xs text-slate-500">{step.target ?? step.stepKey}</p>
               </button>
             </li>
@@ -83,7 +83,7 @@ export function ExecutionReplayViewer({
         </ol>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-slate-950 p-4">
+      <div className="rounded-xl border border-slate-700/60 bg-slate-950 p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">DOM Snapshot</p>
         {selectedSnapshots.length === 0 ? (
           <p className="mt-4 text-sm text-slate-400">No snapshots were captured for the selected step.</p>

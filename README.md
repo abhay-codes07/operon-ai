@@ -61,6 +61,9 @@ Email + Slack notifications on every execution completion, with branded dark-the
 ### 📊 Agent Performance Leaderboard
 Side-by-side reliability ranking: composite score (success rate × 0.6, retry penalty × 0.2, failure frequency × 0.15, latency × 0.05), color-coded score bars, avg execution duration.
 
+### 🎯 Results Hub *(TinyFish-style unified output dashboard)*
+Every execution result in one place — prices, job listings, extracted data, summaries — without leaving Operon. Smart output preview auto-detects result type (price comparison table, job listings, generic arrays) and renders the best view. Auto-refreshes every 3s while agents are active. Status filter, execution timeline, and direct link to full execution detail.
+
 ### 🛡 Operon Shield
 Runtime prompt injection defense — every agent action scanned before execution. Pattern-matched injections blocked (riskScore ≥ 70) with full threat telemetry timeline.
 

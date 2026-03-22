@@ -34,21 +34,21 @@ export function ComplianceDashboardLive({ initial }: ComplianceDashboardLiveProp
 
   return (
     <div className="grid gap-4 md:grid-cols-4">
-      <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900 p-4 shadow-sm">
         <p className="text-xs text-slate-500">Workflows</p>
-        <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.totalWorkflows}</p>
+        <p className="mt-1 text-2xl font-semibold text-white">{summary.totalWorkflows}</p>
       </article>
-      <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900 p-4 shadow-sm">
         <p className="text-xs text-slate-500">Approved</p>
-        <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.approvedWorkflows}</p>
+        <p className="mt-1 text-2xl font-semibold text-white">{summary.approvedWorkflows}</p>
       </article>
-      <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900 p-4 shadow-sm">
         <p className="text-xs text-slate-500">Violations</p>
-        <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.violations}</p>
+        <p className="mt-1 text-2xl font-semibold text-white">{summary.violations}</p>
       </article>
-      <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900 p-4 shadow-sm">
         <p className="text-xs text-slate-500">Passports</p>
-        <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.passportsGenerated}</p>
+        <p className="mt-1 text-2xl font-semibold text-white">{summary.passportsGenerated}</p>
       </article>
     </div>
   );

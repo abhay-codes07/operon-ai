@@ -79,41 +79,41 @@ export function CreateAgentModal({ organizationName }: CreateAgentModalProps): J
           onMouseDown={() => setIsOpen(false)}
         >
           <div
-            className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl"
+            className="w-full max-w-lg rounded-2xl border border-slate-700/60 bg-slate-900 p-6 shadow-2xl"
             onMouseDown={(event) => event.stopPropagation()}
           >
             <div className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Agent Setup</p>
-              <h2 className="text-xl font-semibold text-slate-900">Create New Agent</h2>
-              <p className="text-sm text-slate-600">
+              <h2 className="text-xl font-semibold text-white">Create New Agent</h2>
+              <p className="text-sm text-slate-400">
                 Deploy a new autonomous agent in {organizationName ?? "your workspace"}.
               </p>
             </div>
 
             <form className="mt-6 space-y-4" onSubmit={onCreateAgent}>
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700" htmlFor="agent-name">
+                <label className="block text-sm font-medium text-slate-300" htmlFor="agent-name">
                   Agent Name
                 </label>
                 <input
                   id="agent-name"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
-                  className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm outline-none ring-slate-900/20 focus:ring-2"
+                  className="h-10 w-full rounded-md border border-slate-700/60 bg-slate-800/60 text-white placeholder-slate-500 focus:border-cyan-500/60 focus:ring-cyan-500/30 px-3 text-sm outline-none focus:ring-2"
                   placeholder="Invoice Reconciler"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700" htmlFor="agent-description">
+                <label className="block text-sm font-medium text-slate-300" htmlFor="agent-description">
                   Description
                 </label>
                 <textarea
                   id="agent-description"
                   value={description}
                   onChange={(event) => setDescription(event.target.value)}
-                  className="min-h-24 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none ring-slate-900/20 focus:ring-2"
+                  className="min-h-24 w-full rounded-md border border-slate-700/60 bg-slate-800/60 text-white placeholder-slate-500 focus:border-cyan-500/60 focus:ring-cyan-500/30 px-3 py-2 text-sm outline-none focus:ring-2"
                   placeholder="Handles B2B invoice reconciliation across billing portals."
                 />
               </div>

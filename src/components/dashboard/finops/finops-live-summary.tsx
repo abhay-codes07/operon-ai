@@ -38,17 +38,17 @@ export function FinOpsLiveSummary({ initial }: FinOpsLiveSummaryProps): JSX.Elem
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
-      <article className="rounded-xl border border-slate-200 bg-white p-4">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900 p-4">
         <p className="text-xs text-slate-500">Total AI Spend (Month)</p>
-        <p className="mt-1 text-2xl font-semibold text-slate-900">${summary.totalSpendUsd.toFixed(2)}</p>
+        <p className="mt-1 text-2xl font-semibold text-white">${summary.totalSpendUsd.toFixed(2)}</p>
       </article>
-      <article className="rounded-xl border border-slate-200 bg-white p-4">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900 p-4">
         <p className="text-xs text-slate-500">Workflows Tracked</p>
-        <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.workflowCount}</p>
+        <p className="mt-1 text-2xl font-semibold text-white">{summary.workflowCount}</p>
       </article>
-      <article className="rounded-xl border border-slate-200 bg-white p-4">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900 p-4">
         <p className="text-xs text-slate-500">Cost Anomalies</p>
-        <p className="mt-1 text-2xl font-semibold text-slate-900">{summary.anomalyCount}</p>
+        <p className="mt-1 text-2xl font-semibold text-white">{summary.anomalyCount}</p>
       </article>
     </div>
   );

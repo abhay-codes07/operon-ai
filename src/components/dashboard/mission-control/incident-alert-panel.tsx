@@ -17,7 +17,7 @@ type IncidentItem = {
 };
 
 const severityClass: Record<IncidentItem["severity"], string> = {
-  LOW: "text-slate-700",
+  LOW: "text-slate-300",
   MEDIUM: "text-amber-700",
   HIGH: "text-orange-700",
   CRITICAL: "text-rose-700",
@@ -40,19 +40,19 @@ export function IncidentAlertPanel({ items }: { items: IncidentItem[] }): JSX.El
   }
 
   if (queue.length === 0) {
-    return <p className="text-sm text-slate-600">No active incidents.</p>;
+    return <p className="text-sm text-slate-400">No active incidents.</p>;
   }
 
   return (
     <div className="space-y-3">
       {queue.map((incident) => (
-        <article key={incident.id} className="rounded-xl border border-slate-200 bg-white p-4">
+        <article key={incident.id} className="rounded-xl border border-slate-700/60 bg-slate-900 p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className={`text-xs font-semibold uppercase tracking-[0.12em] ${severityClass[incident.severity]}`}>
                 {incident.severity}
               </p>
-              <h3 className="text-sm font-semibold text-slate-900">{incident.title}</h3>
+              <h3 className="text-sm font-semibold text-white">{incident.title}</h3>
             </div>
             <p className="text-xs text-slate-500">{new Date(incident.detectedAt).toLocaleString()}</p>
           </div>

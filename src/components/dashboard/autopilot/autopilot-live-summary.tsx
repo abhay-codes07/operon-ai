@@ -52,25 +52,25 @@ export function AutopilotLiveSummary({ initial }: AutopilotLiveSummaryProps) {
 
   return (
     <div className="grid gap-3 md:grid-cols-5">
-      <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-3">
         <p className="text-xs text-slate-500">Total Sessions</p>
-        <p className="text-lg font-semibold text-slate-900">{state.totalSessions}</p>
+        <p className="text-lg font-semibold text-white">{state.totalSessions}</p>
       </article>
-      <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-3">
         <p className="text-xs text-slate-500">Recording</p>
-        <p className="text-lg font-semibold text-slate-900">{state.activeSessions}</p>
+        <p className="text-lg font-semibold text-white">{state.activeSessions}</p>
       </article>
-      <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-3">
         <p className="text-xs text-slate-500">In Review</p>
-        <p className="text-lg font-semibold text-slate-900">{state.reviewSessions}</p>
+        <p className="text-lg font-semibold text-white">{state.reviewSessions}</p>
       </article>
-      <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-3">
         <p className="text-xs text-slate-500">Repair Events</p>
-        <p className="text-lg font-semibold text-slate-900">{state.repairEvents}</p>
+        <p className="text-lg font-semibold text-white">{state.repairEvents}</p>
       </article>
-      <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <article className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-3">
         <p className="text-xs text-slate-500">Avg Repair Confidence</p>
-        <p className="text-lg font-semibold text-slate-900">{Math.round(state.averageRepairConfidence * 100)}%</p>
+        <p className="text-lg font-semibold text-white">{Math.round(state.averageRepairConfidence * 100)}%</p>
       </article>
     </div>
   );

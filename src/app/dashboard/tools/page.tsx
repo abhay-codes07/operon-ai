@@ -39,21 +39,21 @@ export default async function DashboardToolsPage({
       />
       <DashboardCard>
         <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <article className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-3">
             <p className="text-xs text-slate-500">Registered Tools</p>
-            <p className="mt-1 text-xl font-semibold text-slate-900">{metrics.toolCount}</p>
+            <p className="mt-1 text-xl font-bold text-white tabular-nums">{metrics.toolCount}</p>
           </article>
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <article className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-3">
             <p className="text-xs text-slate-500">Validated Versions</p>
-            <p className="mt-1 text-xl font-semibold text-slate-900">{metrics.validatedVersionCount}</p>
+            <p className="mt-1 text-xl font-bold text-white tabular-nums">{metrics.validatedVersionCount}</p>
           </article>
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <article className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-3">
             <p className="text-xs text-slate-500">Tool Executions</p>
-            <p className="mt-1 text-xl font-semibold text-slate-900">{metrics.toolExecutionCount}</p>
+            <p className="mt-1 text-xl font-bold text-cyan-400 tabular-nums">{metrics.toolExecutionCount}</p>
           </article>
-          <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <article className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-3">
             <p className="text-xs text-slate-500">Avg Reliability</p>
-            <p className="mt-1 text-xl font-semibold text-slate-900">
+            <p className="mt-1 text-xl font-bold text-emerald-400 tabular-nums">
               {metrics.averageReliability.toFixed(1)}
             </p>
           </article>
@@ -67,12 +67,12 @@ export default async function DashboardToolsPage({
             name="query"
             defaultValue={query}
             placeholder="Search tools by name or description"
-            className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+            className="h-10 w-full rounded-md border border-slate-700/60 bg-slate-800/60 px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
           />
         </form>
 
         {tools.length === 0 ? (
-          <p className="text-sm text-slate-600">No tools available yet. Failed runs will generate new candidates.</p>
+          <p className="text-sm text-slate-500">No tools available yet. Failed runs will generate new candidates.</p>
         ) : (
           <div className="grid gap-3 lg:grid-cols-2">
             {tools.map((tool) => (

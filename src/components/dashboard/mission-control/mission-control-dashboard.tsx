@@ -93,14 +93,14 @@ export function MissionControlDashboard({
       <OperationalMetricsDashboard metrics={metrics} />
 
       <div className="grid gap-4 xl:grid-cols-[1.35fr,1fr]">
-        <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <section className="rounded-xl border border-slate-700/60 bg-slate-900 p-4 shadow-sm">
           <div className="mb-3">
-            <h3 className="text-sm font-semibold text-slate-900">Fleet Status</h3>
+            <h3 className="text-sm font-semibold text-white">Fleet Status</h3>
             <p className="text-xs text-slate-500">Live state for deployed agents.</p>
           </div>
-          <div className="overflow-hidden rounded-xl border border-slate-200">
-            <table className="min-w-full divide-y divide-slate-200">
-              <thead className="bg-slate-50">
+          <div className="overflow-hidden rounded-xl border border-slate-700/60">
+            <table className="min-w-full divide-y divide-slate-800">
+              <thead className="bg-slate-900/60">
                 <tr>
                   <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Agent</th>
                   <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
@@ -108,11 +108,11 @@ export function MissionControlDashboard({
                   <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Updated</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
+              <tbody className="divide-y divide-slate-800/60 text-sm text-slate-700">
                 {fleet.map((agent) => (
                   <tr key={agent.id}>
                     <td className="px-3 py-2">
-                      <Link href={`/dashboard/agents`} className="font-medium text-slate-900 hover:underline">
+                      <Link href={`/dashboard/agents`} className="font-medium text-white hover:underline">
                         {agent.name}
                       </Link>
                     </td>
@@ -132,9 +132,9 @@ export function MissionControlDashboard({
           </div>
         </section>
 
-        <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <section className="rounded-xl border border-slate-700/60 bg-slate-900 p-4 shadow-sm">
           <div className="mb-3">
-            <h3 className="text-sm font-semibold text-slate-900">Incident Alerts</h3>
+            <h3 className="text-sm font-semibold text-white">Incident Alerts</h3>
             <p className="text-xs text-slate-500">Detected anomalies and operator resolution queue.</p>
           </div>
           <IncidentAlertPanel items={incidents} />

@@ -36,13 +36,13 @@ export function IncidentCenterTable({ items }: IncidentCenterTableProps): JSX.El
   }
 
   if (rows.length === 0) {
-    return <p className="text-sm text-slate-600">No SLA incidents.</p>;
+    return <p className="text-sm text-slate-400">No SLA incidents.</p>;
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200">
-      <table className="min-w-full divide-y divide-slate-200 bg-white">
-        <thead className="bg-slate-50">
+    <div className="overflow-hidden rounded-xl border border-slate-700/60">
+      <table className="min-w-full divide-y divide-slate-800 bg-slate-900">
+        <thead className="bg-slate-900/60">
           <tr>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Workflow</th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Breach Type</th>
@@ -51,7 +51,7 @@ export function IncidentCenterTable({ items }: IncidentCenterTableProps): JSX.El
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
+        <tbody className="divide-y divide-slate-800/60 text-sm text-slate-300">
           {rows.map((row) => (
             <tr key={row.id}>
               <td className="px-4 py-3">{row.workflowName}</td>
@@ -63,7 +63,7 @@ export function IncidentCenterTable({ items }: IncidentCenterTableProps): JSX.El
                   {row.runId ? (
                     <button
                       type="button"
-                      className="rounded border border-slate-300 px-2 py-1 text-xs"
+                      className="rounded border border-slate-700/60 px-2 py-1 text-xs text-slate-300"
                       onClick={() => retry(row.runId)}
                     >
                       Retry Workflow
@@ -72,7 +72,7 @@ export function IncidentCenterTable({ items }: IncidentCenterTableProps): JSX.El
                   {!row.resolvedAt ? (
                     <button
                       type="button"
-                      className="rounded border border-slate-300 px-2 py-1 text-xs"
+                      className="rounded border border-slate-700/60 px-2 py-1 text-xs text-slate-300"
                       onClick={() => resolve(row.id)}
                     >
                       Resolve

@@ -6,6 +6,12 @@ export const dashboardNav = [
     icon: "LayoutDashboard",
   },
   {
+    href: "/dashboard/results",
+    label: "Results Hub",
+    description: "All agent outputs & runs",
+    icon: "LayoutGrid",
+  },
+  {
     href: "/dashboard/agents",
     label: "Agents",
     description: "Manage autonomous agents",

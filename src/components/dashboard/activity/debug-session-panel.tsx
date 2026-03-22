@@ -68,13 +68,13 @@ export function DebugSessionPanel({
           value={selectorPatch}
           onChange={(event) => setSelectorPatch(event.target.value)}
           placeholder="Selector correction"
-          className="h-10 min-w-[220px] rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 min-w-[220px] rounded-md border border-slate-700/60 bg-slate-800/60 text-white placeholder-slate-500 focus:border-cyan-500/60 focus:ring-cyan-500/30 px-3 text-sm"
         />
       </div>
-      {sessions.length === 0 ? <p className="text-sm text-slate-600">No active debug sessions.</p> : null}
+      {sessions.length === 0 ? <p className="text-sm text-slate-400">No active debug sessions.</p> : null}
       {sessions.map((session) => (
-        <article key={session.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-          <p className="text-sm font-semibold text-slate-900">Session {session.id.slice(-8)}</p>
+        <article key={session.id} className="rounded-xl border border-slate-700/60 bg-slate-900/60 p-3">
+          <p className="text-sm font-semibold text-white">Session {session.id.slice(-8)}</p>
           <p className="text-xs text-slate-500">{new Date(session.createdAt).toLocaleString()}</p>
           <div className="mt-2 flex items-center gap-2">
             <Button type="button" variant="ghost" onClick={() => patchSession(session.id)}>

@@ -18,9 +18,9 @@ export default async function DashboardKnowledgePage(): Promise<JSX.Element> {
         <DashboardCard title="Domain Knowledge" description="Observed domain risk and stability signals">
           <div className="space-y-2">
             {graph.domains.slice(0, 8).map((domain) => (
-              <article key={domain.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
-                <p className="font-semibold text-slate-900">{domain.domain}</p>
-                <p className="text-slate-600">
+              <article key={domain.id} className="rounded-lg border border-slate-700/60 bg-slate-800/40 p-3 text-sm">
+                <p className="font-semibold text-white">{domain.domain}</p>
+                <p className="text-slate-400">
                   Stability {(domain.stabilityScore * 100).toFixed(0)}% • Issues {domain.issueCount}
                 </p>
               </article>
@@ -30,9 +30,9 @@ export default async function DashboardKnowledgePage(): Promise<JSX.Element> {
         <DashboardCard title="Shared Signals" description="Recurring execution indicators across agents">
           <div className="space-y-2">
             {graph.signals.slice(0, 8).map((signal) => (
-              <article key={signal.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
-                <p className="font-semibold text-slate-900">{signal.signalType}</p>
-                <p className="text-slate-600">{signal.signalKey}</p>
+              <article key={signal.id} className="rounded-lg border border-slate-700/60 bg-slate-800/40 p-3 text-sm">
+                <p className="font-semibold text-white">{signal.signalType}</p>
+                <p className="text-slate-400">{signal.signalKey}</p>
               </article>
             ))}
           </div>
@@ -40,9 +40,9 @@ export default async function DashboardKnowledgePage(): Promise<JSX.Element> {
         <DashboardCard title="Agent Insights" description="Learned behavior patterns published by execution outcomes">
           <div className="space-y-2">
             {graph.insights.slice(0, 8).map((insight) => (
-              <article key={insight.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
-                <p className="font-semibold text-slate-900">{insight.insightType}</p>
-                <p className="text-slate-600">{insight.insightKey}</p>
+              <article key={insight.id} className="rounded-lg border border-slate-700/60 bg-slate-800/40 p-3 text-sm">
+                <p className="font-semibold text-white">{insight.insightType}</p>
+                <p className="text-slate-400">{insight.insightKey}</p>
               </article>
             ))}
           </div>

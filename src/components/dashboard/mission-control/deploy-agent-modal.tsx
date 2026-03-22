@@ -85,22 +85,22 @@ export function DeployAgentModal({ agents }: DeployAgentModalProps): JSX.Element
           onMouseDown={() => setIsOpen(false)}
         >
           <div
-            className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl"
+            className="w-full max-w-lg rounded-2xl border border-slate-700/60 bg-slate-900 p-6 shadow-2xl"
             onMouseDown={(event) => event.stopPropagation()}
           >
-            <h2 className="text-lg font-semibold text-slate-900">Deploy Agent</h2>
-            <p className="mt-1 text-sm text-slate-600">Set desired scale and push this agent into active fleet rotation.</p>
+            <h2 className="text-lg font-semibold text-white">Deploy Agent</h2>
+            <p className="mt-1 text-sm text-slate-400">Set desired scale and push this agent into active fleet rotation.</p>
 
             <form className="mt-5 space-y-4" onSubmit={onDeploy}>
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700" htmlFor="deploy-agent-id">
+                <label className="block text-sm font-medium text-slate-300" htmlFor="deploy-agent-id">
                   Agent
                 </label>
                 <select
                   id="deploy-agent-id"
                   value={agentId}
                   onChange={(event) => setAgentId(event.target.value)}
-                  className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+                  className="h-10 w-full rounded-md border border-slate-700/60 bg-slate-800/60 text-white focus:border-cyan-500/60 focus:ring-cyan-500/30 px-3 text-sm"
                 >
                   {agents.map((agent) => (
                     <option key={agent.id} value={agent.id}>
@@ -111,7 +111,7 @@ export function DeployAgentModal({ agents }: DeployAgentModalProps): JSX.Element
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700" htmlFor="deploy-desired-runs">
+                <label className="block text-sm font-medium text-slate-300" htmlFor="deploy-desired-runs">
                   Desired Parallel Runs
                 </label>
                 <input
@@ -121,19 +121,19 @@ export function DeployAgentModal({ agents }: DeployAgentModalProps): JSX.Element
                   max={100}
                   value={desiredRuns}
                   onChange={(event) => setDesiredRuns(event.target.value)}
-                  className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+                  className="h-10 w-full rounded-md border border-slate-700/60 bg-slate-800/60 text-white placeholder-slate-500 focus:border-cyan-500/60 focus:ring-cyan-500/30 px-3 text-sm"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700" htmlFor="deploy-notes">
+                <label className="block text-sm font-medium text-slate-300" htmlFor="deploy-notes">
                   Notes
                 </label>
                 <textarea
                   id="deploy-notes"
                   value={notes}
                   onChange={(event) => setNotes(event.target.value)}
-                  className="min-h-20 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                  className="min-h-20 w-full rounded-md border border-slate-700/60 bg-slate-800/60 text-white placeholder-slate-500 focus:border-cyan-500/60 focus:ring-cyan-500/30 px-3 py-2 text-sm"
                   placeholder="Deployment rationale, rollout constraints, escalation owner."
                 />
               </div>

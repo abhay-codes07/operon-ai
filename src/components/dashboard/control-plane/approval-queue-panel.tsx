@@ -33,15 +33,15 @@ export function ApprovalQueuePanel({ items }: ApprovalQueuePanelProps): JSX.Elem
   }
 
   if (queue.length === 0) {
-    return <p className="text-sm text-slate-600">No pending approval requests.</p>;
+    return <p className="text-sm text-slate-400">No pending approval requests.</p>;
   }
 
   return (
     <div className="space-y-3">
       {queue.map((item) => (
-        <article key={item.id} className="rounded-xl border border-slate-200 bg-white p-4">
+        <article key={item.id} className="rounded-xl border border-slate-700/60 bg-slate-900 p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{item.actionType}</p>
-          <p className="mt-1 text-sm text-slate-900">
+          <p className="mt-1 text-sm text-white">
             Execution {item.executionId?.slice(-8) ?? "N/A"} • Step {item.stepKey ?? "N/A"}
           </p>
           <p className="text-xs text-slate-500">{new Date(item.requestedAt).toLocaleString()}</p>

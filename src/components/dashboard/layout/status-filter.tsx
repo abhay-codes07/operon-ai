@@ -33,7 +33,7 @@ export function StatusFilter({ options, queryKey = "status" }: StatusFilterProps
   }
 
   return (
-    <div className="inline-flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white p-2">
+    <div className="inline-flex flex-wrap items-center gap-2 rounded-xl border border-slate-700/60 bg-slate-900 p-2">
       {options.map((option) => {
         const isActive = activeValue === option.value;
 
@@ -47,7 +47,7 @@ export function StatusFilter({ options, queryKey = "status" }: StatusFilterProps
               "rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors",
               isActive
                 ? "bg-slate-900 text-white"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900",
+                : "bg-slate-800/60 text-slate-400 hover:bg-slate-800/60 hover:text-white",
             )}
           >
             {option.label}

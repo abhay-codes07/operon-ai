@@ -59,25 +59,25 @@ export function AutopilotSessionTableLive() {
             type="button"
             onClick={() => setStatus(option)}
             className={`rounded-full border px-3 py-1 text-xs font-semibold ${
-              status === option ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 text-slate-700"
+              status === option ? "border-slate-700 bg-slate-800 text-white" : "border-slate-700/60 text-slate-300"
             }`}
           >
             {option}
           </button>
         ))}
       </div>
-      {loading ? <p className="text-sm text-slate-600">Loading sessions...</p> : null}
+      {loading ? <p className="text-sm text-slate-400">Loading sessions...</p> : null}
       <div className="space-y-2">
         {items.map((session) => (
-          <article key={session.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <article key={session.id} className="rounded-lg border border-slate-700/60 bg-slate-900/60 p-3">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-sm font-semibold text-slate-900">{session.domain}</p>
-                <p className="text-xs text-slate-600">
+                <p className="text-sm font-semibold text-white">{session.domain}</p>
+                <p className="text-xs text-slate-400">
                   {session.status} • {session.actions.length} actions
                 </p>
               </div>
-              <Link href={`/autopilot/sessions/${session.id}`} className="text-xs font-semibold text-slate-700 underline">
+              <Link href={`/autopilot/sessions/${session.id}`} className="text-xs font-semibold text-slate-300 underline">
                 View
               </Link>
             </div>
