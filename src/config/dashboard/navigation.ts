@@ -36,6 +36,24 @@ export const dashboardNav = [
     icon: "Layers",
   },
   {
+    href: "/dashboard/recon",
+    label: "Recon",
+    description: "Autonomous security scanner",
+    icon: "ScanSearch",
+  },
+  {
+    href: "/dashboard/pulse",
+    label: "Pulse",
+    description: "Competitive intelligence",
+    icon: "Activity",
+  },
+  {
+    href: "/dashboard/datamesh",
+    label: "DataMesh",
+    description: "Web-to-JSON extraction API",
+    icon: "Database",
+  },
+  {
     href: "/dashboard/sentinels",
     label: "Sentinels",
     description: "Web intelligence tripwires",
