@@ -185,4 +185,16 @@ export const dashboardNav = [
     description: "Synthetic user monitoring",
     icon: "HeartPulse",
   },
+  {
+    href: "/dashboard/pricewatch",
+    label: "PriceWatch",
+    description: "Price drop alerts",
+    icon: "BellRing",
+  },
+  {
+    href: "/dashboard/ethicswatch",
+    label: "EthicsWatch",
+    description: "ESG & ethics intelligence",
+    icon: "Scale",
+  },
 ] as const;

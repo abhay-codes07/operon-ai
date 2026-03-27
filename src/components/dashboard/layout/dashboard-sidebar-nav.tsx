@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Activity,
   AlertTriangle,
+  BellRing,
   Bot,
   Brain,
   ClipboardCheck,
@@ -23,6 +24,7 @@ import {
   Network,
   Radar,
   Rocket,
+  Scale,
   ScanSearch,
   ShieldAlert,
   ShieldCheck,
@@ -69,6 +71,8 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   AlertTriangle,
   Target,
   HeartPulse,
+  BellRing,
+  Scale,
 };
 
 export function DashboardSidebarNav(): JSX.Element {
