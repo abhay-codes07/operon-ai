@@ -15,6 +15,7 @@ import {
   Eye,
   FlaskConical,
   GitBranch,
+  HeartPulse,
   LayoutDashboard,
   LayoutGrid,
   Layers,
@@ -27,6 +28,7 @@ import {
   ShieldCheck,
   SlidersHorizontal,
   Store,
+  Target,
   TrendingUp,
   Users,
   Wrench,
@@ -65,6 +67,8 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   ShieldAlert,
   ClipboardCheck,
   AlertTriangle,
+  Target,
+  HeartPulse,
 };
 
 export function DashboardSidebarNav(): JSX.Element {

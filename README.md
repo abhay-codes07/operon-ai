@@ -9,116 +9,95 @@
 
 **The web is now programmable.**
 
-Operon is an enterprise-grade autonomous web agent platform powered by [TinyFish AI](https://tinyfish.ai). Deploy fleets of parallel agents that navigate, extract, and act across any website — with full observability, security, and learning built in.
-
-[Live Demo](https://operon-ai.vercel.app) · [Dashboard](https://operon-ai.vercel.app/dashboard) · [GitHub](https://github.com/abhay-codes07/operon-ai)
+Operon is an autonomous web agent platform powered by [TinyFish AI](https://tinyfish.ai). Deploy fleets of parallel agents that navigate, extract, and act across any website — with full observability, security, and learning built in.
 
 </div>
 
 ---
 
-## Why Operon
+## Why TinyFish
 
 |  | Operon / TinyFish | OpenAI Operator | Claude Computer Use | Browser Use |
 |---|---|---|---|---|
 | **Mind2Web Accuracy** | **89.9%** | 61.3% | 56.3% | 30.0% |
 | **Easy→Hard Degradation** | **−15.6 pts** | −39 pts | −45 pts | −58 pts |
 | **Parallel Agents** | **1,000** | 1 | 1 | 1 |
-| **Cost / operation** | **$0.015** | ~$0.08 | ~$0.12 | varies |
-
-TinyFish holds up under compound-error multi-step scenarios where every other tool collapses. Operon is the management layer that makes those capabilities production-grade.
+| **Cost / step** | **$0.015** | ~$0.08 | ~$0.12 | varies |
 
 ---
 
 ## Features
 
-### 🌊 Swarm Orchestration *(new — unique)*
-Launch fleets of parallel TinyFish agents across multiple target sites simultaneously from a single command. A live swarm dashboard shows every agent's real-time status in a grid. Results aggregate automatically when all agents report back — cross-site intelligence in seconds, not hours.
+### SnapBuy — Autonomous Deal Sniper
+Set a trigger condition in plain English ("price drops below $899", "back in stock", "ticket available under $400"). A TinyFish agent watches the URL on a schedule. The instant the condition is met, it doesn't alert — it **acts**. Completes the purchase, books the slot, or reserves the item using your saved details. First tool to close the loop from monitoring → action.
+
+### Heartbeat — Synthetic User Monitoring
+Define your product's critical user journeys in plain English. TinyFish agents run them every 15 minutes against your live product. If anything breaks — wrong page, unclickable button, missing form field — you get an alert with a screenshot of exactly what failed and which step. Visual UI understanding, not just HTTP status codes.
+
+### Swarm Orchestration
+Launch fleets of parallel TinyFish agents across multiple URLs simultaneously from one command. A live grid shows every agent's real-time status. Results aggregate automatically.
 
 ```bash
 POST /api/internal/swarm/launch
-{ "agentId": "...", "workflowId": "...", "targetUrls": ["amazon.com", "ebay.com", "walmart.com"] }
+{ "agentId": "...", "targetUrls": ["amazon.com", "ebay.com", "walmart.com"] }
 ```
 
-### 👁 Sentinel Watchlist *(new — unique)*
-Deploy always-on sentinel agents that monitor specific URLs on a schedule. Unlike dumb DOM diffing, sentinels use Claude AI to determine if a change is **semantically meaningful** — then auto-generate an intelligence briefing: *"Amazon renamed their Prime tier and added a new upsell step to checkout. Your workflow selector needs updating."*
+### Sentinel Watchlist
+Deploy always-on agents that monitor specific URLs on a schedule. Claude determines if a detected change is semantically meaningful and auto-generates an intelligence briefing — not just "the DOM changed."
 
-### 🧬 Agent DNA Transfer *(new — unique)*
-After each successful execution, Operon extracts a **behavioral fingerprint** — the exact action sequence, selector patterns, and timing that worked. This DNA is stored and transferable to new agents, giving them near-instant first-run success. A visual DNA helix shows pattern confidence per step.
+### Agent DNA Transfer
+After each successful execution, Operon extracts a behavioral fingerprint — the exact action sequence, selector patterns, and timing that worked. Transferable to new agents for near-instant first-run success.
 
-### 🔴 Real-Time SSE Execution Stream
-Live execution events stream from the BullMQ worker to your browser via Server-Sent Events — no extra WebSocket server. Auto-closes when execution reaches terminal status.
+### Recon — Security Surface Scanner
+Fan out 6 TinyFish agents across a target domain simultaneously: admin panel exposure, sensitive file disclosure, login error enumeration, directory listing, unauthenticated API endpoints, missing security headers. Full severity-rated report in minutes.
 
-### 📸 Screenshot Gallery
-TinyFish execution screenshots stored at each agent step, viewable in a full-screen gallery with keyboard navigation.
+### Pulse — Competitive Intelligence Engine
+Point at any competitor domain. Three parallel agents monitor pricing tiers, hiring signals (ML engineer surge = new AI feature in 90 days), and feature page changes. Claude synthesizes a battle card automatically.
 
-### 🧠 NL Workflow Builder
-Describe a task in plain English → Claude Haiku decomposes it into a complete `WorkflowDefinition` JSON with target URL, cron schedule, guardrails, timeout, and step breakdown.
-
-### 📧 Execution Alerts
-Email + Slack notifications on every execution completion, with branded dark-theme email that includes price comparison tables parsed from the agent output.
-
-### 📊 Agent Performance Leaderboard
-Side-by-side reliability ranking: composite score (success rate × 0.6, retry penalty × 0.2, failure frequency × 0.15, latency × 0.05), color-coded score bars, avg execution duration.
-
-### 🎯 Results Hub *(TinyFish-style unified output dashboard)*
-Every execution result in one place — prices, job listings, extracted data, summaries — without leaving Operon. Smart output preview auto-detects result type (price comparison table, job listings, generic arrays) and renders the best view. Auto-refreshes every 3s while agents are active. Status filter, execution timeline, and direct link to full execution detail.
-
-### 🔍 Recon — Autonomous Security Surface Scanner *(new — unique, fundable)*
-Deploy a swarm of 6 TinyFish agents that simultaneously scan a target domain for security misconfigurations: exposed admin panels, sensitive file disclosure (`.env`, `phpinfo.php`, `.git/config`), login error enumeration, open directory listings, unauthenticated API endpoints, and missing security headers. Agents run in parallel — an entire security surface scan completes in minutes, not days. Findings are severity-rated (CRITICAL → CLEAN) with a downloadable report. This is the same category of application that won TinyFish accelerator funding.
+### DataMesh — Web-to-JSON Extraction API
+Public REST API: define a schema, get structured data from any URL.
 
 ```bash
-POST /api/internal/recon/launch
-{ "domain": "target.com", "agentId": "..." }
-# → fans out 6 parallel TinyFish agents, returns { reconId, checks }
+POST /api/v1/extract
+{ "url": "...", "schema": { "price": "number", "title": "string" } }
+→ { "data": { "price": 979.99, "title": "..." }, "confidence": 0.96 }
 ```
 
-### 📡 Pulse — Competitive Intelligence Engine *(new — unique, fundable)*
-Point Pulse at any competitor domain and deploy 3 simultaneous agents monitoring: pricing tier changes, hiring signal analysis (ML engineer surge = AI feature in 90 days), and feature page updates. Claude automatically synthesizes a **battle card** — their strengths, your advantages, a recommended strategic response, and one weakness to exploit. Pricing intelligence that normally costs $50K/year from Crayon or Klenty, delivered in seconds.
+### Results Hub
+Every execution result in one place — prices, jobs, extracted data, summaries. Smart output preview auto-detects result type. Auto-refreshes every 3s while agents are active.
 
-### 🗄 DataMesh — Web-to-JSON Extraction API *(new — unique, fundable)*
-A public REST API that turns any webpage into structured JSON. Define a schema (`{ price: "number", title: "string" }`), provide a URL, and TinyFish extracts exactly those fields with 94%+ confidence. Works on any site, no scraper maintenance, no selector fragility. This is the developer platform play — Firecrawl meets a 90% accurate browser agent.
+### Real-Time SSE Execution Stream
+Live events stream from the BullMQ worker to the browser via Server-Sent Events — no WebSocket server. Auto-closes on terminal status.
 
-```bash
-curl -X POST https://your-operon.vercel.app/api/v1/extract \
-  -H "x-api-key: op_live_xxxxxxxxxxxx" \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://amazon.com/product/...", "schema": {"title": "string", "price": "number", "rating": "number"}}'
-# → { "success": true, "data": { "title": "...", "price": 979.99, "rating": 4.6 }, "confidence": 0.96 }
-```
+### NL Workflow Builder
+Describe a task in plain English → Claude decomposes it into a complete workflow definition with target URL, cron schedule, step breakdown, guardrails.
 
-### 🛡 Operon Shield
-Runtime prompt injection defense — every agent action scanned before execution. Pattern-matched injections blocked (riskScore ≥ 70) with full threat telemetry timeline.
+### Agent Performance Leaderboard
+Side-by-side reliability ranking: composite score combining success rate, retry penalty, failure frequency, latency. Gold/silver/bronze tier badges.
 
-### 🔧 Self-Healing Selectors
-Semantic fallback when target selectors fail. Tries `data-testid`, `aria-label`, and fuzzy similarity scoring. All resolutions stored with strategy and confidence score.
+### Operon Shield
+Runtime prompt injection defense — every agent action scanned before execution. Injections scoring ≥70 blocked with full threat telemetry.
 
-### 🏥 Failure Root Cause Analysis
-Automated failure classification (`SELECTOR_DRIFT`, `NAVIGATION_FAILURE`, `AUTHENTICATION_ISSUE`, `PAGE_LOAD_TIMEOUT`) from logs, failed steps, and DOM snapshots.
+### Self-Healing Selectors
+Semantic fallback when selectors fail. Tries `data-testid`, `aria-label`, fuzzy similarity. All resolutions logged with strategy and confidence.
 
-### 🔁 Deterministic Replay
-Every execution step recorded with DOM snapshot — enabling step-by-step time-travel debugging.
+### Failure Root Cause Analysis
+Automated failure classification (`SELECTOR_DRIFT`, `NAVIGATION_FAILURE`, `AUTHENTICATION_ISSUE`, `PAGE_LOAD_TIMEOUT`) from logs, failed steps, DOM snapshots.
 
-### 🧑‍✈️ Human-in-the-Loop Co-Pilot
-When agent confidence drops below threshold, execution pauses. Operators review the ghost-cursor preview and approve or override — then step resumes autonomously.
+### Human-in-the-Loop Co-Pilot
+When agent confidence drops below threshold, execution pauses for operator review. Ghost-cursor preview, approve or override, then resumes autonomously.
 
-### 🚀 Mission Control
-Fleet-level incident detection with automated runbook execution across `SELECTOR_ERROR_LOOP`, `FAILURE_SPIKE`, and `RETRY_LOOP` patterns.
+### Mission Control
+Fleet-level incident detection with automated runbook execution across `SELECTOR_ERROR_LOOP`, `FAILURE_SPIKE`, `RETRY_LOOP` patterns.
 
-### 📈 FinOps Intelligence
-Per-run cost tracking (browser runtime + LLM tokens + self-healing), monthly aggregation, anomaly detection, and per-workflow budget enforcement.
+### FinOps Intelligence
+Per-run cost tracking (browser runtime + LLM tokens + self-healing), monthly aggregation, anomaly detection, per-workflow budget enforcement.
 
-### ✅ Compliance Passport
+### Compliance Passport
 Full audit trail of every agent action with plain-English compliance summary via Claude. Violation detection with configurable thresholds.
 
-### 🕹 Canary Releases
-Progressive rollout for workflow definition changes with automatic rollback on failure threshold breach.
-
-### 🔬 Sandbox Identities
-Isolated synthetic personas for testing — disposable credentials, isolated session state, blast-radius scoring.
-
-### 🏪 OperonHub Marketplace
-Publish, discover, and install reusable workflow templates with versioning and one-click installation.
+### Canary Releases
+Progressive rollout for workflow changes with automatic rollback on failure threshold.
 
 ---
 
@@ -129,7 +108,7 @@ Publish, discover, and install reusable workflow templates with versioning and o
 │                   Next.js 14 App                      │
 │  ┌──────────────┐  ┌─────────────┐  ┌─────────────┐  │
 │  │  App Router  │  │  API Routes │  │  NextAuth   │  │
-│  │  (RSC + CC)  │  │  80+ routes │  │  RBAC       │  │
+│  │  (RSC + CC)  │  │  90+ routes │  │  RBAC       │  │
 │  └──────────────┘  └─────────────┘  └─────────────┘  │
 └───────────────────────────┬──────────────────────────┘
                             │ BullMQ jobs
@@ -151,10 +130,10 @@ Publish, discover, and install reusable workflow templates with versioning and o
 ```
 
 **Key patterns:**
-- **Server Components** for dashboard data fetching — zero client-side API overhead
-- **BullMQ Worker** as a separate process (`npm run worker:dev`)
-- **SSE** via `/api/internal/executions/[id]/sse` — no WebSocket server required
-- **Repository pattern** — services → repositories → Prisma
+- Server Components for data fetching — zero client-side API overhead on dashboard pages
+- BullMQ Worker as a separate process (`npm run worker:dev`)
+- SSE via `/api/internal/executions/[id]/sse` — no WebSocket server
+- Repository pattern — services → repositories → Prisma
 
 ---
 
@@ -171,7 +150,7 @@ Publish, discover, and install reusable workflow templates with versioning and o
 | Web Agents | TinyFish Web Agent API |
 | LLM | Anthropic Claude (Haiku 4.5) |
 | Billing | Stripe |
-| Email Alerts | Nodemailer (SMTP) |
+| Email | Nodemailer (SMTP) |
 | Deployment | Docker + docker-compose |
 
 ---
@@ -181,8 +160,8 @@ Publish, discover, and install reusable workflow templates with versioning and o
 ### Prerequisites
 - Node.js 20+
 - Docker (for PostgreSQL + Redis)
-- TinyFish API key — [get one free](https://tinyfish.ai)
-- Anthropic API key — [console.anthropic.com](https://console.anthropic.com) *(optional)*
+- TinyFish API key — [tinyfish.ai](https://tinyfish.ai)
+- Anthropic API key — [console.anthropic.com](https://console.anthropic.com) *(optional — powers NL builder + sentinel briefings)*
 
 ### 1. Clone & install
 ```bash
@@ -208,32 +187,32 @@ npx prisma migrate deploy
 npx prisma db seed
 ```
 
-### 5. Run the app
+### 5. Run
 ```bash
-# Terminal 1 — Next.js dev server
+# Terminal 1
 npm run dev
 
-# Terminal 2 — BullMQ execution worker (REQUIRED for agents to execute)
+# Terminal 2 — required for agents to execute
 npm run worker:dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Sign in with the seed credentials from `.env`.
+Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
 ## Environment Variables
 
-See [`.env.example`](.env.example) for the full annotated reference.
-
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `TINYFISH_API_KEY` | ✅ | TinyFish Web Agent API key |
-| `DATABASE_URL` | ✅ | PostgreSQL connection string (port 5433 in docker-compose) |
-| `REDIS_URL` | ✅ | Redis connection string |
+| `DATABASE_URL` | ✅ | PostgreSQL connection (port 5433 in docker-compose) |
+| `REDIS_URL` | ✅ | Redis connection |
 | `NEXTAUTH_SECRET` | ✅ | 32-byte random secret |
-| `ANTHROPIC_API_KEY` | optional | Powers NL workflow builder + sentinel briefings |
-| `SMTP_HOST` + `ALERT_EMAIL_TO` | optional | Email alerts on execution completion |
-| `SLACK_WEBHOOK_URL` | optional | Slack notifications on execution completion |
+| `ANTHROPIC_API_KEY` | optional | NL workflow builder + sentinel briefings |
+| `SMTP_HOST` + `ALERT_EMAIL_TO` | optional | Email alerts |
+| `SLACK_WEBHOOK_URL` | optional | Slack notifications |
+
+See [`.env.example`](.env.example) for the full reference.
 
 ---
 
@@ -242,89 +221,45 @@ See [`.env.example`](.env.example) for the full annotated reference.
 ```
 src/
 ├── app/
-│   ├── dashboard/          # 25+ dashboard pages
-│   │   ├── recon/          # Autonomous Security Scanner ⭐
-│   │   ├── pulse/          # Competitive Intelligence Engine ⭐
-│   │   ├── datamesh/       # Web-to-JSON Extraction Playground ⭐
-│   │   ├── results/        # Results Hub (unified output dashboard)
-│   │   ├── swarm/          # Swarm Orchestrator
-│   │   ├── sentinels/      # Sentinel Watchlist
+│   ├── dashboard/
+│   │   ├── snapbuy/        # SnapBuy — autonomous deal sniper
+│   │   ├── heartbeat/      # Heartbeat — synthetic user monitoring
+│   │   ├── recon/          # Recon — security surface scanner
+│   │   ├── pulse/          # Pulse — competitive intelligence
+│   │   ├── datamesh/       # DataMesh — web-to-JSON API playground
+│   │   ├── results/        # Results Hub
+│   │   ├── swarm/          # Swarm orchestrator
+│   │   ├── sentinels/      # Sentinel watchlist
 │   │   ├── agents/         # Agent registry + leaderboard
 │   │   ├── activity/       # Execution timeline + detail
 │   │   ├── workflows/      # Workflow builder
-│   │   ├── shield/         # Prompt injection defense
-│   │   └── ...
-│   ├── api/internal/       # 80+ API routes
+│   │   └── ...             # 15+ more pages
+│   ├── api/
+│   │   ├── internal/       # 90+ authenticated API routes
+│   │   └── v1/             # Public API (DataMesh extract)
 │   └── page.tsx            # Landing page
-├── components/
-│   ├── dashboard/
-│   │   ├── recon/          # ReconLauncher ⭐
-│   │   ├── pulse/          # PulseDashboard + BattleCard ⭐
-│   │   ├── datamesh/       # DataMeshPlayground + API docs ⭐
-│   │   ├── results/        # ResultsHub (auto-refresh grid)
-│   │   ├── swarm/          # SwarmCanvas, SwarmLaunchForm
-│   │   ├── sentinels/      # SentinelGrid, AddSentinelModal
-│   │   └── activity/       # AgentDnaPanel, ExecutionOutputViewer, ...
-│   └── ui/                 # Button, Card, SectionHeading, ...
+├── components/dashboard/
+│   ├── snapbuy/            # SnapbuyDashboard
+│   ├── heartbeat/          # HeartbeatDashboard
+│   ├── recon/              # ReconLauncher
+│   ├── pulse/              # PulseDashboard
+│   ├── datamesh/           # DataMeshPlayground
+│   ├── swarm/              # SwarmLaunchForm, SwarmHistoryGrid
+│   ├── sentinels/          # SentinelGrid, AddSentinelModal
+│   └── activity/           # AgentDnaPanel, ExecutionDetailLivePanel
 ├── server/
-│   ├── services/           # Business logic
-│   │   ├── executions/     # tinyfish-execution-runner.ts (core)
-│   │   ├── notifications/  # execution-alert-service.ts
-│   │   └── sentinels/      # sentinel-service.ts
-│   ├── integrations/tinyfish/  # client, request-builder, response-parser
-│   └── queue/              # BullMQ producers + workers
-├── lib/                    # shield, finops, compliance, sla, copilot, ...
-└── config/                 # Navigation, env schema
+│   ├── services/executions/  # tinyfish-execution-runner.ts (core)
+│   ├── services/notifications/
+│   ├── services/sentinels/
+│   └── integrations/tinyfish/
+└── config/
 
 prisma/
 ├── schema.prisma           # 50+ models
 └── migrations/
 
-worker/                     # BullMQ worker entry point (separate process)
+worker/                     # BullMQ worker (separate process)
 ```
-
----
-
-## Hackathon & Accelerator
-
-Built for the **[TinyFish Hackathon 2026](https://www.hackerearth.com/challenges/hackathon/the-tiny-fish-hackathon-2026/)** — submission deadline March 29, 2026.
-
-**Six novel features designed to win — and attract funding:**
-
-1. **Recon** — Autonomous security scanner that fans 6 TinyFish agents across a domain in parallel and produces a severity-rated vulnerability report. Directly inspired by the class of application (security scanning at agent scale) that won TinyFish accelerator funding. Every CISO in the world is a potential customer.
-
-2. **Pulse** — Competitive intelligence engine that monitors rivals' pricing, hiring signals, and feature launches, then synthesizes an AI battle card. Replaces $50K/year tools like Crayon and Klenty. Immediate B2B monetization.
-
-3. **DataMesh** — A public REST API (`POST /api/v1/extract`) that converts any URL to structured JSON via a user-defined schema. This is the developer platform play — every data pipeline, every analytics stack, every integration is a potential customer. Firecrawl but with a 90% accurate browser agent instead of static HTML parsing.
-
-4. **Swarm Orchestration** — Direct showcase of TinyFish's 1,000 concurrent agent capability. No other submission has a real-time visual grid of parallel agents across multiple live websites.
-
-5. **Semantic Sentinel Watchlist** — Turns agents from one-shot tools into persistent web intelligence infrastructure. The Claude "is this change meaningful?" layer is the differentiator over dumb DOM diffing.
-
-6. **Agent DNA Transfer** — Genuine autonomous learning beyond key-value memory. Behavioral fingerprints that give new agents near-instant first-run success.
-
-Also applying for the **[TinyFish Accelerator](https://tinyfish.ai/accelerator)** — Operon is B2B infrastructure for enterprises deploying autonomous web agents at scale, which is precisely the Mango Capital / TinyFish investment thesis.
-
----
-
-## Demo Script (5-Minute Video)
-
-| Time | Scene | Key line |
-|------|-------|----------|
-| 0:00–0:20 | Landing page — animated agent network, benchmark chart | *"1.9 billion websites. Watch all of them — automatically."* |
-| 0:20–0:45 | Dashboard Overview | *"Every number here is live. Zero client-side fetching."* |
-| 0:45–1:10 | Agent Leaderboard | *"Every agent ranked by composite reliability score — success rate, retry rate, failure frequency, latency."* |
-| 1:10–1:40 | NL Workflow Builder | *"Describe it in English. Claude decomposes it into a complete workflow. No code. No selectors."* |
-| 1:40–2:00 | Swarm Launch | *"Four TinyFish agents. Four websites. Simultaneously. One command."* |
-| 2:00–2:20 | Results Hub | *"Smart output preview — prices, jobs, data — auto-detected, auto-formatted."* |
-| 2:20–2:45 | **Recon** — launch scan on demo domain | *"6 agents. 6 attack vectors. Running in parallel right now."* Show CRITICAL badge appearing. |
-| 2:45–3:10 | **Pulse** — scan a competitor | *"14 open ML roles. That's a new AI feature in 90 days."* Show battle card generating. |
-| 3:10–3:30 | **DataMesh** — playground + curl | *"Any URL → structured JSON. One API call."* Copy curl, paste in terminal, show response. |
-| 3:30–3:45 | Agent DNA Panel | *"Something no one else has built."* |
-| 3:45–4:00 | Sentinel change detected | *"Not DOM diffing. Contextual AI briefings."* |
-| 4:00–4:15 | Shield blocked injection | *"Risk score 84 — blocked before it runs."* |
-| 4:15–4:30 | Compliance + FinOps | *"Full legal audit trail. Per-run cost tracking."* |
-| 4:30–5:00 | Back to landing benchmark chart | *"This isn't a demo. This is a platform. The web is now programmable."* |
 
 ---
 

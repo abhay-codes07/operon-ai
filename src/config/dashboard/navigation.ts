@@ -173,4 +173,16 @@ export const dashboardNav = [
     description: "SLA breach response",
     icon: "AlertTriangle",
   },
+  {
+    href: "/dashboard/snapbuy",
+    label: "SnapBuy",
+    description: "Autonomous deal sniper",
+    icon: "Target",
+  },
+  {
+    href: "/dashboard/heartbeat",
+    label: "Heartbeat",
+    description: "Synthetic user monitoring",
+    icon: "HeartPulse",
+  },
 ] as const;
