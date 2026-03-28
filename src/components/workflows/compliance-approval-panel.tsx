@@ -86,10 +86,10 @@ export function ComplianceApprovalPanel({
   }
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4">
+    <section className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm">
       <div className="space-y-1">
-        <h2 className="text-sm font-semibold text-slate-900">Workflow Approval</h2>
-        <p className="text-xs text-slate-600">
+        <h2 className="text-sm font-semibold text-white">Workflow Approval</h2>
+        <p className="text-xs text-slate-400">
           Production runs require approval tied to the current workflow version.
         </p>
       </div>
@@ -110,18 +110,18 @@ export function ComplianceApprovalPanel({
       </div>
       {canApprove ? (
         <label className="mt-3 block space-y-1">
-          <span className="text-xs font-medium text-slate-700">Approval Notes</span>
+          <span className="text-xs font-medium text-slate-300">Approval Notes</span>
           <textarea
             rows={3}
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
             placeholder="Why this workflow is approved for production"
           />
         </label>
       ) : null}
-      {state.error ? <p className="mt-3 text-xs text-rose-700">{state.error}</p> : null}
-      {state.success ? <p className="mt-3 text-xs text-emerald-700">{state.success}</p> : null}
+      {state.error ? <p className="mt-3 text-xs text-rose-400">{state.error}</p> : null}
+      {state.success ? <p className="mt-3 text-xs text-emerald-400">{state.success}</p> : null}
     </section>
   );
 }

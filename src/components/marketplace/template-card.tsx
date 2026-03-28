@@ -18,11 +18,11 @@ type TemplateCardProps = {
 
 export function TemplateCard({ template }: TemplateCardProps): JSX.Element {
   return (
-    <article className="rounded-xl border border-slate-200 bg-white p-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{template.category}</p>
-      <h3 className="mt-1 text-base font-semibold text-slate-900">{template.title}</h3>
-      <p className="mt-2 text-sm text-slate-600">{template.description}</p>
-      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-600">
+    <article className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm transition-colors hover:border-cyan-500/30">
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-cyan-400">{template.category}</p>
+      <h3 className="mt-1 text-base font-semibold text-white">{template.title}</h3>
+      <p className="mt-2 text-sm text-slate-400">{template.description}</p>
+      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-400">
         <p>Reliability: {template.reliabilityScore.toFixed(1)}</p>
         <p>Installs: {template.installCount}</p>
         <p>Rating: {template.avgRating.toFixed(1)}</p>
@@ -33,7 +33,7 @@ export function TemplateCard({ template }: TemplateCardProps): JSX.Element {
       <div className="mt-4 flex items-center gap-2">
         <Link
           href={`/marketplace/${template.slug}`}
-          className="inline-flex h-9 items-center rounded-md border border-slate-300 px-3 text-sm font-medium text-slate-700"
+          className="inline-flex h-9 items-center rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm font-medium text-slate-300 hover:border-cyan-500/40 hover:text-white"
         >
           View Details
         </Link>

@@ -59,15 +59,15 @@ export function PipelineStepConfigForm({
   }
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4">
-      <h2 className="text-sm font-semibold text-slate-900">Add Pipeline Step</h2>
+    <section className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm">
+      <h2 className="text-sm font-semibold text-white">Add Pipeline Step</h2>
       <div className="mt-3 space-y-2">
         <label className="block space-y-1">
-          <span className="text-xs text-slate-600">Agent</span>
+          <span className="text-xs text-slate-400">Agent</span>
           <select
             value={agentId}
             onChange={(event) => setAgentId(event.target.value)}
-            className="h-9 w-full rounded-md border border-slate-300 px-2 text-sm"
+            className="h-9 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-2 text-sm text-white"
           >
             {agents.map((agent) => (
               <option key={agent.id} value={agent.id}>
@@ -77,27 +77,27 @@ export function PipelineStepConfigForm({
           </select>
         </label>
         <label className="block space-y-1">
-          <span className="text-xs text-slate-600">Input Mapping JSON</span>
+          <span className="text-xs text-slate-400">Input Mapping JSON</span>
           <textarea
             rows={3}
             value={inputMapping}
             onChange={(event) => setInputMapping(event.target.value)}
-            className="w-full rounded-md border border-slate-300 px-2 py-1 text-xs"
+            className="w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-2 py-1 text-xs text-white font-mono focus:border-cyan-500/60 focus:outline-none"
           />
         </label>
         <label className="block space-y-1">
-          <span className="text-xs text-slate-600">Output Mapping JSON</span>
+          <span className="text-xs text-slate-400">Output Mapping JSON</span>
           <textarea
             rows={3}
             value={outputMapping}
             onChange={(event) => setOutputMapping(event.target.value)}
-            className="w-full rounded-md border border-slate-300 px-2 py-1 text-xs"
+            className="w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-2 py-1 text-xs text-white font-mono focus:border-cyan-500/60 focus:outline-none"
           />
         </label>
         <Button type="button" onClick={onSubmit} disabled={state.loading}>
           {state.loading ? "Saving..." : "Add Step"}
         </Button>
-        {state.error ? <p className="text-xs text-rose-700">{state.error}</p> : null}
+        {state.error ? <p className="text-xs text-rose-400">{state.error}</p> : null}
       </div>
     </section>
   );

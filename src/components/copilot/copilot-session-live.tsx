@@ -47,28 +47,28 @@ export function CoPilotSessionLive({ sessionId }: CoPilotSessionLiveProps) {
 
   return (
     <div className="space-y-4">
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-base font-semibold text-slate-900">Live Browser View</h2>
-        <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p className="text-sm text-slate-700">Workflow: {session?.workflow.name ?? "Loading..."}</p>
-          <p className="text-sm text-slate-700">Run status: {session?.run.status ?? "Loading..."}</p>
-          <p className="text-sm text-slate-700">Interventions: {session?.interventions.length ?? 0}</p>
+      <section className="rounded-2xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-5 backdrop-blur-sm">
+        <h2 className="text-base font-semibold text-white">Live Browser View</h2>
+        <div className="mt-3 rounded-xl border border-[#1e2d5a]/60 bg-[#060b18]/60 p-4">
+          <p className="text-sm text-slate-300">Workflow: {session?.workflow.name ?? "Loading..."}</p>
+          <p className="text-sm text-slate-300">Run status: {session?.run.status ?? "Loading..."}</p>
+          <p className="text-sm text-slate-300">Interventions: {session?.interventions.length ?? 0}</p>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-base font-semibold text-slate-900">Intervention Timeline</h2>
+      <section className="rounded-2xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-5 backdrop-blur-sm">
+        <h2 className="text-base font-semibold text-white">Intervention Timeline</h2>
         <div className="mt-3 space-y-2">
-          {session?.interventions.length ? null : <p className="text-sm text-slate-600">No interventions yet.</p>}
+          {session?.interventions.length ? null : <p className="text-sm text-slate-400">No interventions yet.</p>}
           {session?.interventions.map((item) => (
-            <article key={item.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <p className="text-sm font-semibold text-slate-900">
+            <article key={item.id} className="rounded-lg border border-[#1e2d5a]/60 bg-[#060b18]/60 p-3">
+              <p className="text-sm font-semibold text-white">
                 {item.stepId} • {item.interventionType}
               </p>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-400">
                 confidence {Math.round(item.agentConfidence * 100)}% • suggested {item.agentSuggestedAction}
               </p>
-              <p className="text-xs text-slate-600">human action: {item.humanAction}</p>
+              <p className="text-xs text-slate-400">human action: {item.humanAction}</p>
             </article>
           ))}
         </div>

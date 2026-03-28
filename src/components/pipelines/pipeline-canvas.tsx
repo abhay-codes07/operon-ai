@@ -50,10 +50,10 @@ export function PipelineCanvas({ steps }: PipelineCanvasProps): JSX.Element {
   }
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4">
+    <section className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm">
       <div className="mb-3">
-        <h2 className="text-sm font-semibold text-slate-900">Pipeline Canvas</h2>
-        <p className="text-xs text-slate-600">Drag to reorder steps and inspect input/output mappings.</p>
+        <h2 className="text-sm font-semibold text-white">Pipeline Canvas</h2>
+        <p className="text-xs text-slate-400">Drag to reorder steps and inspect input/output mappings.</p>
       </div>
 
       <div className="space-y-2">
@@ -69,12 +69,12 @@ export function PipelineCanvas({ steps }: PipelineCanvasProps): JSX.Element {
               }
               setDraggingId(null);
             }}
-            className="rounded-lg border border-slate-200 bg-slate-50 p-3"
+            className="rounded-lg border border-[#1e2d5a]/60 bg-[#060b18]/60 p-3 cursor-grab"
           >
-            <p className="text-xs font-semibold text-slate-500">Step {step.stepOrder}</p>
-            <p className="text-sm font-semibold text-slate-900">{step.agentName}</p>
-            <p className="text-xs text-slate-600">Agent ID: {step.agentId}</p>
-            <p className="mt-1 text-xs text-slate-600">
+            <p className="text-xs font-semibold text-cyan-400">Step {step.stepOrder}</p>
+            <p className="text-sm font-semibold text-white">{step.agentName}</p>
+            <p className="text-xs text-slate-400">Agent ID: {step.agentId}</p>
+            <p className="mt-1 text-xs text-slate-400">
               Input keys: {Object.keys(step.inputMapping ?? {}).length} | Output keys:{" "}
               {Object.keys(step.outputMapping ?? {}).length}
             </p>
@@ -82,12 +82,12 @@ export function PipelineCanvas({ steps }: PipelineCanvasProps): JSX.Element {
         ))}
       </div>
 
-      <div className="mt-4 rounded-lg border border-dashed border-slate-300 p-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Step Connections</p>
+      <div className="mt-4 rounded-lg border border-dashed border-[#1e2d5a]/60 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-cyan-400">Step Connections</p>
         {connections.length === 0 ? (
-          <p className="text-xs text-slate-600">Single-step pipeline has no edge links.</p>
+          <p className="text-xs text-slate-400">Single-step pipeline has no edge links.</p>
         ) : (
-          <div className="mt-1 space-y-1 text-xs text-slate-700">
+          <div className="mt-1 space-y-1 text-xs text-slate-300">
             {connections.map((connection) => (
               <p key={`${connection.from}-${connection.to ?? "none"}`}>
                 {connection.from.slice(-6)} to {(connection.to ?? "none").slice(-6)}

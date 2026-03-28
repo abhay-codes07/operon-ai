@@ -5,10 +5,10 @@ type PipelineStatusBadgeProps = {
 };
 
 const statusClassMap: Record<PipelineStatus, string> = {
-  RUNNING: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  PAUSED: "border-amber-200 bg-amber-50 text-amber-700",
-  FAILED: "border-rose-200 bg-rose-50 text-rose-700",
-  COMPLETED: "border-slate-200 bg-slate-100 text-slate-700",
+  RUNNING: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
+  PAUSED: "border-amber-500/30 bg-amber-500/10 text-amber-400",
+  FAILED: "border-rose-500/30 bg-rose-500/10 text-rose-400",
+  COMPLETED: "border-slate-600/40 bg-slate-700/30 text-slate-300",
 };
 
 export function PipelineStatusBadge({ status }: PipelineStatusBadgeProps): JSX.Element {

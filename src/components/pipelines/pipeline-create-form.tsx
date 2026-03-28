@@ -74,37 +74,37 @@ export function PipelineCreateForm({ agents }: PipelineCreateFormProps): JSX.Ele
   }
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4">
-      <h2 className="text-sm font-semibold text-slate-900">Create Pipeline</h2>
-      <p className="text-xs text-slate-600">Chain multiple agents into one coordinated run.</p>
+    <section className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm">
+      <h2 className="text-sm font-semibold text-white">Create Pipeline</h2>
+      <p className="text-xs text-slate-400">Chain multiple agents into one coordinated run.</p>
 
       <div className="mt-4 space-y-3">
         <label className="block space-y-1">
-          <span className="text-xs font-medium text-slate-700">Name</span>
+          <span className="text-xs font-medium text-slate-300">Name</span>
           <input
             value={name}
             onChange={(event) => setName(event.target.value)}
-            className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+            className="h-10 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
             placeholder="Revenue Recovery Pipeline"
           />
         </label>
 
         <label className="block space-y-1">
-          <span className="text-xs font-medium text-slate-700">Description</span>
+          <span className="text-xs font-medium text-slate-300">Description</span>
           <textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             rows={3}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
             placeholder="Describe pipeline objective"
           />
         </label>
 
         <div className="space-y-2">
-          <p className="text-xs font-medium text-slate-700">Steps</p>
+          <p className="text-xs font-medium text-slate-300">Steps</p>
           {steps.map((step, index) => (
-            <div key={index} className="rounded-md border border-slate-200 p-2">
-              <p className="mb-1 text-xs text-slate-500">Step {index + 1}</p>
+            <div key={index} className="rounded-md border border-[#1e2d5a]/60 bg-[#060b18]/60 p-2">
+              <p className="mb-1 text-xs text-slate-400">Step {index + 1}</p>
               <select
                 value={step.agentId}
                 onChange={(event) =>
@@ -114,7 +114,7 @@ export function PipelineCreateForm({ agents }: PipelineCreateFormProps): JSX.Ele
                     ),
                   )
                 }
-                className="h-9 w-full rounded-md border border-slate-300 px-2 text-sm"
+                className="h-9 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-2 text-sm text-white"
               >
                 {agents.map((agent) => (
                   <option key={agent.id} value={agent.id}>
@@ -132,7 +132,7 @@ export function PipelineCreateForm({ agents }: PipelineCreateFormProps): JSX.Ele
         <Button type="button" onClick={onSubmit} disabled={!canSubmit || state.loading}>
           {state.loading ? "Creating..." : "Create Pipeline"}
         </Button>
-        {state.error ? <p className="text-xs text-rose-700">{state.error}</p> : null}
+        {state.error ? <p className="text-xs text-rose-400">{state.error}</p> : null}
       </div>
     </section>
   );

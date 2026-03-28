@@ -29,9 +29,9 @@ type SessionDetailPanelProps = {
 export function SessionDetailPanel(props: SessionDetailPanelProps) {
   return (
     <div className="space-y-5">
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-base font-semibold text-slate-900">Session Overview</h2>
-        <p className="mt-1 text-sm text-slate-600">
+      <section className="rounded-2xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-5 backdrop-blur-sm">
+        <h2 className="text-base font-semibold text-white">Session Overview</h2>
+        <p className="mt-1 text-sm text-slate-400">
           {props.domain} • {props.status}
         </p>
         <p className="text-xs text-slate-500">Fingerprint {props.workflowFingerprint ?? "n/a"}</p>
@@ -41,14 +41,14 @@ export function SessionDetailPanel(props: SessionDetailPanelProps) {
         </p>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-base font-semibold text-slate-900">Captured Actions</h2>
+      <section className="rounded-2xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-5 backdrop-blur-sm">
+        <h2 className="text-base font-semibold text-white">Captured Actions</h2>
         <div className="mt-3 space-y-2">
-          {props.actions.length === 0 ? <p className="text-sm text-slate-600">No actions captured.</p> : null}
+          {props.actions.length === 0 ? <p className="text-sm text-slate-400">No actions captured.</p> : null}
           {props.actions.map((action) => (
-            <article key={action.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <p className="text-sm font-semibold text-slate-900">{action.actionType}</p>
-              <p className="text-xs text-slate-600">
+            <article key={action.id} className="rounded-lg border border-[#1e2d5a]/60 bg-[#060b18]/60 p-3">
+              <p className="text-sm font-semibold text-white">{action.actionType}</p>
+              <p className="text-xs text-slate-400">
                 {action.selector ?? "n/a"} {action.value ? `• ${action.value}` : ""}
               </p>
               <p className="text-xs text-slate-500">{new Date(action.timestamp).toLocaleString()}</p>
@@ -57,14 +57,14 @@ export function SessionDetailPanel(props: SessionDetailPanelProps) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-base font-semibold text-slate-900">Repair Events</h2>
+      <section className="rounded-2xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-5 backdrop-blur-sm">
+        <h2 className="text-base font-semibold text-white">Repair Events</h2>
         <div className="mt-3 space-y-2">
-          {props.repairs.length === 0 ? <p className="text-sm text-slate-600">No repair events.</p> : null}
+          {props.repairs.length === 0 ? <p className="text-sm text-slate-400">No repair events.</p> : null}
           {props.repairs.map((repair) => (
-            <article key={repair.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <p className="text-sm font-semibold text-slate-900">{repair.strategy}</p>
-              <p className="text-xs text-slate-600">
+            <article key={repair.id} className="rounded-lg border border-[#1e2d5a]/60 bg-[#060b18]/60 p-3">
+              <p className="text-sm font-semibold text-white">{repair.strategy}</p>
+              <p className="text-xs text-slate-400">
                 {repair.failedSelector ?? "n/a"} → {repair.repairedSelector ?? "n/a"}
               </p>
               <p className="text-xs text-slate-500">

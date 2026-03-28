@@ -45,16 +45,16 @@ export function SLAConfigForm({ workflowId, initial }: SLAConfigFormProps): JSX.
   return (
     <div className="space-y-4">
       <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">Expected Schedule (cron)</span>
+        <span className="text-sm font-medium text-slate-300">Expected Schedule (cron)</span>
         <input
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white focus:border-cyan-500/60 focus:outline-none"
           value={form.expectedSchedule}
           onChange={(event) => setForm((current) => ({ ...current, expectedSchedule: event.target.value }))}
         />
       </label>
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">Max Failure Rate ({Math.round(form.maxFailureRate * 100)}%)</span>
+        <span className="text-sm font-medium text-slate-300">Max Failure Rate ({Math.round(form.maxFailureRate * 100)}%)</span>
         <input
           type="range"
           min={0}
@@ -63,16 +63,16 @@ export function SLAConfigForm({ workflowId, initial }: SLAConfigFormProps): JSX.
           onChange={(event) =>
             setForm((current) => ({ ...current, maxFailureRate: Number(event.target.value) / 100 }))
           }
-          className="w-full"
+          className="w-full accent-cyan-500"
         />
       </label>
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">Max Execution Time (seconds)</span>
+        <span className="text-sm font-medium text-slate-300">Max Execution Time (seconds)</span>
         <input
           type="number"
           min={1}
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white focus:border-cyan-500/60 focus:outline-none"
           value={form.maxExecutionTimeSeconds}
           onChange={(event) =>
             setForm((current) => ({ ...current, maxExecutionTimeSeconds: Number(event.target.value) }))
@@ -81,12 +81,12 @@ export function SLAConfigForm({ workflowId, initial }: SLAConfigFormProps): JSX.
       </label>
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">Rolling Window Days</span>
+        <span className="text-sm font-medium text-slate-300">Rolling Window Days</span>
         <input
           type="number"
           min={1}
           max={90}
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white focus:border-cyan-500/60 focus:outline-none"
           value={form.rollingWindowDays}
           onChange={(event) =>
             setForm((current) => ({ ...current, rollingWindowDays: Number(event.target.value) }))
@@ -95,18 +95,18 @@ export function SLAConfigForm({ workflowId, initial }: SLAConfigFormProps): JSX.
       </label>
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">Notification Slack Channel</span>
+        <span className="text-sm font-medium text-slate-300">Notification Slack Channel</span>
         <input
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
           value={form.notificationSlackChannel ?? ""}
           onChange={(event) => setForm((current) => ({ ...current, notificationSlackChannel: event.target.value }))}
         />
       </label>
 
       <label className="block space-y-1">
-        <span className="text-sm font-medium text-slate-700">Notification Email</span>
+        <span className="text-sm font-medium text-slate-300">Notification Email</span>
         <input
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
           value={form.notificationEmail ?? ""}
           onChange={(event) => setForm((current) => ({ ...current, notificationEmail: event.target.value }))}
         />
@@ -116,13 +116,13 @@ export function SLAConfigForm({ workflowId, initial }: SLAConfigFormProps): JSX.
         type="button"
         onClick={save}
         disabled={state.loading}
-        className="h-10 rounded-md bg-slate-900 px-4 text-sm font-medium text-white"
+        className="h-10 rounded-md bg-gradient-to-r from-cyan-500 to-blue-600 px-4 text-sm font-medium text-white disabled:opacity-50"
       >
         {state.loading ? "Saving..." : "Save SLA Contract"}
       </button>
 
-      {state.error ? <p className="text-sm text-rose-700">{state.error}</p> : null}
-      {state.success ? <p className="text-sm text-emerald-700">{state.success}</p> : null}
+      {state.error ? <p className="text-sm text-rose-400">{state.error}</p> : null}
+      {state.success ? <p className="text-sm text-emerald-400">{state.success}</p> : null}
     </div>
   );
 }

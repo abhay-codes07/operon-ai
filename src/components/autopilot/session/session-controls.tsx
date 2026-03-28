@@ -20,25 +20,25 @@ export function SessionControls({ sessionId }: SessionControlsProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <p className="text-sm font-semibold text-slate-900">Operator Controls</p>
+    <div className="rounded-2xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm">
+      <p className="text-sm font-semibold text-white">Operator Controls</p>
       <div className="mt-3 flex gap-2">
         <button
           type="button"
           onClick={() => void callAction("approve")}
-          className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white"
+          className="rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-3 py-2 text-xs font-semibold text-white"
         >
           Approve Session
         </button>
         <button
           type="button"
           onClick={() => void callAction("fail")}
-          className="rounded-lg border border-rose-300 px-3 py-2 text-xs font-semibold text-rose-700"
+          className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-400"
         >
           Mark Failed
         </button>
       </div>
-      {message ? <p className="mt-2 text-xs text-slate-600">{message}</p> : null}
+      {message ? <p className="mt-2 text-xs text-slate-400">{message}</p> : null}
     </div>
   );
 }

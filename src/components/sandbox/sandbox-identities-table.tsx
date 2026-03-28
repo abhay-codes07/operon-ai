@@ -28,13 +28,13 @@ export function SandboxIdentitiesTable({ items }: SandboxIdentitiesTableProps) {
 
   return (
     <div className="space-y-2">
-      {rows.length === 0 ? <p className="text-sm text-slate-600">No sandbox identities provisioned.</p> : null}
+      {rows.length === 0 ? <p className="text-sm text-slate-400">No sandbox identities provisioned.</p> : null}
       {rows.map((row) => (
-        <article key={row.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+        <article key={row.id} className="rounded-lg border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-3 backdrop-blur-sm">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <p className="text-sm font-semibold text-slate-900">{row.workflow.name}</p>
-              <p className="text-xs text-slate-600">
+              <p className="text-sm font-semibold text-white">{row.workflow.name}</p>
+              <p className="text-xs text-slate-400">
                 {row.email} • {row.status}
               </p>
               <p className="text-xs text-slate-500">
@@ -44,7 +44,7 @@ export function SandboxIdentitiesTable({ items }: SandboxIdentitiesTableProps) {
             <button
               type="button"
               onClick={() => void revoke(row.id)}
-              className="rounded-md border border-rose-300 px-2 py-1 text-xs font-semibold text-rose-700"
+              className="rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-1 text-xs font-semibold text-rose-400"
             >
               Revoke
             </button>

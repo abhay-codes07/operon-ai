@@ -69,38 +69,38 @@ export function PublishTemplateForm(): JSX.Element {
     <div className="space-y-3">
       <div className="grid gap-3 md:grid-cols-2">
         <input
-          className="h-10 rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
           placeholder="Slug"
           value={form.slug}
           onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))}
         />
         <input
-          className="h-10 rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
           placeholder="Title"
           value={form.title}
           onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
         />
         <input
-          className="h-10 rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
           placeholder="Category"
           value={form.category}
           onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))}
         />
         <input
-          className="h-10 rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
           placeholder="Version"
           value={form.version}
           onChange={(event) => setForm((current) => ({ ...current, version: event.target.value }))}
         />
       </div>
       <textarea
-        className="min-h-24 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+        className="min-h-24 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
         placeholder="Description"
         value={form.description}
         onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
       />
       <textarea
-        className="min-h-56 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-xs"
+        className="min-h-56 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 font-mono text-xs text-white focus:border-cyan-500/60 focus:outline-none"
         value={form.workflowDefinition}
         onChange={(event) => setForm((current) => ({ ...current, workflowDefinition: event.target.value }))}
       />
@@ -108,12 +108,12 @@ export function PublishTemplateForm(): JSX.Element {
         type="button"
         onClick={publish}
         disabled={state.loading}
-        className="inline-flex h-10 items-center rounded-md bg-slate-900 px-4 text-sm font-medium text-white"
+        className="inline-flex h-10 items-center rounded-md bg-gradient-to-r from-cyan-500 to-blue-600 px-4 text-sm font-medium text-white disabled:opacity-50"
       >
         {state.loading ? "Publishing..." : "Publish Template"}
       </button>
-      {state.error ? <p className="text-sm text-rose-700">{state.error}</p> : null}
-      {state.success ? <p className="text-sm text-emerald-700">{state.success}</p> : null}
+      {state.error ? <p className="text-sm text-rose-400">{state.error}</p> : null}
+      {state.success ? <p className="text-sm text-emerald-400">{state.success}</p> : null}
     </div>
   );
 }

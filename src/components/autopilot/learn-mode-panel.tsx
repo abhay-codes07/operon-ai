@@ -175,20 +175,20 @@ export function LearnModePanel() {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="rounded-2xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-5 backdrop-blur-sm">
         <div className="space-y-1">
-          <h2 className="text-base font-semibold text-slate-900">Learn Mode Recorder</h2>
-          <p className="text-sm text-slate-600">Record user actions once and compile a reusable workflow.</p>
+          <h2 className="text-base font-semibold text-white">Learn Mode Recorder</h2>
+          <p className="text-sm text-slate-400">Record user actions once and compile a reusable workflow.</p>
         </div>
 
         <div className="mt-4 grid gap-3 md:grid-cols-3">
-          <label className="space-y-1 text-sm text-slate-700 md:col-span-2">
+          <label className="space-y-1 text-sm text-slate-300 md:col-span-2">
             <span>Domain</span>
             <input
               value={domain}
               onChange={(event) => setDomain(event.target.value)}
               placeholder="app.example.com"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
             />
           </label>
           <div className="flex items-end">
@@ -196,22 +196,22 @@ export function LearnModePanel() {
               type="button"
               onClick={() => void startSession()}
               disabled={!domain.trim()}
-              className="w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-400"
+              className="w-full rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
               Start Recording
             </button>
           </div>
         </div>
 
-        <div className="mt-5 border-t border-slate-100 pt-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Action Capture</p>
+        <div className="mt-5 border-t border-[#1e2d5a]/40 pt-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-400">Action Capture</p>
           <div className="mt-3 grid gap-3 md:grid-cols-4">
-            <label className="space-y-1 text-sm text-slate-700">
+            <label className="space-y-1 text-sm text-slate-300">
               <span>Action</span>
               <select
                 value={actionType}
                 onChange={(event) => setActionType(event.target.value as ActionType)}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 text-sm text-white"
               >
                 <option value="NAVIGATE">NAVIGATE</option>
                 <option value="CLICK">CLICK</option>
@@ -221,22 +221,22 @@ export function LearnModePanel() {
                 <option value="CUSTOM">CUSTOM</option>
               </select>
             </label>
-            <label className="space-y-1 text-sm text-slate-700 md:col-span-2">
+            <label className="space-y-1 text-sm text-slate-300 md:col-span-2">
               <span>Selector</span>
               <input
                 value={selector}
                 onChange={(event) => setSelector(event.target.value)}
                 placeholder="#login-button"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
               />
             </label>
-            <label className="space-y-1 text-sm text-slate-700">
+            <label className="space-y-1 text-sm text-slate-300">
               <span>Value</span>
               <input
                 value={value}
                 onChange={(event) => setValue(event.target.value)}
                 placeholder="optional"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
               />
             </label>
           </div>
@@ -246,7 +246,7 @@ export function LearnModePanel() {
               type="button"
               onClick={() => void captureAction()}
               disabled={!sessionId}
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg border border-[#1e2d5a]/60 bg-[#0d1428]/80 px-4 py-2 text-sm font-semibold text-slate-300 hover:border-cyan-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
               Capture Action
             </button>
@@ -254,15 +254,15 @@ export function LearnModePanel() {
               type="button"
               onClick={() => void stopAndCompile()}
               disabled={!sessionId}
-              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-emerald-300"
+              className="rounded-lg bg-emerald-500/20 border border-emerald-500/30 px-4 py-2 text-sm font-semibold text-emerald-400 hover:bg-emerald-500/30 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Stop and Compile
             </button>
           </div>
         </div>
 
-        {status ? <p className="mt-3 text-sm text-slate-700">{status}</p> : null}
-        {error ? <p className="mt-2 text-sm text-rose-600">{error}</p> : null}
+        {status ? <p className="mt-3 text-sm text-slate-300">{status}</p> : null}
+        {error ? <p className="mt-2 text-sm text-rose-400">{error}</p> : null}
       </section>
 
       {reviewDefinition && sessionId ? (
@@ -277,36 +277,36 @@ export function LearnModePanel() {
       ) : null}
 
       {createdWorkflowId ? (
-        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-          <p className="text-sm font-medium text-emerald-900">Workflow saved successfully.</p>
-          <Link href={`/dashboard/workflows`} className="mt-2 inline-block text-sm font-semibold text-emerald-800 underline">
+        <section className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5">
+          <p className="text-sm font-medium text-emerald-400">Workflow saved successfully.</p>
+          <Link href={`/dashboard/workflows`} className="mt-2 inline-block text-sm font-semibold text-emerald-400 underline">
             Open Workflows
           </Link>
         </section>
       ) : null}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="rounded-2xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-5 backdrop-blur-sm">
         <div className="space-y-1">
-          <h2 className="text-base font-semibold text-slate-900">Selector Repair Simulator</h2>
-          <p className="text-sm text-slate-600">Validate fallback selector quality before running in production.</p>
+          <h2 className="text-base font-semibold text-white">Selector Repair Simulator</h2>
+          <p className="text-sm text-slate-400">Validate fallback selector quality before running in production.</p>
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <label className="space-y-1 text-sm text-slate-700">
+          <label className="space-y-1 text-sm text-slate-300">
             <span>Failed selector</span>
             <input
               value={simFailedSelector}
               onChange={(event) => setSimFailedSelector(event.target.value)}
               placeholder="#submit-button"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
             />
           </label>
-          <label className="space-y-1 text-sm text-slate-700">
+          <label className="space-y-1 text-sm text-slate-300">
             <span>Candidate selectors (one per line)</span>
             <textarea
               value={simCandidates}
               onChange={(event) => setSimCandidates(event.target.value)}
               placeholder="#submit-btn&#10;[data-testid='submit']&#10;button[type='submit']"
-              className="h-28 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              className="h-28 w-full rounded-lg border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
             />
           </label>
         </div>
@@ -315,12 +315,12 @@ export function LearnModePanel() {
             type="button"
             onClick={() => void simulateRepair()}
             disabled={!simFailedSelector.trim()}
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg border border-[#1e2d5a]/60 bg-[#0d1428]/80 px-4 py-2 text-sm font-semibold text-slate-300 hover:border-cyan-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             Simulate Repair
           </button>
         </div>
-        {simResult ? <p className="mt-3 text-sm text-slate-700">{simResult}</p> : null}
+        {simResult ? <p className="mt-3 text-sm text-slate-300">{simResult}</p> : null}
       </section>
     </div>
   );

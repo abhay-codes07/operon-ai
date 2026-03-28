@@ -33,17 +33,17 @@ export function PipelineStatsPanel({ initialStats }: PipelineStatsPanelProps): J
 
   return (
     <section className="grid gap-3 md:grid-cols-3">
-      <article className="rounded-xl border border-slate-200 bg-white p-4">
-        <p className="text-xs text-slate-500">Pipelines</p>
-        <p className="mt-1 text-2xl font-semibold text-slate-900">{stats.totalPipelines}</p>
+      <article className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm">
+        <p className="text-xs text-slate-400">Pipelines</p>
+        <p className="mt-1 text-2xl font-semibold text-white">{stats.totalPipelines}</p>
       </article>
-      <article className="rounded-xl border border-slate-200 bg-white p-4">
-        <p className="text-xs text-slate-500">Active Runs</p>
-        <p className="mt-1 text-2xl font-semibold text-slate-900">{stats.runningRuns}</p>
+      <article className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm">
+        <p className="text-xs text-slate-400">Active Runs</p>
+        <p className="mt-1 text-2xl font-semibold text-white">{stats.runningRuns}</p>
       </article>
-      <article className="rounded-xl border border-slate-200 bg-white p-4">
-        <p className="text-xs text-slate-500">Failed Runs</p>
-        <p className="mt-1 text-2xl font-semibold text-slate-900">{stats.failedRuns}</p>
+      <article className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm">
+        <p className="text-xs text-slate-400">Failed Runs</p>
+        <p className="mt-1 text-2xl font-semibold text-white">{stats.failedRuns}</p>
       </article>
     </section>
   );

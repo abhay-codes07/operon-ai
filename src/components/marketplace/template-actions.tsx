@@ -79,8 +79,8 @@ export function TemplateActions({ slug }: { slug: string }): JSX.Element {
         </button>
         <InstallModal slug={slug} />
       </div>
-      {demoState.output ? <p className="text-sm text-emerald-700">{demoState.output}</p> : null}
-      {demoState.error ? <p className="text-sm text-rose-700">{demoState.error}</p> : null}
+      {demoState.output ? <p className="text-sm text-emerald-400">{demoState.output}</p> : null}
+      {demoState.error ? <p className="text-sm text-rose-400">{demoState.error}</p> : null}
 
       <div className="grid gap-2 md:grid-cols-[120px,1fr,120px]">
         <input
@@ -89,25 +89,25 @@ export function TemplateActions({ slug }: { slug: string }): JSX.Element {
           max={5}
           value={rating}
           onChange={(event) => setRating(event.target.value)}
-          className="h-10 rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white focus:border-cyan-500/60 focus:outline-none"
         />
         <input
           value={comment}
           onChange={(event) => setComment(event.target.value)}
-          className="h-10 rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none"
           placeholder="Write review"
         />
         <button
           type="button"
           onClick={submitReview}
           disabled={reviewState.loading}
-          className="h-10 rounded-md border border-slate-300 px-3 text-sm font-medium text-slate-700"
+          className="h-10 rounded-md border border-[#1e2d5a]/60 bg-[#0d1428]/80 px-3 text-sm font-medium text-slate-300 hover:border-cyan-500/40 hover:text-white"
         >
           {reviewState.loading ? "Saving..." : "Submit"}
         </button>
       </div>
-      {reviewState.message ? <p className="text-sm text-emerald-700">{reviewState.message}</p> : null}
-      {reviewState.error ? <p className="text-sm text-rose-700">{reviewState.error}</p> : null}
+      {reviewState.message ? <p className="text-sm text-emerald-400">{reviewState.message}</p> : null}
+      {reviewState.error ? <p className="text-sm text-rose-400">{reviewState.error}</p> : null}
     </div>
   );
 }

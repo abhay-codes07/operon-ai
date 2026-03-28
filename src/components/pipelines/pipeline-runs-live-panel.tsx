@@ -48,16 +48,16 @@ export function PipelineRunsLivePanel({
   usePolling(refresh, 8_000, true);
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4">
-      <h2 className="text-sm font-semibold text-slate-900">Live Run Status</h2>
+    <section className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm">
+      <h2 className="text-sm font-semibold text-white">Live Run Status</h2>
       {runs.length === 0 ? (
-        <p className="mt-2 text-sm text-slate-600">No runs to monitor yet.</p>
+        <p className="mt-2 text-sm text-slate-400">No runs to monitor yet.</p>
       ) : (
         <div className="mt-2 space-y-2">
           {runs.slice(0, 8).map((run) => (
-            <article key={run.id} className="rounded-lg border border-slate-200 bg-slate-50 p-2">
-              <p className="text-xs font-semibold text-slate-900">{run.id.slice(-8)}</p>
-              <p className="text-xs text-slate-600">
+            <article key={run.id} className="rounded-lg border border-[#1e2d5a]/60 bg-[#060b18]/60 p-2">
+              <p className="text-xs font-semibold text-white">{run.id.slice(-8)}</p>
+              <p className="text-xs text-slate-400">
                 {run.status} • {new Date(run.startedAt).toLocaleTimeString()}
               </p>
             </article>
