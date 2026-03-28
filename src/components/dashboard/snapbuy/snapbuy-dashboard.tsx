@@ -8,7 +8,6 @@ import {
   Music,
   Clock,
   CheckCircle,
-  ShoppingCart,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
@@ -50,44 +49,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Target,
 };
 
-const INITIAL_SNIPES: Snipe[] = [
-  {
-    id: "snipe-1",
-    name: "RTX 5090 GPU Restock",
-    watchUrl: "bestbuy.com/rtx-5090",
-    triggerCondition: "Item comes back in stock",
-    actionTask: "Add to cart and complete checkout with saved payment",
-    status: "TRIGGERED",
-    triggeredAt: "2 minutes ago",
-    result: "Successfully purchased — Order #BB-2847291",
-    savedMoney: null,
-    checkCount: 847,
-    icon: "Zap",
-  },
-  {
-    id: "snipe-2",
-    name: "iPhone 16 Pro — Price Drop",
-    watchUrl: "amazon.com/iphone-16-pro",
-    triggerCondition: "Price drops below $899",
-    actionTask: "Add to cart, apply any available coupons, checkout",
-    status: "WATCHING",
-    currentValue: "$979",
-    targetValue: "$899",
-    checkCount: 234,
-    icon: "TrendingDown",
-  },
-  {
-    id: "snipe-3",
-    name: "Taylor Swift Eras Tour Ticket",
-    watchUrl: "ticketmaster.com/taylor-swift-eras",
-    triggerCondition: "Any floor/pit tickets become available under $400",
-    actionTask: "Select best available seats and complete purchase",
-    status: "WATCHING",
-    currentValue: "Sold Out",
-    checkCount: 1203,
-    icon: "Music",
-  },
-];
+const INITIAL_SNIPES: Snipe[] = [];
 
 const inputClass = cn(
   "w-full rounded-lg border border-slate-700/60 bg-slate-900/60 text-slate-200",
@@ -189,13 +151,9 @@ function SnipeCard({ snipe }: { snipe: Snipe }) {
             )}
           </div>
           <p className="text-xs text-emerald-400/80">{snipe.result}</p>
-          <button
-            disabled
-            className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-400 opacity-70 cursor-not-allowed"
-          >
-            <ShoppingCart className="h-3 w-3" />
-            Order Confirmation
-          </button>
+          <p className="mt-2 text-[11px] text-emerald-600/70">
+            Check your email or the site directly to confirm the outcome.
+          </p>
         </div>
       )}
 
@@ -471,11 +429,21 @@ export function SnapbuyDashboard({ agents }: { agents: Agent[] }) {
       )}
 
       {/* Snipe cards grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {snipes.map((snipe) => (
-          <SnipeCard key={snipe.id} snipe={snipe} />
-        ))}
-      </div>
+      {snipes.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/20 p-12 text-center">
+          <Target className="mx-auto h-10 w-10 text-slate-600 mb-3" />
+          <p className="text-sm font-semibold text-slate-400">No active snipes</p>
+          <p className="mt-1 text-xs text-slate-600 max-w-xs mx-auto">
+            Arm your first snipe above. You&apos;ll need an active agent and — for automated checkout — your site credentials in &quot;Saved Details&quot;.
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {snipes.map((snipe) => (
+            <SnipeCard key={snipe.id} snipe={snipe} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
