@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 import {
   createTemplate,
@@ -70,7 +68,10 @@ export async function POST(request: Request) {
       changelog: parsed.data.changelog,
     });
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
+    const code = error != null && typeof error === "object" && "code" in error
+      ? (error as { code: unknown }).code
+      : undefined;
+    if (code === "P2002") {
       return marketplaceError(409, "TEMPLATE_EXISTS", "Template slug already exists");
     }
     return marketplaceError(500, "TEMPLATE_CREATE_FAILED", "Failed to create marketplace template");
