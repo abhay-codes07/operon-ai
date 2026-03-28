@@ -9,7 +9,7 @@ import {
   Loader2,
   RefreshCw,
   ExternalLink,
-  Image,
+  Image as ImageIcon,
   Zap,
   Filter,
 } from "lucide-react";
@@ -143,7 +143,7 @@ function RunCard({ run }: { run: RunResult }) {
           <div className="flex items-center gap-2 flex-shrink-0">
             {preview.screenshotCount > 0 && (
               <span className="flex items-center gap-1 text-[10px] text-slate-500">
-                <Image size={10} /> {preview.screenshotCount}
+                <ImageIcon size={10} /> {preview.screenshotCount}
               </span>
             )}
             <span className="text-[10px] text-slate-600 font-mono">{formatDuration(run.durationMs)}</span>

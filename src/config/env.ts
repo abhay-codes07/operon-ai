@@ -32,53 +32,44 @@ type RequiredStringEnvKey =
   | "NEXTAUTH_SECRET"
   | "DATABASE_URL"
   | "REDIS_URL"
-  | "STRIPE_SECRET_KEY"
-  | "STRIPE_WEBHOOK_SECRET"
-  | "STRIPE_PRICE_STARTER"
-  | "STRIPE_PRICE_GROWTH"
   | "TINYFISH_API_KEY"
   | "TINYFISH_BASE_URL"
-  | "TINYFISH_EXECUTE_PATH"
-  | "SCREENSHOT_STORAGE_BASE_PATH"
-  | "BULLMQ_QUEUE_PREFIX";
+  | "TINYFISH_EXECUTE_PATH";
 
 const requiredEnvKeys: RequiredStringEnvKey[] = [
   "NEXTAUTH_URL",
   "NEXTAUTH_SECRET",
   "DATABASE_URL",
   "REDIS_URL",
-  "STRIPE_SECRET_KEY",
   "TINYFISH_API_KEY",
   "TINYFISH_BASE_URL",
   "TINYFISH_EXECUTE_PATH",
-  "SCREENSHOT_STORAGE_BASE_PATH",
 ];
 
 function readNodeEnv(value: string | undefined): AppEnv["NODE_ENV"] {
   if (value === "development" || value === "test" || value === "production") {
     return value;
   }
-
   return "development";
 }
 
 function readRequiredEnv(key: RequiredStringEnvKey): string {
   const value = process.env[key];
-
   if (!value || value.trim().length === 0) {
     throw new Error(`Missing required environment variable: ${key}`);
   }
-
   return value;
+}
+
+function readOptionalEnv(key: string, fallback = ""): string {
+  return process.env[key]?.trim() || fallback;
 }
 
 function readTimeoutMs(value: string | undefined): number {
   const parsed = Number(value);
-
   if (!Number.isInteger(parsed) || parsed < 1_000 || parsed > 600_000) {
     return 30_000;
   }
-
   return parsed;
 }
 
@@ -89,11 +80,9 @@ function readBoundedInteger(
   max: number,
 ): number {
   const parsed = Number(value);
-
   if (!Number.isInteger(parsed) || parsed < min || parsed > max) {
     return fallback;
   }
-
   return parsed;
 }
 
@@ -115,10 +104,11 @@ export function getAppEnv(): AppEnv {
     NEXTAUTH_SECRET: readRequiredEnv("NEXTAUTH_SECRET"),
     DATABASE_URL: readRequiredEnv("DATABASE_URL"),
     REDIS_URL: readRequiredEnv("REDIS_URL"),
-    STRIPE_SECRET_KEY: readRequiredEnv("STRIPE_SECRET_KEY"),
-    STRIPE_WEBHOOK_SECRET: readRequiredEnv("STRIPE_WEBHOOK_SECRET"),
-    STRIPE_PRICE_STARTER: readRequiredEnv("STRIPE_PRICE_STARTER"),
-    STRIPE_PRICE_GROWTH: readRequiredEnv("STRIPE_PRICE_GROWTH"),
+    // Stripe is optional — billing routes degrade gracefully if not configured
+    STRIPE_SECRET_KEY: readOptionalEnv("STRIPE_SECRET_KEY"),
+    STRIPE_WEBHOOK_SECRET: readOptionalEnv("STRIPE_WEBHOOK_SECRET"),
+    STRIPE_PRICE_STARTER: readOptionalEnv("STRIPE_PRICE_STARTER"),
+    STRIPE_PRICE_GROWTH: readOptionalEnv("STRIPE_PRICE_GROWTH"),
     SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL?.trim() || undefined,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY?.trim() || undefined,
     ALERT_EMAIL_FROM: process.env.ALERT_EMAIL_FROM?.trim() || undefined,
@@ -132,8 +122,9 @@ export function getAppEnv(): AppEnv {
     TINYFISH_EXECUTE_PATH: readRequiredEnv("TINYFISH_EXECUTE_PATH"),
     TINYFISH_TIMEOUT_MS: readTimeoutMs(process.env.TINYFISH_TIMEOUT_MS),
     SCREENSHOT_STORAGE_PROVIDER: "local",
-    SCREENSHOT_STORAGE_BASE_PATH: readRequiredEnv("SCREENSHOT_STORAGE_BASE_PATH"),
-    BULLMQ_QUEUE_PREFIX: readRequiredEnv("BULLMQ_QUEUE_PREFIX"),
+    // Default to /tmp for serverless environments (Vercel)
+    SCREENSHOT_STORAGE_BASE_PATH: readOptionalEnv("SCREENSHOT_STORAGE_BASE_PATH", "/tmp/operon-screenshots"),
+    BULLMQ_QUEUE_PREFIX: readOptionalEnv("BULLMQ_QUEUE_PREFIX", "operon"),
     BULLMQ_EXECUTION_ATTEMPTS: readBoundedInteger(
       process.env.BULLMQ_EXECUTION_ATTEMPTS,
       3,
