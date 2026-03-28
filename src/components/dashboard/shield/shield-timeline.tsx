@@ -34,7 +34,7 @@ export function ShieldTimeline({ initialItems }: ShieldTimelineProps): JSX.Eleme
   usePolling(refresh, 15_000, true);
 
   if (items.length === 0) {
-    return <p className="text-sm text-slate-600">No threat events in the selected time window.</p>;
+    return <p className="text-sm text-slate-400">No threat events in the selected time window.</p>;
   }
 
   const peak = Math.max(...items.map((item) => item.total), 1);
@@ -42,12 +42,12 @@ export function ShieldTimeline({ initialItems }: ShieldTimelineProps): JSX.Eleme
   return (
     <div className="space-y-2">
       {items.map((item) => (
-        <article key={item.date} className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+        <article key={item.date} className="rounded-lg border border-[#1e2d5a]/60 bg-[#0d1428]/80 px-3 py-2 backdrop-blur-sm">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-medium text-slate-700">{item.date}</p>
-            <p className="text-xs text-slate-600">{item.total} events</p>
+            <p className="text-xs font-medium text-slate-300">{item.date}</p>
+            <p className="text-xs text-slate-400">{item.total} events</p>
           </div>
-          <div className="mt-2 h-2 w-full rounded-full bg-slate-100">
+          <div className="mt-2 h-2 w-full rounded-full bg-[#060b18]">
             <div
               className="h-2 rounded-full bg-rose-500 transition-all"
               style={{

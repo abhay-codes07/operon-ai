@@ -49,15 +49,15 @@ export function ShieldLiveSummary({ initial }: ShieldLiveSummaryProps): JSX.Elem
         <Metric label="Low" value={summary.severity.LOW} />
       </div>
       <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Hot Workflows</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-cyan-400">Hot Workflows</p>
         {summary.hotWorkflows.length === 0 ? (
-          <p className="text-sm text-slate-600">No elevated threat concentration detected.</p>
+          <p className="text-sm text-slate-400">No elevated threat concentration detected.</p>
         ) : (
           <div className="grid gap-2 md:grid-cols-2">
             {summary.hotWorkflows.map((item) => (
-              <article key={item.workflowId} className="rounded-lg border border-slate-200 bg-white px-3 py-2">
-                <p className="text-sm font-medium text-slate-900">{item.workflowName}</p>
-                <p className="text-xs text-slate-600">{item.count} events</p>
+              <article key={item.workflowId} className="rounded-lg border border-[#1e2d5a]/60 bg-[#0d1428]/80 px-3 py-2">
+                <p className="text-sm font-medium text-white">{item.workflowName}</p>
+                <p className="text-xs text-slate-400">{item.count} events</p>
               </article>
             ))}
           </div>
@@ -69,9 +69,9 @@ export function ShieldLiveSummary({ initial }: ShieldLiveSummaryProps): JSX.Elem
 
 function Metric({ label, value }: { label: string; value: number }) {
   return (
-    <article className="rounded-lg border border-slate-200 bg-white px-3 py-3">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-slate-900">{value}</p>
+    <article className="rounded-lg border border-[#1e2d5a]/60 bg-[#0d1428]/80 px-3 py-3 backdrop-blur-sm">
+      <p className="text-xs text-slate-400">{label}</p>
+      <p className="mt-1 text-2xl font-semibold text-white">{value}</p>
     </article>
   );
 }

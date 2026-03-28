@@ -64,14 +64,14 @@ export function AgentPolicyManager({ agents, initialPolicies }: AgentPolicyManag
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Active Agent Policies</p>
+      <div className="rounded-lg border border-[#1e2d5a]/60 bg-[#060b18]/60 p-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-cyan-400">Active Agent Policies</p>
         {initialPolicies.length === 0 ? (
-          <p className="mt-2 text-xs text-slate-600">No agent-level policies configured.</p>
+          <p className="mt-2 text-xs text-slate-400">No agent-level policies configured.</p>
         ) : (
           <div className="mt-2 space-y-1">
             {initialPolicies.map((item) => (
-              <p key={item.id} className="text-xs text-slate-700">
+              <p key={item.id} className="text-xs text-slate-300">
                 {agents.find((agent) => agent.id === item.agentId)?.name ?? item.agentId.slice(-8)} •{" "}
                 {item.enabled ? "Enabled" : "Disabled"} • Limit {item.maxRunsPerHour}/hr
               </p>
@@ -81,9 +81,9 @@ export function AgentPolicyManager({ agents, initialPolicies }: AgentPolicyManag
       </div>
 
       <label className="block space-y-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Agent</span>
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Agent</span>
         <select
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white"
           value={agentId}
           onChange={(event) => setAgentId(event.target.value)}
         >
@@ -96,38 +96,38 @@ export function AgentPolicyManager({ agents, initialPolicies }: AgentPolicyManag
       </label>
 
       <label className="block space-y-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Domain Allowlist</span>
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Domain Allowlist</span>
         <textarea
           value={domainAllowlist}
           onChange={(event) => setDomainAllowlist(event.target.value)}
-          className="min-h-24 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          className="min-h-24 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
           placeholder="example.com&#10;admin.example.com"
         />
       </label>
 
       <label className="block space-y-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Action Allowlist</span>
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Action Allowlist</span>
         <input
           value={actionAllowlist}
           onChange={(event) => setActionAllowlist(event.target.value)}
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
           placeholder="navigate,click,extract,submit"
         />
       </label>
 
       <label className="block space-y-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Max Runs / Hour</span>
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Max Runs / Hour</span>
         <input
           type="number"
           min={1}
           max={2000}
           value={maxRunsPerHour}
           onChange={(event) => setMaxRunsPerHour(event.target.value)}
-          className="h-10 w-full rounded-md border border-slate-300 px-3 text-sm"
+          className="h-10 w-full rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
         />
       </label>
 
-      <label className="flex items-center gap-2 text-sm text-slate-700">
+      <label className="flex items-center gap-2 text-sm text-slate-300">
         <input type="checkbox" checked={enabled} onChange={(event) => setEnabled(event.target.checked)} />
         Enable policy enforcement
       </label>
@@ -136,8 +136,8 @@ export function AgentPolicyManager({ agents, initialPolicies }: AgentPolicyManag
         <Button type="button" onClick={savePolicy} disabled={state.saving}>
           {state.saving ? "Saving..." : "Save Agent Policy"}
         </Button>
-        {state.error ? <p className="text-xs text-rose-700">{state.error}</p> : null}
-        {state.success ? <p className="text-xs text-emerald-700">{state.success}</p> : null}
+        {state.error ? <p className="text-xs text-rose-400">{state.error}</p> : null}
+        {state.success ? <p className="text-xs text-emerald-400">{state.success}</p> : null}
       </div>
     </div>
   );

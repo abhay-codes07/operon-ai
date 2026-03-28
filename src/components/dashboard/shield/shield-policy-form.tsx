@@ -56,18 +56,18 @@ export function ShieldPolicyForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid gap-3 md:grid-cols-2">
         <label className="space-y-1 text-sm">
-          <span className="font-medium text-slate-900">Allowed Domains</span>
+          <span className="font-medium text-slate-300">Allowed Domains</span>
           <textarea
-            className="min-h-[140px] w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-slate-500 focus:outline-none"
+            className="min-h-[140px] w-full rounded-lg border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
             value={allowedDomains}
             onChange={(event) => setAllowedDomains(event.target.value)}
             placeholder="example.com"
           />
         </label>
         <label className="space-y-1 text-sm">
-          <span className="font-medium text-slate-900">Blocked Actions</span>
+          <span className="font-medium text-slate-300">Blocked Actions</span>
           <textarea
-            className="min-h-[140px] w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-slate-500 focus:outline-none"
+            className="min-h-[140px] w-full rounded-lg border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
             value={blockedActions}
             onChange={(event) => setBlockedActions(event.target.value)}
             placeholder="submit_payment"
@@ -78,7 +78,7 @@ export function ShieldPolicyForm({
         <Button type="submit" disabled={saving}>
           {saving ? "Saving..." : "Save Shield Policy"}
         </Button>
-        {statusMessage ? <p className="text-xs text-slate-600">{statusMessage}</p> : null}
+        {statusMessage ? <p className="text-xs text-slate-400">{statusMessage}</p> : null}
       </div>
     </form>
   );

@@ -78,13 +78,13 @@ export function ReleaseControlPanel({ workflows, releases }: ReleaseControlPanel
 
   return (
     <div className="space-y-5">
-      <div className="rounded-xl border border-slate-200 bg-white p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Create Progressive Release</p>
+      <div className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-cyan-400">Create Progressive Release</p>
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           <select
             value={stableWorkflowId}
             onChange={(event) => setStableWorkflowId(event.target.value)}
-            className="h-10 rounded-md border border-slate-300 px-3 text-sm"
+            className="h-10 rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white"
           >
             {workflows.map((workflow) => (
               <option key={workflow.id} value={workflow.id}>
@@ -95,7 +95,7 @@ export function ReleaseControlPanel({ workflows, releases }: ReleaseControlPanel
           <select
             value={canaryWorkflowId}
             onChange={(event) => setCanaryWorkflowId(event.target.value)}
-            className="h-10 rounded-md border border-slate-300 px-3 text-sm"
+            className="h-10 rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white"
           >
             {workflows.map((workflow) => (
               <option key={workflow.id} value={workflow.id}>
@@ -106,7 +106,7 @@ export function ReleaseControlPanel({ workflows, releases }: ReleaseControlPanel
           <input
             value={canaryTrafficPercent}
             onChange={(event) => setCanaryTrafficPercent(event.target.value)}
-            className="h-10 rounded-md border border-slate-300 px-3 text-sm"
+            className="h-10 rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
             type="number"
             min={1}
             max={95}
@@ -115,7 +115,7 @@ export function ReleaseControlPanel({ workflows, releases }: ReleaseControlPanel
           <input
             value={failureThresholdPct}
             onChange={(event) => setFailureThresholdPct(event.target.value)}
-            className="h-10 rounded-md border border-slate-300 px-3 text-sm"
+            className="h-10 rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
             type="number"
             min={1}
             max={100}
@@ -124,7 +124,7 @@ export function ReleaseControlPanel({ workflows, releases }: ReleaseControlPanel
           <input
             value={minCanarySampleSize}
             onChange={(event) => setMinCanarySampleSize(event.target.value)}
-            className="h-10 rounded-md border border-slate-300 px-3 text-sm md:col-span-2"
+            className="h-10 rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 md:col-span-2"
             type="number"
             min={5}
             max={500}
@@ -135,25 +135,25 @@ export function ReleaseControlPanel({ workflows, releases }: ReleaseControlPanel
           <Button type="button" onClick={createRelease} disabled={state.saving}>
             {state.saving ? "Creating..." : "Create Release"}
           </Button>
-          {state.error ? <p className="text-xs text-rose-700">{state.error}</p> : null}
-          {state.success ? <p className="text-xs text-emerald-700">{state.success}</p> : null}
+          {state.error ? <p className="text-xs text-rose-400">{state.error}</p> : null}
+          {state.success ? <p className="text-xs text-emerald-400">{state.success}</p> : null}
         </div>
       </div>
 
       <div className="space-y-3">
         {releases.map((release) => (
-          <article key={release.id} className="rounded-xl border border-slate-200 bg-white p-4">
-            <p className="text-sm font-semibold text-slate-900">
+          <article key={release.id} className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm">
+            <p className="text-sm font-semibold text-white">
               {release.stableWorkflow.name} {"->"} {release.canaryWorkflow.name}
             </p>
-            <p className="mt-1 text-xs text-slate-600">
+            <p className="mt-1 text-xs text-slate-400">
               Status {release.status} • Canary Traffic {release.canaryTrafficPercent}% • Auto Rollback{" "}
               {release.autoRollbackEnabled ? "On" : "Off"}
             </p>
-            <p className="mt-1 text-xs text-slate-600">
+            <p className="mt-1 text-xs text-slate-400">
               Threshold {release.failureThresholdPct}% • Min Sample {release.minCanarySampleSize}
             </p>
-            <p className="mt-1 text-xs text-slate-600">
+            <p className="mt-1 text-xs text-slate-400">
               Latest Canary Failure: {release.metricSnapshots[0]?.canaryFailurePct ?? 0}% on{" "}
               {release.metricSnapshots[0]
                 ? new Date(release.metricSnapshots[0].capturedAt).toLocaleString()

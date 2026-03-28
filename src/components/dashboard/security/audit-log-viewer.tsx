@@ -36,23 +36,23 @@ export function AuditLogViewer({ initialItems }: { initialItems: AuditItem[] }):
   usePolling(refresh, 7000, true);
 
   if (items.length === 0) {
-    return <p className="text-sm text-slate-600">No audit records yet.</p>;
+    return <p className="text-sm text-slate-400">No audit records yet.</p>;
   }
 
   return (
     <div className="space-y-3">
       {items.map((item) => (
-        <article key={item.id} className="rounded-xl border border-slate-200 bg-white p-4">
+        <article key={item.id} className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-sm font-semibold text-slate-900">
+            <p className="text-sm font-semibold text-white">
               {item.agent.name} • {item.action}
             </p>
             <p className="text-xs text-slate-500">{new Date(item.occurredAt).toLocaleString()}</p>
           </div>
-          <p className="mt-1 text-xs text-slate-600">
+          <p className="mt-1 text-xs text-slate-400">
             Result {item.result} • Policy {item.policyDecision} • Risk {item.riskLevel} ({item.riskScore})
           </p>
-          {item.targetDomain ? <p className="mt-1 text-xs text-slate-600">Target: {item.targetDomain}</p> : null}
+          {item.targetDomain ? <p className="mt-1 text-xs text-slate-400">Target: {item.targetDomain}</p> : null}
           {item.riskReason ? <p className="mt-1 text-xs text-slate-500">{item.riskReason}</p> : null}
         </article>
       ))}

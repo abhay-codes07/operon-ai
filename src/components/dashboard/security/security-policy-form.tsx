@@ -45,7 +45,7 @@ export function SecurityPolicyForm({ initialPolicy }: SecurityPolicyFormProps): 
   return (
     <div className="space-y-4">
       <label className="block space-y-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Domain Allowlist</span>
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Domain Allowlist</span>
         <textarea
           value={policy.domainAllowlist.join("\n")}
           onChange={(event) =>
@@ -57,13 +57,13 @@ export function SecurityPolicyForm({ initialPolicy }: SecurityPolicyFormProps): 
                 .filter(Boolean),
             }))
           }
-          className="min-h-28 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          className="min-h-28 w-full rounded-lg border border-[#1e2d5a]/60 bg-[#060b18] px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
           placeholder="example.com&#10;app.example.com"
         />
       </label>
 
       <label className="block space-y-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
           Restricted Actions
         </span>
         <input
@@ -77,14 +77,14 @@ export function SecurityPolicyForm({ initialPolicy }: SecurityPolicyFormProps): 
                 .filter(Boolean),
             }))
           }
-          className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm"
+          className="h-10 w-full rounded-lg border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white placeholder-slate-500 focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
           placeholder="delete, submit, purchase"
         />
       </label>
 
       <div className="grid gap-3 md:grid-cols-2">
         <label className="block space-y-2">
-          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Window Start (UTC)</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Window Start (UTC)</span>
           <input
             type="number"
             min={0}
@@ -97,11 +97,11 @@ export function SecurityPolicyForm({ initialPolicy }: SecurityPolicyFormProps): 
                   event.target.value === "" ? undefined : Number(event.target.value),
               }))
             }
-            className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm"
+            className="h-10 w-full rounded-lg border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
           />
         </label>
         <label className="block space-y-2">
-          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Window End (UTC)</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Window End (UTC)</span>
           <input
             type="number"
             min={0}
@@ -113,12 +113,12 @@ export function SecurityPolicyForm({ initialPolicy }: SecurityPolicyFormProps): 
                 allowedWindowEndHr: event.target.value === "" ? undefined : Number(event.target.value),
               }))
             }
-            className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm"
+            className="h-10 w-full rounded-lg border border-[#1e2d5a]/60 bg-[#060b18] px-3 text-sm text-white focus:border-cyan-500/60 focus:outline-none focus:ring-1 focus:ring-cyan-500/30"
           />
         </label>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-slate-700">
+      <label className="flex items-center gap-2 text-sm text-slate-300">
         <input
           type="checkbox"
           checked={policy.requireHttps}
@@ -136,8 +136,8 @@ export function SecurityPolicyForm({ initialPolicy }: SecurityPolicyFormProps): 
         <Button type="button" onClick={savePolicy} disabled={state.saving}>
           {state.saving ? "Saving..." : "Save Policy"}
         </Button>
-        {state.error ? <p className="text-xs text-rose-700">{state.error}</p> : null}
-        {state.success ? <p className="text-xs text-emerald-700">{state.success}</p> : null}
+        {state.error ? <p className="text-xs text-rose-400">{state.error}</p> : null}
+        {state.success ? <p className="text-xs text-emerald-400">{state.success}</p> : null}
       </div>
     </div>
   );

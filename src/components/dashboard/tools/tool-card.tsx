@@ -71,9 +71,9 @@ export function ToolCard({ tool, workflows }: ToolCardProps): JSX.Element {
   }
 
   return (
-    <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <p className="text-sm font-semibold text-slate-900">{tool.name}</p>
-      <p className="mt-1 text-sm text-slate-600">{tool.description}</p>
+    <article className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 backdrop-blur-sm">
+      <p className="text-sm font-semibold text-white">{tool.name}</p>
+      <p className="mt-1 text-sm text-slate-400">{tool.description}</p>
       <p className="mt-2 text-xs text-slate-500">
         Reliability {tool.reliabilityScore.toFixed(1)} • Usage {tool.usageCount}
       </p>
@@ -82,7 +82,7 @@ export function ToolCard({ tool, workflows }: ToolCardProps): JSX.Element {
         <select
           value={workflowId}
           onChange={(event) => setWorkflowId(event.target.value)}
-          className="h-9 rounded-md border border-slate-300 px-2 text-sm"
+          className="h-9 rounded-md border border-[#1e2d5a]/60 bg-[#060b18] px-2 text-sm text-white"
         >
           {workflows.map((workflow) => (
             <option key={workflow.id} value={workflow.id}>
@@ -98,9 +98,9 @@ export function ToolCard({ tool, workflows }: ToolCardProps): JSX.Element {
         </Button>
       </div>
       {typeof state.validationScore === "number" ? (
-        <p className="mt-2 text-xs text-slate-600">Validation score: {state.validationScore.toFixed(1)}</p>
+        <p className="mt-2 text-xs text-slate-400">Validation score: {state.validationScore.toFixed(1)}</p>
       ) : null}
-      {state.message ? <p className="mt-2 text-xs text-slate-600">{state.message}</p> : null}
+      {state.message ? <p className="mt-2 text-xs text-slate-400">{state.message}</p> : null}
     </article>
   );
 }
