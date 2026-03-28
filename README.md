@@ -298,7 +298,6 @@ The BullMQ worker cannot run on Vercel (serverless). Deploy it to:
 | `REDIS_URL` | ✅ | Redis connection string |
 | `NEXTAUTH_SECRET` | ✅ | 32-byte random secret (`openssl rand -base64 32`) |
 | `NEXTAUTH_URL` | ✅ prod | Full URL of your deployment |
-| `ANTHROPIC_API_KEY` | optional | NL workflow builder + sentinel briefings |
 | `SMTP_HOST` + `ALERT_EMAIL_TO` | optional | Email alerts |
 | `SLACK_WEBHOOK_URL` | optional | Slack notifications |
 | `DATAMESH_API_KEY` | optional | Public DataMesh API key validation |
@@ -316,7 +315,6 @@ The BullMQ worker cannot run on Vercel (serverless). Deploy it to:
 | Queue | BullMQ + Redis |
 | Auth | NextAuth.js v4 |
 | Web Agents | TinyFish Web Agent API |
-| LLM | Anthropic Claude Haiku 4.5 |
 | Billing | Stripe |
 | Email | Nodemailer (SMTP) |
 | Deployment | Vercel + Railway/Render (worker) |
@@ -387,7 +385,7 @@ worker/                       # BullMQ worker (separate process)
 
 <div align="center">
 
-Built on **[TinyFish AI](https://tinyfish.ai)** · Powered by **Anthropic Claude** · **TinyFish Hackathon 2026**
+Built on **[TinyFish AI](https://tinyfish.ai)** · **TinyFish Hackathon 2026**
 
 *"The web moves faster than you do. Now you don't have to."*
 

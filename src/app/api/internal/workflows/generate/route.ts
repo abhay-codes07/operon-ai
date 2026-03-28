@@ -1,4 +1,3 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -7,29 +6,6 @@ import { requireOrganizationRole } from "@/server/auth/authorization";
 const bodySchema = z.object({
   description: z.string().trim().min(10).max(2000),
 });
-
-const SYSTEM_PROMPT = `You are an AI that converts a plain-English automation task description into a structured workflow definition for an autonomous web agent platform called Operon.
-
-Return ONLY a valid JSON object — no markdown, no explanation, no code blocks. The JSON must match this exact shape:
-{
-  "name": "Short workflow name (3-6 words)",
-  "description": "One-sentence description",
-  "naturalLanguageTask": "The exact task for the agent, written clearly with all context. If the user mentions specific sites, preserve them. If they mention price/shopping, mention checking multiple sites.",
-  "targetUrl": "Best starting URL for this task, or empty string if not applicable",
-  "guardrails": ["Array of 2-4 safety rules relevant to this task"],
-  "timeoutSeconds": 300,
-  "retryLimit": 1,
-  "scheduleCron": "5-field cron if user requested scheduling (e.g. '0 9 * * 1-5'), else empty string"
-}
-
-Rules:
-- naturalLanguageTask must be actionable and specific — the agent will follow it literally
-- For shopping/price tasks: always instruct the agent to compare across Amazon, eBay, Walmart, BestBuy, and Target
-- For recurring tasks (daily, weekly, every morning): populate scheduleCron
-- targetUrl: use a real URL if obvious from context, otherwise ""
-- guardrails: practical rules like "Do not submit payment forms", "Screenshot at each step", "Stop if CAPTCHA is detected"
-- timeoutSeconds: 180 for quick tasks, 300 for medium, 600 for complex multi-site tasks
-- Always return valid JSON`;
 
 export async function POST(request: Request) {
   const user = await requireOrganizationRole("MEMBER");
@@ -41,55 +17,58 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey || apiKey === "sk-ant-REPLACE_ME") {
-    // Fallback: generate a sensible default without AI
-    const task = parsed.data.description;
-    const isPrice = /price|cost|cheap|buy|deal|compare/i.test(task);
-    const isScheduled = /daily|weekly|every day|every morning|every week|monday/i.test(task);
+  const task = parsed.data.description;
 
-    return NextResponse.json({
-      name: task.split(" ").slice(0, 5).join(" "),
-      description: task.slice(0, 120),
-      naturalLanguageTask: isPrice
-        ? `Search Google Shopping then check Amazon, eBay, Walmart, BestBuy, and Target to compare prices and collect the best price from each site for: ${task}`
-        : task,
-      targetUrl: isPrice ? "https://www.google.com/shopping" : "",
-      guardrails: [
+  const isPrice     = /price|cost|cheap|buy|deal|compare|shop|discount|sale|offer/i.test(task);
+  const isJobs      = /job|career|hiring|recruit|linkedin|glassdoor|indeed/i.test(task);
+  const isNews      = /news|article|headline|latest|update|blog|post/i.test(task);
+  const isSecurity  = /security|vuln|scan|audit|pentest|exposure|leak/i.test(task);
+  const isScheduled = /daily|weekly|every day|every morning|every week|monday|cron/i.test(task);
+
+  let naturalLanguageTask = task;
+  let targetUrl = "";
+  let timeoutSeconds = 300;
+
+  if (isPrice) {
+    naturalLanguageTask = `Search Google Shopping then check Amazon, eBay, Walmart, BestBuy, and Target to compare prices and availability for: ${task}. Return a structured comparison with price, retailer, stock status, and direct product URL for each.`;
+    targetUrl = "https://www.google.com/shopping";
+    timeoutSeconds = 600;
+  } else if (isJobs) {
+    naturalLanguageTask = `Search LinkedIn Jobs, Indeed, and Glassdoor for: ${task}. Extract job title, company, location, salary range, and application URL for the top 10 most relevant results.`;
+    targetUrl = "https://www.linkedin.com/jobs";
+    timeoutSeconds = 480;
+  } else if (isNews) {
+    naturalLanguageTask = `Search Google News and relevant sources for: ${task}. Extract the top 5 most recent articles: title, source, published date, summary, and URL.`;
+    targetUrl = "https://news.google.com";
+    timeoutSeconds = 240;
+  } else if (isSecurity) {
+    naturalLanguageTask = `Perform a surface-level security audit for: ${task}. Check for exposed admin panels, sensitive files, open directory listings, and missing security headers. Report findings with severity.`;
+    targetUrl = "";
+    timeoutSeconds = 600;
+  }
+
+  const guardrails = isSecurity
+    ? [
+        "Do not exploit any discovered vulnerabilities",
+        "Screenshot at each finding",
+        "Stop if authentication is required beyond public pages",
+        "Report findings only — do not modify any data",
+      ]
+    : [
         "Do not submit payment forms or add items to cart",
         "Screenshot at each major step",
         "Stop if CAPTCHA is detected",
         "Do not enter personal information",
-      ],
-      timeoutSeconds: isPrice ? 600 : 300,
-      retryLimit: 1,
-      scheduleCron: isScheduled ? "0 9 * * 1-5" : "",
-    });
-  }
+      ];
 
-  const client = new Anthropic({ apiKey });
-
-  const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 1024,
-    system: SYSTEM_PROMPT,
-    messages: [
-      {
-        role: "user",
-        content: `Generate a workflow definition for this task:\n\n${parsed.data.description}`,
-      },
-    ],
+  return NextResponse.json({
+    name: task.split(" ").slice(0, 5).join(" "),
+    description: task.slice(0, 120),
+    naturalLanguageTask,
+    targetUrl,
+    guardrails,
+    timeoutSeconds,
+    retryLimit: 1,
+    scheduleCron: isScheduled ? "0 9 * * 1-5" : "",
   });
-
-  const content = message.content[0];
-  if (content?.type !== "text") {
-    return NextResponse.json({ error: "AI generation failed" }, { status: 500 });
-  }
-
-  try {
-    const result = JSON.parse(content.text) as Record<string, unknown>;
-    return NextResponse.json(result);
-  } catch {
-    return NextResponse.json({ error: "AI returned invalid JSON", raw: content.text }, { status: 500 });
-  }
 }

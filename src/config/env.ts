@@ -9,7 +9,6 @@ export type AppEnv = {
   STRIPE_PRICE_STARTER: string;
   STRIPE_PRICE_GROWTH: string;
   SLACK_WEBHOOK_URL?: string;
-  ANTHROPIC_API_KEY?: string;
   ALERT_EMAIL_FROM?: string;
   ALERT_EMAIL_TO?: string;
   SMTP_HOST?: string;
@@ -110,7 +109,6 @@ export function getAppEnv(): AppEnv {
     STRIPE_PRICE_STARTER: readOptionalEnv("STRIPE_PRICE_STARTER"),
     STRIPE_PRICE_GROWTH: readOptionalEnv("STRIPE_PRICE_GROWTH"),
     SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL?.trim() || undefined,
-    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY?.trim() || undefined,
     ALERT_EMAIL_FROM: process.env.ALERT_EMAIL_FROM?.trim() || undefined,
     ALERT_EMAIL_TO: process.env.ALERT_EMAIL_TO?.trim() || undefined,
     SMTP_HOST: process.env.SMTP_HOST?.trim() || undefined,

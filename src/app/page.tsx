@@ -606,7 +606,7 @@ export default function Home(): JSX.Element {
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-xs text-slate-600 uppercase tracking-widest mb-6">Powered by & integrates with</p>
           <div className="flex flex-wrap justify-center items-center gap-8">
-            {["TinyFish AI", "Anthropic Claude", "PostgreSQL", "Redis / BullMQ", "Next.js", "Vercel"].map((tech) => (
+            {["TinyFish AI", "PostgreSQL", "Redis / BullMQ", "Next.js", "Vercel", "TypeScript"].map((tech) => (
               <span key={tech} className="text-sm font-semibold text-slate-500 hover:text-slate-300 transition-colors cursor-default">
                 {tech}
               </span>
