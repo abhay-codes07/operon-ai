@@ -36,59 +36,7 @@ type FormData = {
   agentId: string;
 };
 
-const INITIAL_WATCHES: Watch[] = [
-  {
-    id: "pw-1",
-    productName: "Sony WH-1000XM5 Headphones",
-    productUrl: "amazon.com/sony-wh1000xm5",
-    currentPrice: 279,
-    targetPrice: 249,
-    lowestEver: 228,
-    status: "WATCHING",
-    checksToday: 24,
-    priceHistory: [349, 329, 299, 289, 279, 279, 289, 279, 279, 279, 279, 279],
-    savings: 30,
-    percentOff: 10.8,
-    lastChecked: "12 minutes ago",
-    retailer: "Amazon",
-  },
-  {
-    id: "pw-2",
-    productName: 'MacBook Pro M4 14"',
-    productUrl: "apple.com/macbook-pro",
-    currentPrice: 1599,
-    targetPrice: 1399,
-    lowestEver: 1499,
-    status: "ALERT_SENT",
-    checksToday: 24,
-    priceHistory: [
-      1999, 1999, 1899, 1799, 1699, 1599, 1599, 1599, 1499, 1599, 1599, 1599,
-    ],
-    savings: 200,
-    percentOff: 12.5,
-    lastChecked: "3 hours ago",
-    alertSentAt: "3 hours ago",
-    alertPrice: 1499,
-    retailer: "Apple",
-  },
-  {
-    id: "pw-3",
-    productName: "Dyson V15 Detect Vacuum",
-    productUrl: "bestbuy.com/dyson-v15",
-    currentPrice: 649,
-    targetPrice: 499,
-    lowestEver: 524,
-    status: "WATCHING",
-    checksToday: 24,
-    priceHistory: [
-      749, 749, 699, 699, 649, 649, 649, 649, 649, 649, 649, 649,
-    ],
-    savings: 150,
-    percentOff: 23.1,
-    lastChecked: "1 hour ago",
-    retailer: "Best Buy",
-  },
-];
+const INITIAL_WATCHES: Watch[] = [];
 
 const inputClass = cn(
   "w-full rounded-lg border border-slate-700/60 bg-slate-900/60 text-slate-200",

@@ -7,7 +7,6 @@ export default async function PricewatchPage(): Promise<JSX.Element> {
 
   const agentsResult = await fetchAgentCatalog({
     organizationId: user.organizationId!,
-    status: "ACTIVE",
     page: 1,
     pageSize: 50,
   }).catch(() => ({ items: [] as Array<{ id: string; name: string }> }));
