@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { StatusFilter } from "@/components/dashboard/layout/status-filter";
 import { CreateWorkflowModal } from "@/components/dashboard/workflows/create-workflow-modal";
 import { WorkflowsTable } from "@/components/dashboard/workflows/workflows-table";
@@ -146,15 +147,17 @@ export default async function DashboardWorkflowsPage({
             />
           </form>
           <div className="flex gap-3">
-            <StatusFilter
-              options={[
-                { label: "All", value: "ALL" },
-                { label: "Draft", value: "DRAFT" },
-                { label: "Active", value: "ACTIVE" },
-                { label: "Paused", value: "PAUSED" },
-                { label: "Archived", value: "ARCHIVED" },
-              ]}
-            />
+            <Suspense fallback={null}>
+              <StatusFilter
+                options={[
+                  { label: "All", value: "ALL" },
+                  { label: "Draft", value: "DRAFT" },
+                  { label: "Active", value: "ACTIVE" },
+                  { label: "Paused", value: "PAUSED" },
+                  { label: "Archived", value: "ARCHIVED" },
+                ]}
+              />
+            </Suspense>
             <CreateWorkflowModal
               agents={agents.items
                 .filter((agent) => agent.status !== "ARCHIVED")

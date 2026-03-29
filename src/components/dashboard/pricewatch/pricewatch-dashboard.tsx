@@ -252,12 +252,15 @@ export function PricewatchDashboard({ agents }: { agents: Agent[] }) {
 
     setLoading(true);
     try {
+      const normalizedUrl = formData.productUrl.match(/^https?:\/\//)
+        ? formData.productUrl
+        : `https://${formData.productUrl}`;
       const res = await fetch("/api/internal/pricewatch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           productName: formData.productName,
-          productUrl: formData.productUrl,
+          productUrl: normalizedUrl,
           targetPrice: targetPriceNum,
           currentPrice: currentPriceNum,
           agentId: formData.agentId,
@@ -394,7 +397,6 @@ export function PricewatchDashboard({ agents }: { agents: Agent[] }) {
                 </label>
                 <input
                   required
-                  type="url"
                   className={inputClass}
                   placeholder="https://amazon.com/product/..."
                   value={formData.productUrl}

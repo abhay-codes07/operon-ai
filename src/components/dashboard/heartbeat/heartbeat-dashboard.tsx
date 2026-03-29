@@ -38,70 +38,7 @@ type Journey = {
   heartbeatHistory: number[];
 };
 
-const INITIAL_JOURNEYS: Journey[] = [
-  {
-    id: "hb-1",
-    name: "New User Signup Flow",
-    targetUrl: "app.operon-ai.com",
-    steps: [
-      "Land on homepage",
-      "Click Get Started",
-      "Fill signup form",
-      "Verify email confirmation page loads",
-      "Complete onboarding checklist",
-    ],
-    status: "HEALTHY",
-    uptime: 99.7,
-    avgDurationMs: 18400,
-    lastRunAt: "4 minutes ago",
-    lastRunStatus: "PASSED",
-    checksToday: 96,
-    failuresLast7d: 1,
-    heartbeatHistory: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-  },
-  {
-    id: "hb-2",
-    name: "Checkout & Payment Flow",
-    targetUrl: "app.operon-ai.com/billing",
-    steps: [
-      "Navigate to billing",
-      "Click Upgrade to Pro",
-      "Fill payment form with test card 4242 4242 4242 4242",
-      "Confirm subscription confirmation page",
-      "Verify email receipt mention",
-    ],
-    status: "DEGRADED",
-    uptime: 94.2,
-    avgDurationMs: 31200,
-    lastRunAt: "19 minutes ago",
-    lastRunStatus: "FAILED",
-    failureStep: "Fill payment form with test card 4242 4242 4242 4242",
-    failureReason: "Payment form did not render within 8 seconds — possible Stripe JS load failure",
-    checksToday: 96,
-    failuresLast7d: 8,
-    heartbeatHistory: [1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0],
-  },
-  {
-    id: "hb-3",
-    name: "Agent Creation Flow",
-    targetUrl: "app.operon-ai.com/dashboard/agents",
-    steps: [
-      "Login as test user",
-      "Click Create Agent",
-      "Fill agent name and description",
-      "Submit form",
-      "Verify agent appears in agents list",
-    ],
-    status: "HEALTHY",
-    uptime: 100,
-    avgDurationMs: 12100,
-    lastRunAt: "2 minutes ago",
-    lastRunStatus: "PASSED",
-    checksToday: 96,
-    failuresLast7d: 0,
-    heartbeatHistory: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  },
-];
+const INITIAL_JOURNEYS: Journey[] = [];
 
 const inputClass = cn(
   "w-full rounded-lg border border-slate-700/60 bg-slate-900/60 text-slate-200",
@@ -589,6 +526,16 @@ export function HeartbeatDashboard({ agents }: { agents: Agent[] }) {
           <JourneyCard key={journey.id} journey={journey} />
         ))}
       </div>
+
+      {journeys.length === 0 && (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/40 py-16 text-center">
+          <HeartPulse className="h-10 w-10 text-slate-700 mb-3" />
+          <p className="text-slate-400 font-medium">No journeys being monitored</p>
+          <p className="text-slate-600 text-sm mt-1">
+            Click &quot;Add Journey&quot; to start synthetic monitoring.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

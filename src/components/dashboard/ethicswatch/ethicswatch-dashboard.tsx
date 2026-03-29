@@ -346,12 +346,15 @@ export function EthicswatchDashboard({ agents }: { agents: Agent[] }) {
 
     setLoading(true);
     try {
+      const normalizedUrl = formData.organizationUrl.match(/^https?:\/\//)
+        ? formData.organizationUrl
+        : `https://${formData.organizationUrl}`;
       const res = await fetch("/api/internal/ethicswatch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           organizationName: formData.organizationName,
-          organizationUrl: formData.organizationUrl,
+          organizationUrl: normalizedUrl,
           watchCategories: formData.watchCategories,
           agentId: formData.agentId,
         }),
@@ -365,7 +368,7 @@ export function EthicswatchDashboard({ agents }: { agents: Agent[] }) {
       const newMonitor: Monitor = {
         id: `ew-${Date.now()}`,
         organizationName: formData.organizationName,
-        organizationUrl: formData.organizationUrl,
+        organizationUrl: normalizedUrl,
         categories: formData.watchCategories,
         status: "MONITORING",
         severity: null,
@@ -482,7 +485,6 @@ export function EthicswatchDashboard({ agents }: { agents: Agent[] }) {
                 </label>
                 <input
                   required
-                  type="url"
                   className={inputClass}
                   placeholder="https://company.com/sustainability"
                   value={formData.organizationUrl}

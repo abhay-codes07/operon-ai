@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 
@@ -15,7 +16,9 @@ export function ComplianceApprovalPanel({
   canApprove,
   isApproved,
 }: ComplianceApprovalPanelProps): JSX.Element {
+  const router = useRouter();
   const [notes, setNotes] = useState("");
+  const [localApproved, setLocalApproved] = useState(isApproved);
   const [state, setState] = useState<{
     loading: boolean;
     error?: string;
@@ -60,10 +63,12 @@ export function ComplianceApprovalPanel({
       return;
     }
 
+    setLocalApproved(true);
     setState({
       loading: false,
       success: "Workflow approved for production execution.",
     });
+    router.refresh();
   }
 
   async function rejectOrRevoke() {
@@ -79,10 +84,12 @@ export function ComplianceApprovalPanel({
       return;
     }
 
+    setLocalApproved(false);
     setState({
       loading: false,
       success: "Approval revoked.",
     });
+    router.refresh();
   }
 
   return (
@@ -94,16 +101,25 @@ export function ComplianceApprovalPanel({
         </p>
       </div>
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Button type="button" variant="secondary" disabled={state.loading} onClick={requestApproval}>
-          Request Approval
-        </Button>
+        {!localApproved && (
+          <Button type="button" variant="secondary" disabled={state.loading} onClick={requestApproval}>
+            Request Approval
+          </Button>
+        )}
         {canApprove ? (
           <>
-            <Button type="button" disabled={state.loading} onClick={approve}>
-              Approve
-            </Button>
+            {!localApproved && (
+              <Button type="button" disabled={state.loading} onClick={approve}>
+                Approve
+              </Button>
+            )}
+            {localApproved && (
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-sm font-semibold text-emerald-400">
+                ✓ Approved for production
+              </span>
+            )}
             <Button type="button" variant="ghost" disabled={state.loading} onClick={rejectOrRevoke}>
-              {isApproved ? "Revoke" : "Reject"}
+              {localApproved ? "Revoke" : "Reject"}
             </Button>
           </>
         ) : null}
