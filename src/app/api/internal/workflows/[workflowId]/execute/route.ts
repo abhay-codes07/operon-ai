@@ -17,6 +17,7 @@ import {
   resolveWorkflowForExecution,
 } from "@/server/services/workflows/release-manager-service";
 import { fetchWorkflowById } from "@/server/services/workflows/workflow-service";
+import { triggerWorker } from "@/lib/worker/trigger";
 
 const paramsSchema = z.object({
   workflowId: z.string().trim().min(1),
@@ -199,6 +200,9 @@ export async function POST(request: Request, context: RouteContext) {
       traceId,
     },
   });
+
+  // Trigger worker server-side so it's not cancelled if user navigates away
+  triggerWorker(execution.id);
 
   return NextResponse.json(
     {

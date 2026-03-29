@@ -8,6 +8,7 @@ import {
   queueExecution,
 } from "@/server/services/executions/execution-service";
 import { createWorkflowTemplate } from "@/server/services/workflows/workflow-service";
+import { triggerWorkers } from "@/lib/worker/trigger";
 
 const swarmLaunchSchema = z.object({
   agentId: z.string().trim().min(1),
@@ -80,6 +81,9 @@ export async function POST(request: Request) {
       return { executionId: execution.id, targetUrl };
     }),
   );
+
+  // Trigger workers server-side (independent Vercel invocations, not cancelled on navigation)
+  triggerWorkers(executions.map((e) => e.executionId));
 
   return NextResponse.json({ swarmId, executions }, { status: 201 });
 }

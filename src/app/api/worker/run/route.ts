@@ -5,10 +5,9 @@ import { prisma } from "@/server/db/client";
 import { runExecutionWithTinyFish } from "@/server/services/executions/tinyfish-execution-runner";
 import { appendExecutionEvent, setExecutionStatus } from "@/server/services/executions/execution-service";
 
-// Vercel Hobby plan: max 60s. Pro plan: up to 300s.
-// TinyFish is synchronous and takes 30-90s per task.
-// Process ONE execution at a time to stay within timeout.
-export const maxDuration = 60;
+// Vercel Pro plan supports up to 300s. TinyFish tasks can take 60-300s.
+// Process ONE execution at a time within this window.
+export const maxDuration = 300;
 
 export async function GET(request: Request) {
   // Allow: valid CRON_SECRET bearer token, or authenticated user session
@@ -22,6 +21,30 @@ export async function GET(request: Request) {
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+  }
+
+  // Reconcile executions stuck in RUNNING for > 6 minutes (Vercel killed them before completion)
+  const stuckCutoff = new Date(Date.now() - 6 * 60 * 1000);
+  const stuckExecutions = await prisma.execution.findMany({
+    where: { status: "RUNNING", updatedAt: { lt: stuckCutoff } },
+    select: { id: true, organizationId: true },
+    take: 10,
+  });
+  if (stuckExecutions.length > 0) {
+    await Promise.all(
+      stuckExecutions.map(async (ex) => {
+        await prisma.execution.update({
+          where: { id: ex.id },
+          data: { status: "QUEUED" },
+        });
+        await appendExecutionEvent({
+          organizationId: ex.organizationId,
+          executionId: ex.id,
+          level: "WARN",
+          message: "Execution was stuck in RUNNING state — re-queued for retry",
+        });
+      }),
+    );
   }
 
   const url = new URL(request.url);
