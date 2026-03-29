@@ -7,6 +7,8 @@ import {
   appendExecutionEvent,
   queueExecution,
 } from "@/server/services/executions/execution-service";
+import { createWorkflowTemplate } from "@/server/services/workflows/workflow-service";
+import { triggerWorkers } from "@/lib/worker/trigger";
 
 const reconLaunchSchema = z.object({
   domain: z.string().trim().min(1),
@@ -53,16 +55,42 @@ export async function POST(request: Request) {
 
   const checks = await Promise.all(
     CHECK_TYPES.map(async (checkType) => {
+      const task = buildTaskPrompt(checkType, domain);
+      const targetUrl = domain.startsWith("http://") || domain.startsWith("https://") ? domain : `https://${domain}`;
+
+      // Auto-create a workflow so the worker can process this execution
+      const workflow = await createWorkflowTemplate({
+        organizationId: user.organizationId!,
+        agentId,
+        createdById: user.id,
+        name: `Recon: ${checkType} — ${domain.slice(0, 40)}`,
+        definition: {
+          naturalLanguageTask: task,
+          steps: [
+            {
+              id: crypto.randomUUID(),
+              action: "Navigate and inspect",
+              target: targetUrl,
+              expectedOutcome: `Security check: ${checkType}`,
+            },
+          ],
+          guardrails: [],
+          timeoutSeconds: 120,
+          retryLimit: 1,
+        },
+      });
+
       const execution = await queueExecution({
         organizationId: user.organizationId!,
         agentId,
+        workflowId: workflow.id,
         requestedById: user.id,
         trigger: "MANUAL",
         inputPayload: {
           reconId,
           checkType,
-          targetUrl: domain,
-          taskOverride: buildTaskPrompt(checkType, domain),
+          targetUrl,
+          taskOverride: task,
         },
       });
 
@@ -76,6 +104,9 @@ export async function POST(request: Request) {
       return { executionId: execution.id, checkType };
     }),
   );
+
+  // Trigger workers server-side so executions run even if user navigates away
+  triggerWorkers(checks.map((c) => c.executionId));
 
   return NextResponse.json({ reconId, checks }, { status: 201 });
 }

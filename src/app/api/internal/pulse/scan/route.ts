@@ -7,6 +7,8 @@ import {
   appendExecutionEvent,
   queueExecution,
 } from "@/server/services/executions/execution-service";
+import { createWorkflowTemplate } from "@/server/services/workflows/workflow-service";
+import { triggerWorkers } from "@/lib/worker/trigger";
 
 const pulseScanSchema = z.object({
   domain: z.string().trim().min(1),
@@ -40,16 +42,42 @@ export async function POST(request: Request) {
 
   const scans = await Promise.all(
     SCAN_TYPES.map(async (scanType) => {
+      const task = buildScanPrompt(scanType, domain);
+      const targetUrl = domain.startsWith("http://") || domain.startsWith("https://") ? domain : `https://${domain}`;
+
+      // Auto-create a workflow so the worker can process this execution
+      const workflow = await createWorkflowTemplate({
+        organizationId: user.organizationId!,
+        agentId,
+        createdById: user.id,
+        name: `Pulse: ${scanType} — ${domain.slice(0, 40)}`,
+        definition: {
+          naturalLanguageTask: task,
+          steps: [
+            {
+              id: crypto.randomUUID(),
+              action: "Navigate and extract",
+              target: targetUrl,
+              expectedOutcome: `Competitive intel: ${scanType}`,
+            },
+          ],
+          guardrails: [],
+          timeoutSeconds: 120,
+          retryLimit: 1,
+        },
+      });
+
       const execution = await queueExecution({
         organizationId: user.organizationId!,
         agentId,
+        workflowId: workflow.id,
         requestedById: user.id,
         trigger: "MANUAL",
         inputPayload: {
           pulseId,
           scanType,
-          targetUrl: domain,
-          taskOverride: buildScanPrompt(scanType, domain),
+          targetUrl,
+          taskOverride: task,
         },
       });
 
@@ -63,6 +91,9 @@ export async function POST(request: Request) {
       return { executionId: execution.id, scanType };
     }),
   );
+
+  // Trigger workers server-side so executions run even if user navigates away
+  triggerWorkers(scans.map((s) => s.executionId));
 
   return NextResponse.json({ pulseId, scans }, { status: 201 });
 }

@@ -10,10 +10,10 @@ import { appendExecutionEvent, setExecutionStatus } from "@/server/services/exec
 export const maxDuration = 300;
 
 export async function GET(request: Request) {
-  // Allow: valid CRON_SECRET bearer token, or authenticated user session
+  // Allow: valid CRON_SECRET bearer token, authenticated user session, or open when no secret configured
   const cronSecret = process.env.CRON_SECRET;
   const auth = request.headers.get("authorization");
-  const isValidCronSecret = cronSecret && auth === `Bearer ${cronSecret}`;
+  const isValidCronSecret = !cronSecret || auth === `Bearer ${cronSecret}`;
 
   if (!isValidCronSecret) {
     // Fall back to checking for a valid user session (browser-triggered)
