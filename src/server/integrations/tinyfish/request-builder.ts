@@ -93,10 +93,19 @@ const SITE_MAP: Record<string, string> = {
 
 type UrlExtractionResult = { url: string; goalPrefix: string | null };
 
+function normalizeUrl(raw: string): string {
+  const trimmed = raw.trim();
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
+  return "https://" + trimmed;
+}
+
 function extractUrlAndIntent(definition: WorkflowDefinition): UrlExtractionResult {
-  // Priority 1: Explicit targetUrl field in definition
-  const targetUrl = (definition as Record<string, unknown>)?.targetUrl as string | undefined;
-  if (targetUrl && isValidUrl(targetUrl)) return { url: targetUrl, goalPrefix: null };
+  // Priority 1: Explicit targetUrl field in definition (normalize missing protocol)
+  const rawTargetUrl = (definition as Record<string, unknown>)?.targetUrl as string | undefined;
+  if (rawTargetUrl) {
+    const targetUrl = normalizeUrl(rawTargetUrl);
+    if (isValidUrl(targetUrl)) return { url: targetUrl, goalPrefix: null };
+  }
 
   const task = definition.naturalLanguageTask.toLowerCase();
 

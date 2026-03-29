@@ -42,7 +42,11 @@ export function SwarmLaunchForm({ agents }: SwarmLaunchFormProps) {
 
     const targetUrls = urlsText
       .split("\n")
-      .map((u) => u.trim())
+      .map((u) => {
+        const t = u.trim();
+        if (!t) return "";
+        return t.startsWith("http://") || t.startsWith("https://") ? t : "https://" + t;
+      })
       .filter(Boolean);
 
     if (targetUrls.length === 0) {
@@ -65,7 +69,11 @@ export function SwarmLaunchForm({ agents }: SwarmLaunchFormProps) {
 
     const targetUrls = urlsText
       .split("\n")
-      .map((u) => u.trim())
+      .map((u) => {
+        const t = u.trim();
+        if (!t) return "";
+        return t.startsWith("http://") || t.startsWith("https://") ? t : "https://" + t;
+      })
       .filter(Boolean);
 
     try {
