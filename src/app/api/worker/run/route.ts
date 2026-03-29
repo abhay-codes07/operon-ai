@@ -4,9 +4,6 @@ import { prisma } from "@/server/db/client";
 import { runExecutionWithTinyFish } from "@/server/services/executions/tinyfish-execution-runner";
 import { appendExecutionEvent, setExecutionStatus } from "@/server/services/executions/execution-service";
 
-// Allow up to 5 minutes for long-running TinyFish executions (Vercel Pro)
-export const maxDuration = 300;
-
 export async function GET(request: Request) {
   // Verify cron/worker secret in production
   const cronSecret = process.env.CRON_SECRET;
