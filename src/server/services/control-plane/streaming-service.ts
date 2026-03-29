@@ -18,8 +18,14 @@ function getPublisher() {
 
   publisherClient = new IORedis(getAppEnv().REDIS_URL, {
     maxRetriesPerRequest: null,
-    enableReadyCheck: true,
+    enableReadyCheck: false,
+    lazyConnect: true,
+    retryStrategy: () => null, // don't retry — fail fast
   });
+
+  // Prevent unhandled error events from crashing the process
+  publisherClient.on("error", () => null);
+
   return publisherClient;
 }
 
@@ -42,17 +48,22 @@ export async function publishExecutionStreamEvent(input: {
     payload: input.payload,
   });
 
-  await getPublisher().publish(
-    CONTROL_PLANE_CHANNEL,
-    JSON.stringify({
-      organizationId: event.organizationId,
-      executionId: event.executionId,
-      sequence: event.sequence,
-      eventType: event.eventType,
-      payload: event.payload,
-      occurredAt: event.occurredAt,
-    }),
-  );
+  // Redis pub/sub is best-effort — if Redis is unavailable, still return the persisted event
+  try {
+    await getPublisher().publish(
+      CONTROL_PLANE_CHANNEL,
+      JSON.stringify({
+        organizationId: event.organizationId,
+        executionId: event.executionId,
+        sequence: event.sequence,
+        eventType: event.eventType,
+        payload: event.payload,
+        occurredAt: event.occurredAt,
+      }),
+    );
+  } catch {
+    // Redis unavailable — event is already persisted to DB, live streaming just won't work
+  }
 
   return event;
 }

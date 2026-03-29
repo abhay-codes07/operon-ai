@@ -35,83 +35,58 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[#1e2d5a]/60">
-      <table className="min-w-full divide-y divide-[#1e2d5a]/40 bg-[#0d1428]/80">
-        <thead className="bg-[#060b18]/60">
-          <tr>
-            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Workflow</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Status</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">SLA</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">Compliance</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Schedule
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Steps
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-[#1e2d5a]/30">
-          {items.map((workflow) => (
-            <tr key={workflow.id} className="transition-colors hover:bg-[#1e2d5a]/20">
-              <td className="px-4 py-3">
-                <p className="text-sm font-semibold text-white">{workflow.name}</p>
-                <p className="text-xs text-slate-400">
-                  {workflow.description ?? workflow.definition?.naturalLanguageTask ?? ""}
-                </p>
-                <div className="mt-1 flex gap-2 text-xs">
-                  <Link href={`/workflows/${workflow.id}/sla`} className="text-cyan-400 hover:underline">
-                    SLA
-                  </Link>
-                  <Link href={`/workflows/${workflow.id}/compliance`} className="text-cyan-400 hover:underline">
-                    Compliance
-                  </Link>
-                  <Link href={`/workflows/${workflow.id}/finops`} className="text-cyan-400 hover:underline">
-                    FinOps
-                  </Link>
-                  <Link href={`/workflows/${workflow.id}/shield`} className="text-cyan-400 hover:underline">
-                    Shield
-                  </Link>
-                </div>
-              </td>
-              <td className="px-4 py-3">
+    <div className="space-y-3">
+      {items.map((workflow) => (
+        <div key={workflow.id} className="rounded-xl border border-[#1e2d5a]/60 bg-[#0d1428]/80 p-4 hover:bg-[#0d1428] transition-colors">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-4">
+            {/* Workflow info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <p className="text-sm font-semibold text-white truncate">{workflow.name}</p>
                 <WorkflowStatusBadge status={workflow.status} />
-              </td>
-              <td className="px-4 py-3">
-                {workflow.hasSla ? <WorkflowHealthBadge state={workflow.slaState} /> : <span className="text-xs text-slate-500">Not configured</span>}
-              </td>
-              <td className="px-4 py-3">
                 <span
-                  className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${
+                  className={`inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold ${
                     workflow.complianceApproved
                       ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
                       : "border-amber-500/30 bg-amber-500/10 text-amber-400"
                   }`}
                 >
-                  {workflow.complianceApproved ? "Approved" : "Pending"}
+                  {workflow.complianceApproved ? "✓ Approved" : "⚠ Pending"}
                 </span>
-              </td>
-              <td className="px-4 py-3 text-sm text-slate-400">{workflow.scheduleCron ?? "Manual trigger"}</td>
-              <td className="px-4 py-3 text-sm text-slate-400">
-                {workflow.definition?.steps?.length ?? 0}
-                <div className="mt-1 text-xs text-slate-500">
-                  Blast Radius: {workflow.blastRadiusScore ?? 0}/100{" "}
-                  {(workflow.blastRadiusScore ?? 0) <= 10 ? "(Sandboxed)" : ""}
-                </div>
-              </td>
-              <td className="px-4 py-3">
-                <RunWorkflowButton
-                  workflowId={workflow.id}
-                  disabled={workflow.status === "ARCHIVED"}
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+              <p className="text-xs text-slate-400 mb-2 line-clamp-1">
+                {workflow.description ?? workflow.definition?.naturalLanguageTask ?? ""}
+              </p>
+              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                <span>{workflow.scheduleCron ?? "Manual trigger"}</span>
+                <span>·</span>
+                <span>{workflow.definition?.steps?.length ?? 0} steps</span>
+                <span>·</span>
+                <span>Blast: {workflow.blastRadiusScore ?? 0}/100</span>
+                {workflow.hasSla && (
+                  <>
+                    <span>·</span>
+                    <WorkflowHealthBadge state={workflow.slaState} />
+                  </>
+                )}
+              </div>
+              <div className="mt-2 flex gap-3 text-xs">
+                <Link href={`/workflows/${workflow.id}/sla`} className="text-cyan-400 hover:underline">SLA</Link>
+                <Link href={`/workflows/${workflow.id}/compliance`} className="text-cyan-400 hover:underline">Compliance</Link>
+                <Link href={`/workflows/${workflow.id}/finops`} className="text-cyan-400 hover:underline">FinOps</Link>
+                <Link href={`/workflows/${workflow.id}/shield`} className="text-cyan-400 hover:underline">Shield</Link>
+              </div>
+            </div>
+            {/* Actions */}
+            <div className="flex-shrink-0">
+              <RunWorkflowButton
+                workflowId={workflow.id}
+                disabled={workflow.status === "ARCHIVED"}
+              />
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

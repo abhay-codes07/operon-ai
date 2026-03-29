@@ -5,6 +5,11 @@ import { prisma } from "@/server/db/client";
 import { runExecutionWithTinyFish } from "@/server/services/executions/tinyfish-execution-runner";
 import { appendExecutionEvent, setExecutionStatus } from "@/server/services/executions/execution-service";
 
+// Vercel Hobby plan: max 60s. Pro plan: up to 300s.
+// TinyFish is synchronous and takes 30-90s per task.
+// Process ONE execution at a time to stay within timeout.
+export const maxDuration = 60;
+
 export async function GET(request: Request) {
   // Allow: valid CRON_SECRET bearer token, or authenticated user session
   const cronSecret = process.env.CRON_SECRET;
@@ -19,14 +24,14 @@ export async function GET(request: Request) {
     }
   }
 
-  // Find the oldest QUEUED executions that have a workflowId
-  const executions = await prisma.execution.findMany({
+  // Pick up the oldest QUEUED execution with a workflowId
+  // Process ONE at a time — TinyFish is synchronous and takes 30-90s
+  const execution = await prisma.execution.findFirst({
     where: {
       status: "QUEUED",
       workflowId: { not: null },
     },
     orderBy: { createdAt: "asc" },
-    take: 3,
     select: {
       id: true,
       organizationId: true,
@@ -35,52 +40,44 @@ export async function GET(request: Request) {
     },
   });
 
-  if (executions.length === 0) {
+  if (!execution) {
     return NextResponse.json({ processed: 0, message: "No queued executions" });
   }
 
-  const results = await Promise.allSettled(
-    executions.map(async (exec) => {
-      await appendExecutionEvent({
-        organizationId: exec.organizationId,
-        executionId: exec.id,
-        level: "INFO",
-        message: "Execution picked up by Vercel cron worker",
-      });
+  await appendExecutionEvent({
+    organizationId: execution.organizationId,
+    executionId: execution.id,
+    level: "INFO",
+    message: "Execution picked up by worker",
+  });
 
-      return runExecutionWithTinyFish({
-        organizationId: exec.organizationId,
-        executionId: exec.id,
-        agentId: exec.agentId,
-        workflowId: exec.workflowId!,
-        traceId: crypto.randomUUID(),
-      });
-    }),
-  );
+  try {
+    await runExecutionWithTinyFish({
+      organizationId: execution.organizationId,
+      executionId: execution.id,
+      agentId: execution.agentId,
+      workflowId: execution.workflowId!,
+      traceId: crypto.randomUUID(),
+    });
 
-  // Mark any that threw as FAILED
-  for (let i = 0; i < results.length; i++) {
-    const result = results[i];
-    if (result?.status === "rejected") {
-      const exec = executions[i];
-      if (exec) {
-        await setExecutionStatus({
-          organizationId: exec.organizationId,
-          executionId: exec.id,
-          status: "FAILED",
-        }).catch(() => null);
-        await appendExecutionEvent({
-          organizationId: exec.organizationId,
-          executionId: exec.id,
-          level: "ERROR",
-          message: `Worker failed: ${String(result.reason)}`,
-        }).catch(() => null);
-      }
-    }
+    return NextResponse.json({ processed: 1, failed: 0, executionId: execution.id });
+  } catch (error) {
+    await setExecutionStatus({
+      organizationId: execution.organizationId,
+      executionId: execution.id,
+      status: "FAILED",
+    }).catch(() => null);
+
+    await appendExecutionEvent({
+      organizationId: execution.organizationId,
+      executionId: execution.id,
+      level: "ERROR",
+      message: `Worker failed: ${String(error)}`,
+    }).catch(() => null);
+
+    return NextResponse.json(
+      { processed: 0, failed: 1, executionId: execution.id, error: String(error) },
+      { status: 500 },
+    );
   }
-
-  const processed = results.filter((r) => r.status === "fulfilled").length;
-  const failed = results.filter((r) => r.status === "rejected").length;
-
-  return NextResponse.json({ processed, failed, total: executions.length });
 }

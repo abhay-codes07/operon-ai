@@ -63,6 +63,7 @@ export async function executeTinyFishWorkflow(
   const timeoutHandle = setTimeout(() => controller.abort(), config.timeoutMs);
 
   try {
+    const requestBody = JSON.stringify(request);
     logInfo("Dispatching TinyFish execution request", {
       component: "tinyfish-client",
       executionId: request.requestId,
@@ -72,7 +73,16 @@ export async function executeTinyFishWorkflow(
         stepCount: request.steps.length,
         url: request.url,
         goal: request.goal,
+        endpoint: `${config.baseUrl}${config.executePath}`,
       },
+    });
+    console.log("[TinyFish Request]", {
+      endpoint: `${config.baseUrl}${config.executePath}`,
+      requestId: request.requestId,
+      url: request.url,
+      goal: request.goal,
+      stepCount: request.steps.length,
+      requestBodySample: requestBody.substring(0, 500),
     });
 
     const response = await fetch(`${config.baseUrl}${config.executePath}`, {
@@ -86,28 +96,38 @@ export async function executeTinyFishWorkflow(
       signal: controller.signal,
     });
 
-    const payload = (await response.json().catch(() => null)) as unknown;
+    // Read raw text first for debugging, then parse as JSON
+    const rawText = await response.text().catch(() => "");
+
+    console.log("[TinyFish Raw Response]", {
+      executionId: request.requestId,
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get("content-type"),
+      rawBody: rawText.substring(0, 1000),
+    });
+
+    let payload: unknown = null;
+    try {
+      payload = rawText ? JSON.parse(rawText) : null;
+    } catch {
+      // Not JSON — payload stays null
+    }
 
     if (!response.ok) {
       console.error("[TinyFish API Error]", {
         status: response.status,
         statusText: response.statusText,
+        rawBody: rawText.substring(0, 500),
         payload,
         requestId: request.requestId,
       });
       throw new TinyFishApiError(
-        `TinyFish request failed with status ${response.status}`,
+        `TinyFish request failed with status ${response.status}: ${rawText.substring(0, 200)}`,
         response.status,
         payload,
       );
     }
-
-    const responseStr = typeof payload === "string" ? payload : JSON.stringify(payload);
-    console.log("[TinyFish Response]", {
-      executionId: request.requestId,
-      responseLength: responseStr.length,
-      responseSample: responseStr.substring(0, 500),
-    });
 
     logInfo("TinyFish execution request accepted", {
       component: "tinyfish-client",
@@ -118,20 +138,27 @@ export async function executeTinyFishWorkflow(
 
     // Normalize TinyFish API response to our internal format.
     // TinyFish uses different field names and status strings than our type contract.
-    const raw = payload as Record<string, unknown>;
+    // Guard against null/non-JSON response bodies.
+    const raw = (payload != null && typeof payload === "object" ? payload : {}) as Record<string, unknown>;
     const normalized: TinyFishExecutionResponse = {
       // TinyFish uses "run_id"; fall back to our requestId if absent
-      providerExecutionId: (raw.run_id as string) ?? request.requestId,
+      providerExecutionId: (raw.run_id as string) ?? (raw.id as string) ?? request.requestId,
       // Normalize status: TinyFish returns uppercase "COMPLETED"/"FAILED"
       status: normalizeTinyFishStatus(raw.status as string),
       // TinyFish uses "result" for output data
       output: (raw.result ?? raw.output) as Record<string, unknown> | undefined,
-      summary: raw.summary as string | undefined,
+      summary: (raw.summary ?? (rawText && !payload ? rawText.substring(0, 500) : undefined)) as string | undefined,
       // TinyFish may not return events/screenshots; default to empty arrays
       events: (raw.events as TinyFishExecutionResponse["events"]) ?? [],
       screenshots: (raw.screenshots as TinyFishExecutionResponse["screenshots"]) ?? [],
       error: raw.error as TinyFishExecutionResponse["error"] | undefined,
     };
+
+    console.log("[TinyFish Normalized]", {
+      executionId: request.requestId,
+      providerExecutionId: normalized.providerExecutionId,
+      status: normalized.status,
+    });
 
     return normalized;
   } catch (error) {
