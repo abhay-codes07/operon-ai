@@ -54,7 +54,7 @@ export function CompetitorManager({ initialItems }: CompetitorManagerProps): JSX
 
   return (
     <div className="space-y-3">
-      <div className="grid gap-2 md:grid-cols-[1fr,1fr,auto]">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <input
           value={name}
           onChange={(event) => setName(event.target.value)}

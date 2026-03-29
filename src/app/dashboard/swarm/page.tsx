@@ -70,7 +70,6 @@ export default async function DashboardSwarmPage(): Promise<JSX.Element> {
   const [agentsResult, recentSwarms] = await Promise.all([
     fetchAgentCatalog({
       organizationId: user.organizationId!,
-      status: "ACTIVE",
       page: 1,
       pageSize: 50,
     }).catch(() => ({ items: [] as Array<{ id: string; name: string }> })),
