@@ -15,44 +15,37 @@ const snapbuySchema = z.object({
   savedDetails: z.string().optional(),
 });
 
-const mockSnipes = [
-  {
-    id: "snipe-1",
-    name: "RTX 5090 GPU Restock",
-    watchUrl: "bestbuy.com/rtx-5090",
-    triggerCondition: "Item comes back in stock",
-    actionTask: "Add to cart and complete checkout with saved payment",
-    status: "TRIGGERED",
-    triggeredAt: "2 minutes ago",
-    result: "Successfully purchased — Order #BB-2847291",
-    checkCount: 847,
-  },
-  {
-    id: "snipe-2",
-    name: "iPhone 16 Pro — Price Drop",
-    watchUrl: "amazon.com/iphone-16-pro",
-    triggerCondition: "Price drops below $899",
-    actionTask: "Add to cart, apply any available coupons, checkout",
-    status: "WATCHING",
-    currentValue: "$979",
-    targetValue: "$899",
-    checkCount: 234,
-  },
-  {
-    id: "snipe-3",
-    name: "Taylor Swift Eras Tour Ticket",
-    watchUrl: "ticketmaster.com/taylor-swift-eras",
-    triggerCondition: "Any floor/pit tickets become available under $400",
-    actionTask: "Select best available seats and complete purchase",
-    status: "WATCHING",
-    currentValue: "Sold Out",
-    checkCount: 1203,
-  },
-];
-
 export async function GET() {
-  await requireOrganizationRole("MEMBER");
-  return NextResponse.json({ snipes: mockSnipes });
+  const user = await requireOrganizationRole("MEMBER");
+
+  const workflows = await prisma.workflow.findMany({
+    where: {
+      organizationId: user.organizationId!,
+      definition: { path: ["type"], equals: "snapbuy" },
+    },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      name: true,
+      definition: true,
+      createdAt: true,
+    },
+  });
+
+  const snipes = workflows.map((w) => {
+    const def = w.definition as Record<string, unknown>;
+    return {
+      id: w.id,
+      name: w.name,
+      watchUrl: (def.watchUrl as string) ?? "",
+      triggerCondition: (def.triggerCondition as string) ?? "",
+      actionTask: (def.actionTask as string) ?? "",
+      status: (def.status as string) ?? "WATCHING",
+      checkCount: 0,
+    };
+  });
+
+  return NextResponse.json({ snipes });
 }
 
 export async function POST(request: Request) {
@@ -74,6 +67,11 @@ export async function POST(request: Request) {
         actionTask: data.actionTask,
         savedDetails: data.savedDetails ?? "",
         status: "WATCHING",
+        naturalLanguageTask: `Watch ${data.watchUrl} and ${data.actionTask} when: ${data.triggerCondition}`,
+        steps: [],
+        guardrails: [],
+        timeoutSeconds: 30,
+        retryLimit: 2,
       },
     },
   });
@@ -90,6 +88,16 @@ export async function POST(request: Request) {
       actionTask: data.actionTask,
     },
   });
+
+  // Trigger worker (fire-and-forget from server; client also triggers independently)
+  const baseUrl = process.env.NEXTAUTH_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+  if (baseUrl) {
+    const headers: Record<string, string> = {};
+    if (process.env.CRON_SECRET) {
+      headers["authorization"] = `Bearer ${process.env.CRON_SECRET}`;
+    }
+    fetch(`${baseUrl}/api/worker/run`, { headers }).catch(() => null);
+  }
 
   return NextResponse.json({ snipeId: workflow.id }, { status: 201 });
 }

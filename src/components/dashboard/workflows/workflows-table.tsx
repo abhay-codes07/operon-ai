@@ -60,7 +60,7 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
               <td className="px-4 py-3">
                 <p className="text-sm font-semibold text-white">{workflow.name}</p>
                 <p className="text-xs text-slate-400">
-                  {workflow.description ?? workflow.definition.naturalLanguageTask}
+                  {workflow.description ?? workflow.definition?.naturalLanguageTask ?? ""}
                 </p>
                 <div className="mt-1 flex gap-2 text-xs">
                   <Link href={`/workflows/${workflow.id}/sla`} className="text-cyan-400 hover:underline">
@@ -96,7 +96,7 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
               </td>
               <td className="px-4 py-3 text-sm text-slate-400">{workflow.scheduleCron ?? "Manual trigger"}</td>
               <td className="px-4 py-3 text-sm text-slate-400">
-                {workflow.definition.steps.length}
+                {workflow.definition?.steps?.length ?? 0}
                 <div className="mt-1 text-xs text-slate-500">
                   Blast Radius: {workflow.blastRadiusScore ?? 0}/100{" "}
                   {(workflow.blastRadiusScore ?? 0) <= 10 ? "(Sandboxed)" : ""}

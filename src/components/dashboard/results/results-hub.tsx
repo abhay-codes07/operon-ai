@@ -131,7 +131,7 @@ function RunCard({ run }: { run: RunResult }) {
   const preview = extractOutputPreview(run.outputPayload);
 
   return (
-    <Link href={`/dashboard/activity/executions/${run.id}`} className="block group">
+    <Link href={`/dashboard/activity/${run.id}`} className="block group">
       <article className={`relative rounded-xl border ${cfg.bg} bg-slate-900/60 p-4 hover:bg-slate-800/60 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg`}>
         {/* Header */}
         <div className="flex items-start justify-between gap-3 mb-3">

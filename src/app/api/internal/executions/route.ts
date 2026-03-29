@@ -56,9 +56,7 @@ export async function POST(request: Request) {
   });
 
   // Immediately trigger the worker to process this execution without waiting for the cron
-  const baseUrl = process.env.NEXTAUTH_URL ?? process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : null;
+  const baseUrl = process.env.NEXTAUTH_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
   if (baseUrl) {
     const workerUrl = `${baseUrl}/api/worker/run`;
     const headers: Record<string, string> = {};

@@ -15,50 +15,43 @@ const pricewatchSchema = z.object({
   checkIntervalHours: z.number().int().min(1).max(24).default(1),
 });
 
-const mockWatches = [
-  {
-    id: "pw-1",
-    productName: "Sony WH-1000XM5 Headphones",
-    productUrl: "amazon.com/sony-wh1000xm5",
-    currentPrice: 279,
-    targetPrice: 249,
-    lowestEver: 228,
-    status: "WATCHING",
-    checksToday: 24,
-    lastChecked: "12 minutes ago",
-    retailer: "Amazon",
-  },
-  {
-    id: "pw-2",
-    productName: 'MacBook Pro M4 14"',
-    productUrl: "apple.com/macbook-pro",
-    currentPrice: 1599,
-    targetPrice: 1399,
-    lowestEver: 1499,
-    status: "ALERT_SENT",
-    checksToday: 24,
-    lastChecked: "3 hours ago",
-    alertSentAt: "3 hours ago",
-    alertPrice: 1499,
-    retailer: "Apple",
-  },
-  {
-    id: "pw-3",
-    productName: "Dyson V15 Detect Vacuum",
-    productUrl: "bestbuy.com/dyson-v15",
-    currentPrice: 649,
-    targetPrice: 499,
-    lowestEver: 524,
-    status: "WATCHING",
-    checksToday: 24,
-    lastChecked: "1 hour ago",
-    retailer: "Best Buy",
-  },
-];
-
 export async function GET() {
-  await requireOrganizationRole("MEMBER");
-  return NextResponse.json({ watches: mockWatches });
+  const user = await requireOrganizationRole("MEMBER");
+
+  const workflows = await prisma.workflow.findMany({
+    where: {
+      organizationId: user.organizationId!,
+      definition: { path: ["type"], equals: "pricewatch" },
+    },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      name: true,
+      definition: true,
+      createdAt: true,
+    },
+  });
+
+  const watches = workflows.map((w) => {
+    const def = w.definition as Record<string, unknown>;
+    return {
+      id: w.id,
+      productName: w.name,
+      productUrl: (def.productUrl as string) ?? "",
+      currentPrice: (def.currentPrice as number) ?? (def.targetPrice as number) ?? 0,
+      targetPrice: (def.targetPrice as number) ?? 0,
+      lowestEver: (def.currentPrice as number) ?? (def.targetPrice as number) ?? 0,
+      status: (def.status as string) ?? "WATCHING",
+      checksToday: 0,
+      priceHistory: [(def.currentPrice as number) ?? (def.targetPrice as number) ?? 0],
+      savings: 0,
+      percentOff: 0,
+      lastChecked: "pending",
+      retailer: "Web",
+    };
+  });
+
+  return NextResponse.json({ watches });
 }
 
 export async function POST(request: Request) {
@@ -77,8 +70,14 @@ export async function POST(request: Request) {
         type: "pricewatch",
         productUrl: data.productUrl,
         targetPrice: data.targetPrice,
+        currentPrice: data.currentPrice,
         checkIntervalHours: data.checkIntervalHours,
         status: "WATCHING",
+        naturalLanguageTask: `Monitor the price of ${data.productName} and alert when it drops below $${data.targetPrice}`,
+        steps: [],
+        guardrails: [],
+        timeoutSeconds: 30,
+        retryLimit: 2,
       },
     },
   });
@@ -95,6 +94,16 @@ export async function POST(request: Request) {
       targetPrice: data.targetPrice,
     },
   });
+
+  // Trigger worker (fire-and-forget from server; client also triggers independently)
+  const baseUrl = process.env.NEXTAUTH_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+  if (baseUrl) {
+    const headers: Record<string, string> = {};
+    if (process.env.CRON_SECRET) {
+      headers["authorization"] = `Bearer ${process.env.CRON_SECRET}`;
+    }
+    fetch(`${baseUrl}/api/worker/run`, { headers }).catch(() => null);
+  }
 
   return NextResponse.json({ watchId: workflow.id }, { status: 201 });
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Scale, X, ExternalLink, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
@@ -304,6 +304,17 @@ export function EthicswatchDashboard({ agents }: { agents: Agent[] }) {
   const [monitors, setMonitors] = useState<Monitor[]>(INITIAL_MONITORS);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/internal/ethicswatch")
+      .then((r) => r.json())
+      .then((data: { monitors?: Monitor[] }) => {
+        if (Array.isArray(data.monitors) && data.monitors.length > 0) {
+          setMonitors(data.monitors);
+        }
+      })
+      .catch(() => null);
+  }, []);
   const [formError, setFormError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     organizationName: "",
@@ -379,6 +390,8 @@ export function EthicswatchDashboard({ agents }: { agents: Agent[] }) {
       };
 
       setMonitors((prev) => [newMonitor, ...prev]);
+      // Trigger the worker from browser to process this execution
+      fetch("/api/worker/run").catch(() => null);
       setShowForm(false);
       setFormData({
         organizationName: "",

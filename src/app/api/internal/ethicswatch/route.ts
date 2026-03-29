@@ -24,67 +24,40 @@ const ethicswatchSchema = z.object({
   agentId: z.string().min(1),
 });
 
-const mockMonitors = [
-  {
-    id: "ew-1",
-    organizationName: "Apple Inc.",
-    organizationUrl: "apple.com/environment",
-    categories: ["ESG", "ENVIRONMENT", "SUPPLY_CHAIN"],
-    status: "CHANGE_DETECTED",
-    severity: "HIGH",
-    lastChange: {
-      detectedAt: "2 hours ago",
-      title: "Apple updated 2030 Carbon Neutrality commitment scope",
-      summary:
-        "Apple expanded their supply chain carbon neutrality target from Tier 1 to Tier 3 suppliers, affecting ~200 additional manufacturing partners. New disclosure requirements added for conflict minerals sourcing.",
-      implication:
-        "Significant tightening of supplier ESG requirements. Companies in Apple's supply chain may face new compliance costs.",
-      source:
-        "apple.com/environment/pdf/Apple_Environmental_Progress_Report_2026.pdf",
-      changeType: "POLICY_EXPANSION",
-    },
-    monitoringSince: "6 months ago",
-    changesDetected: 4,
-    lastScanned: "2 hours ago",
-  },
-  {
-    id: "ew-2",
-    organizationName: "SEC (U.S. Securities and Exchange Commission)",
-    organizationUrl: "sec.gov/climate-disclosure",
-    categories: ["REGULATIONS", "ESG", "GOVERNANCE"],
-    status: "CHANGE_DETECTED",
-    severity: "CRITICAL",
-    lastChange: {
-      detectedAt: "6 hours ago",
-      title: "SEC finalized enhanced climate disclosure rules — effective Q2 2026",
-      summary:
-        "The SEC published final amendments to climate-related disclosure requirements. All large accelerated filers must now report Scope 1 and Scope 2 GHG emissions. New rules require disclosure of climate-related risks material to financial condition.",
-      implication:
-        "Every publicly traded company must update 10-K filings. Non-compliance carries material misstatement liability. Legal and compliance teams must begin gap analysis immediately.",
-      source: "sec.gov/rules/final/2026/33-11275.pdf",
-      changeType: "NEW_REGULATION",
-    },
-    monitoringSince: "1 year ago",
-    changesDetected: 12,
-    lastScanned: "6 hours ago",
-  },
-  {
-    id: "ew-3",
-    organizationName: "Microsoft Corporation",
-    organizationUrl: "microsoft.com/en-us/corporate-responsibility",
-    categories: ["ESG", "SOCIAL", "GOVERNANCE"],
-    status: "MONITORING",
-    severity: null,
-    lastChange: null,
-    monitoringSince: "3 months ago",
-    changesDetected: 1,
-    lastScanned: "30 minutes ago",
-  },
-];
-
 export async function GET() {
-  await requireOrganizationRole("MEMBER");
-  return NextResponse.json({ monitors: mockMonitors });
+  const user = await requireOrganizationRole("MEMBER");
+
+  const workflows = await prisma.workflow.findMany({
+    where: {
+      organizationId: user.organizationId!,
+      definition: { path: ["type"], equals: "ethicswatch" },
+    },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      name: true,
+      definition: true,
+      createdAt: true,
+    },
+  });
+
+  const monitors = workflows.map((w) => {
+    const def = w.definition as Record<string, unknown>;
+    return {
+      id: w.id,
+      organizationName: w.name,
+      organizationUrl: (def.organizationUrl as string) ?? "",
+      categories: (def.watchCategories as string[]) ?? [],
+      status: (def.status as string) ?? "MONITORING",
+      severity: null,
+      lastChange: null,
+      monitoringSince: "just added",
+      changesDetected: 0,
+      lastScanned: "pending",
+    };
+  });
+
+  return NextResponse.json({ monitors });
 }
 
 export async function POST(request: Request) {
@@ -104,6 +77,11 @@ export async function POST(request: Request) {
         organizationUrl: data.organizationUrl,
         watchCategories: data.watchCategories,
         status: "MONITORING",
+        naturalLanguageTask: `Monitor ESG and compliance changes for ${data.organizationName} across ${data.watchCategories.join(", ")} categories`,
+        steps: [],
+        guardrails: [],
+        timeoutSeconds: 30,
+        retryLimit: 2,
       },
     },
   });
@@ -120,6 +98,16 @@ export async function POST(request: Request) {
       watchCategories: data.watchCategories,
     },
   });
+
+  // Trigger worker (fire-and-forget from server; client also triggers independently)
+  const baseUrl = process.env.NEXTAUTH_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+  if (baseUrl) {
+    const headers: Record<string, string> = {};
+    if (process.env.CRON_SECRET) {
+      headers["authorization"] = `Bearer ${process.env.CRON_SECRET}`;
+    }
+    fetch(`${baseUrl}/api/worker/run`, { headers }).catch(() => null);
+  }
 
   return NextResponse.json({ watchId: workflow.id }, { status: 201 });
 }

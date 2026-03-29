@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Target,
   Zap,
@@ -185,6 +185,17 @@ export function SnapbuyDashboard({ agents }: { agents: Agent[] }) {
   const [snipes, setSnipes] = useState<Snipe[]>(INITIAL_SNIPES);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/internal/snapbuy")
+      .then((r) => r.json())
+      .then((data: { snipes?: Snipe[] }) => {
+        if (Array.isArray(data.snipes) && data.snipes.length > 0) {
+          setSnipes(data.snipes);
+        }
+      })
+      .catch(() => null);
+  }, []);
   const [formError, setFormError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -234,6 +245,8 @@ export function SnapbuyDashboard({ agents }: { agents: Agent[] }) {
       };
 
       setSnipes((prev) => [newSnipe, ...prev]);
+      // Trigger the worker from browser to process this execution
+      fetch("/api/worker/run").catch(() => null);
       setShowForm(false);
       setFormData({
         name: "",

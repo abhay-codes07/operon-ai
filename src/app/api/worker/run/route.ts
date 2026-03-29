@@ -1,15 +1,20 @@
 import { NextResponse } from "next/server";
 
+import { getAuthSession } from "@/server/auth/session";
 import { prisma } from "@/server/db/client";
 import { runExecutionWithTinyFish } from "@/server/services/executions/tinyfish-execution-runner";
 import { appendExecutionEvent, setExecutionStatus } from "@/server/services/executions/execution-service";
 
 export async function GET(request: Request) {
-  // Verify cron/worker secret in production
+  // Allow: valid CRON_SECRET bearer token, or authenticated user session
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${cronSecret}`) {
+  const auth = request.headers.get("authorization");
+  const isValidCronSecret = cronSecret && auth === `Bearer ${cronSecret}`;
+
+  if (!isValidCronSecret) {
+    // Fall back to checking for a valid user session (browser-triggered)
+    const session = await getAuthSession();
+    if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
   }

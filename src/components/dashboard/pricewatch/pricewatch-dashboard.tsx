@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BellRing, X, ExternalLink, Clock, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
@@ -213,6 +213,17 @@ export function PricewatchDashboard({ agents }: { agents: Agent[] }) {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/internal/pricewatch")
+      .then((r) => r.json())
+      .then((data: { watches?: Watch[] }) => {
+        if (Array.isArray(data.watches) && data.watches.length > 0) {
+          setWatches(data.watches);
+        }
+      })
+      .catch(() => null);
+  }, []);
   const [formData, setFormData] = useState<FormData>({
     productName: "",
     productUrl: "",
@@ -292,6 +303,8 @@ export function PricewatchDashboard({ agents }: { agents: Agent[] }) {
       };
 
       setWatches((prev) => [newWatch, ...prev]);
+      // Trigger the worker from browser to process this execution
+      fetch("/api/worker/run").catch(() => null);
       setShowForm(false);
       setFormData({
         productName: "",

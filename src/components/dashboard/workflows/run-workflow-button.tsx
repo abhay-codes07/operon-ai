@@ -86,8 +86,13 @@ export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonPro
         return;
       }
 
-      const resultJson = await response.json().catch(() => ({}));
+      const resultJson = await response.json().catch(() => ({})) as { executionId?: string };
       console.log("Workflow execution queued successfully:", resultJson);
+
+      // Trigger the worker immediately from the client — fire-and-forget from browser
+      // (server-side fire-and-forget is unreliable on Vercel serverless)
+      fetch("/api/worker/run").catch(() => null);
+
       router.refresh();
     } catch (err) {
       setIsRunning(false);
