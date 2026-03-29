@@ -102,6 +102,7 @@ type RunTinyFishExecutionInput = {
   agentId: string;
   workflowId: string;
   traceId?: string;
+  targetUrlOverride?: string;
 };
 
 type WorkflowDefinitionStep = {
@@ -262,6 +263,7 @@ export async function runExecutionWithTinyFish(
       timeoutSeconds: number;
       retryLimit: number;
     },
+    targetUrlOverride: input.targetUrlOverride,
     metadata: {
       source: "webops-ai",
       traceId: input.traceId,

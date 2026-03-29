@@ -7,6 +7,7 @@ import {
   appendExecutionEvent,
   queueExecution,
 } from "@/server/services/executions/execution-service";
+import { createWorkflowTemplate } from "@/server/services/workflows/workflow-service";
 
 const swarmLaunchSchema = z.object({
   agentId: z.string().trim().min(1),
@@ -24,12 +25,32 @@ export async function POST(request: Request) {
 
   const swarmId = crypto.randomUUID();
 
+  // Resolve workflowId: use provided one, or auto-create a workflow from the task description
+  let resolvedWorkflowId = data.workflowId;
+  if (!resolvedWorkflowId) {
+    const task = data.taskOverride?.trim() || "Swarm agent task";
+    const workflow = await createWorkflowTemplate({
+      organizationId: user.organizationId!,
+      agentId: data.agentId,
+      createdById: user.id,
+      name: `Swarm: ${task.slice(0, 60)}`,
+      definition: {
+        naturalLanguageTask: task,
+        steps: [],
+        guardrails: [],
+        timeoutSeconds: 120,
+        retryLimit: 1,
+      },
+    });
+    resolvedWorkflowId = workflow.id;
+  }
+
   const executions = await Promise.all(
     data.targetUrls.map(async (targetUrl) => {
       const execution = await queueExecution({
         organizationId: user.organizationId!,
         agentId: data.agentId,
-        workflowId: data.workflowId,
+        workflowId: resolvedWorkflowId,
         requestedById: user.id,
         trigger: "MANUAL",
         inputPayload: {

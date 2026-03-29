@@ -9,6 +9,7 @@ type BuildTinyFishExecutionRequestInput = {
   workflowId: string;
   workflowName: string;
   definition: WorkflowDefinition;
+  targetUrlOverride?: string;
   metadata?: Record<string, unknown>;
 };
 
@@ -156,8 +157,12 @@ function isValidUrl(str: string): boolean {
 export function buildTinyFishExecutionRequest(
   input: BuildTinyFishExecutionRequestInput,
 ): TinyFishExecutionRequest {
-  const { url, goalPrefix } = extractUrlAndIntent(input.definition);
-  const goal = buildGoal(input.definition.naturalLanguageTask, goalPrefix);
+  // targetUrlOverride (e.g. from swarm inputPayload) takes highest priority
+  const resolvedDefinition = input.targetUrlOverride
+    ? { ...input.definition, targetUrl: input.targetUrlOverride }
+    : input.definition;
+  const { url, goalPrefix } = extractUrlAndIntent(resolvedDefinition as WorkflowDefinition);
+  const goal = buildGoal(resolvedDefinition.naturalLanguageTask, goalPrefix);
 
   return {
     requestId: input.requestId,
@@ -168,15 +173,15 @@ export function buildTinyFishExecutionRequest(
     naturalLanguageTask: goal,
     url,
     goal,
-    steps: input.definition.steps.map((step) => ({
+    steps: resolvedDefinition.steps.map((step) => ({
       id: step.id,
       action: step.action,
       target: step.target,
       expectedOutcome: step.expectedOutcome,
     })),
-    guardrails: input.definition.guardrails,
-    timeoutSeconds: input.definition.timeoutSeconds,
-    retryLimit: input.definition.retryLimit,
+    guardrails: resolvedDefinition.guardrails,
+    timeoutSeconds: resolvedDefinition.timeoutSeconds,
+    retryLimit: resolvedDefinition.retryLimit,
     metadata: input.metadata,
   };
 }

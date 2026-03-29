@@ -24,19 +24,21 @@ export async function GET(request: Request) {
     }
   }
 
-  // Pick up the oldest QUEUED execution with a workflowId
-  // Process ONE at a time — TinyFish is synchronous and takes 30-90s
+  const url = new URL(request.url);
+  const targetExecutionId = url.searchParams.get("executionId");
+
+  // Pick up a specific execution by ID, or the oldest QUEUED execution with a workflowId
   const execution = await prisma.execution.findFirst({
-    where: {
-      status: "QUEUED",
-      workflowId: { not: null },
-    },
+    where: targetExecutionId
+      ? { id: targetExecutionId, status: "QUEUED", workflowId: { not: null } }
+      : { status: "QUEUED", workflowId: { not: null } },
     orderBy: { createdAt: "asc" },
     select: {
       id: true,
       organizationId: true,
       agentId: true,
       workflowId: true,
+      inputPayload: true,
     },
   });
 
@@ -52,12 +54,16 @@ export async function GET(request: Request) {
   });
 
   try {
+    const inputPayload = execution.inputPayload as Record<string, unknown> | null;
+    const targetUrlOverride = typeof inputPayload?.targetUrl === "string" ? inputPayload.targetUrl : undefined;
+
     await runExecutionWithTinyFish({
       organizationId: execution.organizationId,
       executionId: execution.id,
       agentId: execution.agentId,
       workflowId: execution.workflowId!,
       traceId: crypto.randomUUID(),
+      targetUrlOverride,
     });
 
     return NextResponse.json({ processed: 1, failed: 0, executionId: execution.id });

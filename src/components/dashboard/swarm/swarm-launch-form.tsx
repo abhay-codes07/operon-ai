@@ -75,6 +75,13 @@ export function SwarmLaunchForm({ agents }: SwarmLaunchFormProps) {
       setSuccessInfo({ swarmId: result.swarmId, count: result.executions.length });
       setTaskDescription("");
       setUrlsText("");
+
+      // Trigger one worker per execution in parallel — each targets its specific execution
+      const executionIds: string[] = (result.executions as Array<{ executionId: string }>).map((e) => e.executionId);
+      void Promise.all(
+        executionIds.map((id) => fetch(`/api/worker/run?executionId=${id}`).catch(() => null)),
+      );
+
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");
