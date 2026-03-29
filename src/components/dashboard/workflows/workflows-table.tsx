@@ -81,6 +81,8 @@ export function WorkflowsTable({ items }: WorkflowsTableProps): JSX.Element {
             <div className="flex-shrink-0">
               <RunWorkflowButton
                 workflowId={workflow.id}
+                workflowName={workflow.name}
+                workflowTask={workflow.definition?.naturalLanguageTask}
                 disabled={workflow.status === "ARCHIVED"}
               />
             </div>

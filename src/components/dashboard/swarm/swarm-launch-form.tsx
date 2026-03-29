@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils/cn";
+import { ComplianceApprovalModal } from "@/components/dashboard/shared/compliance-approval-modal";
 
 type Agent = {
   id: string;
@@ -21,6 +22,7 @@ export function SwarmLaunchForm({ agents }: SwarmLaunchFormProps) {
   const [urlsText, setUrlsText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showApproval, setShowApproval] = useState(false);
   const [successInfo, setSuccessInfo] = useState<{
     swarmId: string;
     count: number;
@@ -33,7 +35,7 @@ export function SwarmLaunchForm({ agents }: SwarmLaunchFormProps) {
     "transition-colors",
   );
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setSuccessInfo(null);
@@ -53,7 +55,18 @@ export function SwarmLaunchForm({ agents }: SwarmLaunchFormProps) {
       return;
     }
 
+    // Show compliance approval modal before executing
+    setShowApproval(true);
+  }
+
+  async function executeLaunch() {
+    setShowApproval(false);
     setIsLoading(true);
+
+    const targetUrls = urlsText
+      .split("\n")
+      .map((u) => u.trim())
+      .filter(Boolean);
 
     try {
       const res = await fetch("/api/internal/swarm/launch", {
@@ -196,6 +209,18 @@ export function SwarmLaunchForm({ agents }: SwarmLaunchFormProps) {
           "Launch Swarm"
         )}
       </button>
+
+      {/* Compliance approval modal */}
+      {showApproval && (
+        <ComplianceApprovalModal
+          title="Compliance Approval Required"
+          agentName={agents.find((a) => a.id === agentId)?.name}
+          task={taskDescription.trim() || "Extract information from target websites"}
+          targetUrls={urlsText.split("\n").map((u) => u.trim()).filter(Boolean)}
+          onApprove={executeLaunch}
+          onCancel={() => setShowApproval(false)}
+        />
+      )}
     </form>
   );
 }

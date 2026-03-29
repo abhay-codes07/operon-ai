@@ -7,18 +7,22 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AutonomyModePanel } from "@/components/dashboard/workflows/autonomy-mode-panel";
 import { SimulationPreviewPanel } from "@/components/dashboard/workflows/simulation-preview-panel";
+import { ComplianceApprovalModal } from "@/components/dashboard/shared/compliance-approval-modal";
 
 type RunWorkflowButtonProps = {
   workflowId: string;
+  workflowName?: string;
+  workflowTask?: string;
   disabled?: boolean;
 };
 
-export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonProps): JSX.Element {
+export function RunWorkflowButton({ workflowId, workflowName, workflowTask, disabled }: RunWorkflowButtonProps): JSX.Element {
   const router = useRouter();
   const [isRunning, setIsRunning] = useState(false);
   const [isSimulating, setIsSimulating] = useState(false);
   const [isAutonomyLoading, setIsAutonomyLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showApproval, setShowApproval] = useState(false);
   const [needsComplianceApproval, setNeedsComplianceApproval] = useState(false);
   const [simulation, setSimulation] = useState<{
     id: string;
@@ -48,10 +52,16 @@ export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonPro
     }>;
   } | null>(null);
 
-  async function onRunWorkflow() {
-    setIsRunning(true);
+  function onRunWorkflow() {
     setError(null);
     setNeedsComplianceApproval(false);
+    setShowApproval(true);
+  }
+
+  async function executeWorkflow() {
+    setShowApproval(false);
+    setIsRunning(true);
+    setError(null);
 
     try {
       const response = await fetch(`/api/internal/workflows/${workflowId}/execute`, {
@@ -192,10 +202,21 @@ export function RunWorkflowButton({ workflowId, disabled }: RunWorkflowButtonPro
       {autonomy ? <AutonomyModePanel payload={autonomy} /> : null}
       {error ? <p className="text-xs text-rose-700">{error}</p> : null}
       {needsComplianceApproval ? (
-        <Link href={`/workflows/${workflowId}/compliance`} className="text-xs font-medium text-slate-700 underline">
-          Open Compliance Passport
+        <Link href={`/dashboard/workflows/${workflowId}`} className="text-xs font-medium text-amber-400 underline">
+          View Compliance Passport →
         </Link>
       ) : null}
+
+      {/* Compliance approval modal */}
+      {showApproval && (
+        <ComplianceApprovalModal
+          title="Compliance Approval Required"
+          agentName={workflowName}
+          task={workflowTask ?? "Execute the configured workflow task"}
+          onApprove={executeWorkflow}
+          onCancel={() => setShowApproval(false)}
+        />
+      )}
     </div>
   );
 }

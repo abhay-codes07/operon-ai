@@ -28,15 +28,25 @@ export async function POST(request: Request) {
   // Resolve workflowId: use provided one, or auto-create a workflow from the task description
   let resolvedWorkflowId = data.workflowId;
   if (!resolvedWorkflowId) {
-    const task = data.taskOverride?.trim() || "Swarm agent task";
+    const task = data.taskOverride?.trim() || "Extract information from the target website";
+    // Ensure task meets min(10) length requirement
+    const normalizedTask = task.length >= 10 ? task : `${task} (swarm task)`;
+    const firstUrl = data.targetUrls[0] ?? "the target website";
     const workflow = await createWorkflowTemplate({
       organizationId: user.organizationId!,
       agentId: data.agentId,
       createdById: user.id,
-      name: `Swarm: ${task.slice(0, 60)}`,
+      name: `Swarm: ${normalizedTask.slice(0, 60)}`,
       definition: {
-        naturalLanguageTask: task,
-        steps: [],
+        naturalLanguageTask: normalizedTask,
+        steps: [
+          {
+            id: crypto.randomUUID(),
+            action: "Navigate and extract",
+            target: firstUrl,
+            expectedOutcome: "Extract the requested information from the page",
+          },
+        ],
         guardrails: [],
         timeoutSeconds: 120,
         retryLimit: 1,
